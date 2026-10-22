@@ -205,7 +205,7 @@ const Diary = () => {
                         </p>
                       </div>
                     </div>
-                    <span className="text-xs font-semibold px-2.5 py-1 bg-white group-hover:bg-[#18181B] group-hover:text-white text-gray-700 rounded-full border border-gray-200 transition-colors shadow-sm flex items-center gap-1">
+                    <span className="text-xs font-semibold px-2.5 py-1 bg-white group-hover:bg-amber-400 group-hover:text-[#0B0C10] text-gray-700 rounded-full border border-gray-200 transition-colors shadow-sm flex items-center gap-1">
                       <Check size={13} /> Log
                     </span>
                   </div>

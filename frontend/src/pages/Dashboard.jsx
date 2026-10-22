@@ -106,7 +106,7 @@ const Dashboard = () => {
 
           <button
             onClick={() => navigate('/diary')}
-            className="flex items-center gap-1.5 bg-[#18181B] hover:bg-black text-white px-4 py-1.5 rounded-full text-xs font-semibold shadow-sm transition-all active:scale-95"
+            className="flex items-center gap-1.5 bg-amber-400 hover:bg-amber-300 text-[#0B0C10] px-4 py-1.5 rounded-full text-xs font-semibold shadow-sm transition-all active:scale-95"
           >
             <Plus size={14} /> Log Food
           </button>

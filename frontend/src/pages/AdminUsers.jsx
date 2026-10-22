@@ -193,7 +193,7 @@ const AdminUsers = () => {
     <div className="space-y-6">
       {/* Toast Notification */}
       {successMsg && (
-        <div className="fixed top-20 right-6 z-50 bg-[#18181B] text-white px-5 py-3 rounded-2xl shadow-xl flex items-center gap-3 border border-gray-700 animate-in slide-in-from-top-4 duration-200">
+        <div className="fixed top-20 right-6 z-50 bg-[#24262E] text-white px-5 py-3 rounded-2xl shadow-xl flex items-center gap-3 border border-gray-700 animate-in slide-in-from-top-4 duration-200">
           <CheckCircle2 size={18} className="text-emerald-400 shrink-0" />
           <span className="text-xs font-semibold">{successMsg}</span>
         </div>
@@ -243,7 +243,7 @@ const AdminUsers = () => {
             className={`px-5 py-2.5 rounded-2xl font-bold text-xs flex items-center gap-2 shadow-sm transition-all ${
               isMaxReached
                 ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                : 'bg-[#18181B] hover:bg-black text-white shadow-gray-200 hover:scale-[1.02]'
+                : 'bg-amber-400 hover:bg-amber-300 text-[#0B0C10] shadow-gray-200 hover:scale-[1.02]'
             }`}
           >
             <UserPlus size={15} />
@@ -544,7 +544,7 @@ const AdminUsers = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2.5 bg-[#18181B] hover:bg-black text-white rounded-xl text-xs font-bold shadow-sm"
+                  className="px-5 py-2.5 bg-amber-400 hover:bg-amber-300 text-[#0B0C10] rounded-xl text-xs font-bold shadow-sm"
                 >
                   Create Account
                 </button>
@@ -636,7 +636,7 @@ const AdminUsers = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2.5 bg-[#18181B] hover:bg-black text-white rounded-xl text-xs font-bold shadow-sm"
+                  className="px-5 py-2.5 bg-amber-400 hover:bg-amber-300 text-[#0B0C10] rounded-xl text-xs font-bold shadow-sm"
                 >
                   Save Changes
                 </button>
@@ -756,7 +756,7 @@ const AdminUsers = () => {
             ) : inspectDiary ? (
               <div className="space-y-5">
                 {/* Total Stats Banner */}
-                <div className="grid grid-cols-4 gap-2 bg-[#18181B] text-white p-4 rounded-2xl text-center">
+                <div className="grid grid-cols-4 gap-2 bg-[#24262E] text-white p-4 rounded-2xl text-center">
                   <div>
                     <div className="text-[10px] uppercase font-bold text-gray-400">Calories</div>
                     <div className="text-base font-black text-amber-400">

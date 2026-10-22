@@ -11,10 +11,10 @@ const CalorieRing = ({ calories = 0, goal = 2000, protein = 0, carbs = 0, fat = 
     { name: 'Protein', value: protein * 4, color: '#f97316' }, // Orange for protein
     { name: 'Carbs', value: carbs * 4, color: '#eab308' }, // Yellow for carbs
     { name: 'Fat', value: fat * 9, color: '#ef4444' }, // Red for fat
-    { name: 'Remaining', value: remaining, color: '#e5e7eb' } // Gray
+    { name: 'Remaining', value: remaining, color: '#2A2C34' } // Gray
   ] : [
     { name: 'Consumed', value: calories, color: '#22c55e' },
-    { name: 'Remaining', value: remaining, color: '#e5e7eb' }
+    { name: 'Remaining', value: remaining, color: '#2A2C34' }
   ];
 
   return (

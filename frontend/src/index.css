@@ -3,34 +3,57 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    color-scheme: dark;
+  }
+
   body {
-    background-color: #ECEEF1;
-    color: #111827;
+    background-color: #0B0C10;
+    background-image:
+      radial-gradient(900px 500px at 10% -10%, rgba(245, 158, 11, 0.07), transparent 60%),
+      radial-gradient(800px 500px at 100% 0%, rgba(236, 72, 153, 0.05), transparent 60%);
+    background-attachment: fixed;
+    color: #F4F4F5;
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI", Roboto, sans-serif;
     -webkit-font-smoothing: antialiased;
   }
+
+  /* Slim dark scrollbars */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #2A2C34 transparent;
+  }
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-thumb { background: #2A2C34; border-radius: 9999px; border: 2px solid #0B0C10; }
+  ::-webkit-scrollbar-track { background: transparent; }
 }
 
 @layer components {
   .card, .zentra-card {
-    @apply bg-white rounded-[28px] border border-white/80 transition-all;
-    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.04), 0 2px 6px -1px rgba(0, 0, 0, 0.02);
+    @apply bg-white rounded-[28px] border border-[#fff]/[0.06] transition-all;
+    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5), 0 2px 6px -1px rgba(0, 0, 0, 0.3);
   }
-  
+
   .card:hover, .zentra-card:hover {
-    box-shadow: 0 16px 36px -6px rgba(0, 0, 0, 0.07), 0 4px 10px -2px rgba(0, 0, 0, 0.03);
+    @apply border-[#fff]/[0.1];
+    box-shadow: 0 16px 36px -6px rgba(0, 0, 0, 0.6), 0 4px 10px -2px rgba(0, 0, 0, 0.35);
   }
-  
+
   .btn-primary {
-    @apply bg-[#18181B] hover:bg-black text-white font-semibold py-2 px-5 rounded-full transition-all shadow-sm active:scale-[0.98];
+    @apply bg-amber-400 hover:bg-amber-300 text-[#0B0C10] font-semibold py-2 px-5 rounded-full transition-all shadow-sm active:scale-[0.98];
   }
-  
+
   .btn-secondary {
-    @apply bg-white hover:bg-gray-50 text-gray-700 border border-gray-200/80 font-semibold py-2 px-5 rounded-full transition-all shadow-sm;
+    @apply bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-200/80 font-semibold py-2 px-5 rounded-full transition-all shadow-sm;
   }
-  
+
   .input-field {
-    @apply w-full border border-gray-200 rounded-2xl px-3.5 py-2.5 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition-all;
+    @apply w-full border border-gray-200 rounded-2xl px-3.5 py-2.5 bg-gray-50 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition-all;
+  }
+
+  /* Accent pill used for active tabs and primary actions */
+  .pill-active {
+    @apply bg-amber-400 text-[#0B0C10];
   }
 
   /* Candy-Stripe Diagonal Hatched Utilities */
@@ -73,7 +96,7 @@
 
   /* Frosted Grain Insight Card */
   .gradient-insight {
-    background: linear-gradient(135deg, #7FA7C4 0%, #E39D7D 50%, #E5A85A 100%);
+    background: linear-gradient(135deg, #3B4F7A 0%, #8A4A5E 50%, #A8682A 100%);
     position: relative;
     overflow: hidden;
   }
@@ -81,7 +104,7 @@
     content: "";
     position: absolute;
     inset: 0;
-    background-image: radial-gradient(rgba(255, 255, 255, 0.18) 1px, transparent 1px);
+    background-image: radial-gradient(rgba(255, 255, 255, 0.12) 1px, transparent 1px);
     background-size: 6px 6px;
     opacity: 0.7;
   }

@@ -45,7 +45,7 @@ const Navbar = () => {
   };
 
   return (
-    <header className="bg-[#ECEEF1] py-4 px-4 md:px-8 flex items-center justify-between sticky top-0 z-30 transition-all">
+    <header className="bg-[#0B0C10]/80 backdrop-blur-md border-b border-[#fff]/[0.04] py-4 px-4 md:px-8 flex items-center justify-between sticky top-0 z-30 transition-all">
       <div className="flex items-center gap-6 lg:gap-10">
         {/* Brand Logo with Orange Squircle */}
         <NavLink to="/" className="flex items-center gap-2.5 group">
@@ -65,7 +65,7 @@ const Navbar = () => {
                 to={item.path}
                 className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all flex items-center gap-1.5 ${
                   isActive
-                    ? 'bg-[#18181B] text-white shadow-sm'
+                    ? 'pill-active shadow-sm'
                     : 'text-gray-600 hover:text-gray-950 hover:bg-gray-100/60'
                 }`}
               >

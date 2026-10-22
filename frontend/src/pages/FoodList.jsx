@@ -194,7 +194,7 @@ const FoodList = () => {
               onClick={() => setPortionMode('100g')}
               className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
                 portionMode === '100g'
-                  ? 'bg-[#18181B] text-white shadow-sm'
+                  ? 'pill-active shadow-sm'
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
@@ -204,7 +204,7 @@ const FoodList = () => {
               onClick={() => setPortionMode('serving')}
               className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
                 portionMode === 'serving'
-                  ? 'bg-[#18181B] text-white shadow-sm'
+                  ? 'pill-active shadow-sm'
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
@@ -315,7 +315,7 @@ const FoodList = () => {
                 >
                   <span>{cat.icon}</span>
                   <span>{cat.title.split('(')[0].trim()}</span>
-                  <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${isSelected ? 'bg-white/20 text-white' : 'bg-gray-200 text-gray-600'}`}>
+                  <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${isSelected ? 'bg-[#fff]/20 text-white' : 'bg-gray-200 text-gray-600'}`}>
                     {cat.count}
                   </span>
                 </button>

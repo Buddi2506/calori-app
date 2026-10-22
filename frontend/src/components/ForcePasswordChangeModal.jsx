@@ -128,7 +128,7 @@ const ForcePasswordChangeModal = () => {
           <button
             type="submit"
             disabled={loading || !newPassword || !confirmPassword}
-            className="w-full py-3.5 px-4 bg-[#18181B] hover:bg-black text-white font-bold text-sm rounded-2xl shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
+            className="w-full py-3.5 px-4 bg-amber-400 hover:bg-amber-300 text-[#0B0C10] font-bold text-sm rounded-2xl shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
           >
             {loading ? (
               <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>

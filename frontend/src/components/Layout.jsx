@@ -5,7 +5,7 @@ import Navbar from './Navbar';
 
 const Layout = () => {
   return (
-    <div className="min-h-screen bg-[#ECEEF1] text-gray-900 flex flex-col selection:bg-amber-500 selection:text-white">
+    <div className="min-h-screen text-gray-900 flex flex-col selection:bg-amber-500 selection:text-white">
       {/* Zentra Top Navigation */}
       <Navbar />
 

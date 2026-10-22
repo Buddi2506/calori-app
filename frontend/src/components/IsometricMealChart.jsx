@@ -147,7 +147,7 @@ const IsometricMealChart = ({ mealsData = {}, onMealClick }) => {
                 }`}
               >
                 {/* 3D Chamfered Top Plane */}
-                <div className="h-2.5 w-full bg-white/30 rounded-t-2xl border-b border-white/20"></div>
+                <div className="h-2.5 w-full bg-[#fff]/30 rounded-t-2xl border-b border-white/20"></div>
                 {isSelected && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-8 h-1.5 bg-gray-900/40 rounded-full"></div>
                 )}

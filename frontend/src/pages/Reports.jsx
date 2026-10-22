@@ -33,7 +33,7 @@ const Reports = () => {
               onClick={() => setActiveTab(tab)}
               className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${
                 activeTab === tab
-                  ? 'bg-[#18181B] text-white shadow-sm'
+                  ? 'pill-active shadow-sm'
                   : 'text-gray-600 hover:text-gray-950'
               }`}
             >
@@ -178,7 +178,7 @@ const DailyReport = () => {
                     onClick={() => setNutrientFilter(f.id)}
                     className={`px-3 py-1 rounded-full transition-all ${
                       nutrientFilter === f.id
-                        ? 'bg-[#18181B] text-white shadow-sm'
+                        ? 'pill-active shadow-sm'
                         : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100/60'
                     }`}
                   >
@@ -245,7 +245,7 @@ const DailyReport = () => {
                     <table className="w-full text-xs border-collapse">
                       <thead>
                         <tr className="bg-gray-50/90 text-[11px] font-extrabold text-gray-500 uppercase tracking-wider border-b border-gray-200">
-                          <th className="sticky left-0 bg-gray-100 py-3 px-4 text-left z-20 border-r border-gray-200 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.06)] min-w-[190px]">
+                          <th className="sticky left-0 bg-gray-100 py-3 px-4 text-left z-20 border-r border-gray-200 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.4)] min-w-[190px]">
                             Food
                           </th>
                           <th className="py-3 px-3 text-right min-w-[90px] border-b border-gray-200">Portion</th>
@@ -262,7 +262,7 @@ const DailyReport = () => {
                         {items.map((item) => (
                           <tr key={item.id} className="group hover:bg-amber-50/20 transition-colors">
                             {/* Sticky Food Name Column */}
-                            <td className="sticky left-0 bg-white group-hover:bg-[#FDFBF7] py-3.5 px-4 font-bold text-gray-900 z-10 border-r border-gray-100 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.04)] whitespace-nowrap">
+                            <td className="sticky left-0 bg-white group-hover:bg-[#1E2027] py-3.5 px-4 font-bold text-gray-900 z-10 border-r border-gray-100 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.4)] whitespace-nowrap">
                               <div className="flex flex-col">
                                 <span className="text-xs font-black text-gray-900">{item.food?.name || item.food_name || 'Food'}</span>
                                 {item.food?.category && (
@@ -307,7 +307,7 @@ const DailyReport = () => {
 
                         {/* Meal Totals Summary Row */}
                         <tr className="bg-gray-50/90 border-t-2 border-gray-200 font-black text-xs">
-                          <td className="sticky left-0 bg-gray-100 py-3.5 px-4 z-10 border-r border-gray-200 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.06)] whitespace-nowrap">
+                          <td className="sticky left-0 bg-gray-100 py-3.5 px-4 z-10 border-r border-gray-200 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.4)] whitespace-nowrap">
                             <span className="font-black text-gray-900 uppercase tracking-wider text-[11px]">
                               Total {mealType}
                             </span>
@@ -409,10 +409,10 @@ const WeeklyReport = () => {
             <h3 className="font-extrabold text-gray-900 mb-4 text-base">Daily Calorie Intake</h3>
             <ResponsiveContainer width="100%" height={240}>
               <BarChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                <XAxis dataKey="day" tick={{ fontSize: 12, fill: '#6b7280' }} />
-                <YAxis tick={{ fontSize: 12, fill: '#6b7280' }} />
-                <Tooltip />
+                <CartesianGrid strokeDasharray="3 3" stroke="#2A2C34" />
+                <XAxis dataKey="day" tick={{ fontSize: 12, fill: '#8E8E98' }} />
+                <YAxis tick={{ fontSize: 12, fill: '#8E8E98' }} />
+                <Tooltip contentStyle={{ background: "#1A1B21", border: "1px solid #2A2C34", borderRadius: 12, color: "#F4F4F5" }} cursor={{ fill: "rgba(255,255,255,0.04)" }} />
                 <Bar dataKey="Calories" fill="#10B981" radius={[6, 6, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
@@ -423,10 +423,10 @@ const WeeklyReport = () => {
             <h3 className="font-extrabold text-gray-900 mb-4 text-base">Macro Trend (g/day)</h3>
             <ResponsiveContainer width="100%" height={240}>
               <LineChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                <XAxis dataKey="day" tick={{ fontSize: 12, fill: '#6b7280' }} />
-                <YAxis tick={{ fontSize: 12, fill: '#6b7280' }} />
-                <Tooltip />
+                <CartesianGrid strokeDasharray="3 3" stroke="#2A2C34" />
+                <XAxis dataKey="day" tick={{ fontSize: 12, fill: '#8E8E98' }} />
+                <YAxis tick={{ fontSize: 12, fill: '#8E8E98' }} />
+                <Tooltip contentStyle={{ background: "#1A1B21", border: "1px solid #2A2C34", borderRadius: 12, color: "#F4F4F5" }} cursor={{ fill: "rgba(255,255,255,0.04)" }} />
                 <Legend />
                 <Line type="monotone" dataKey="Protein" stroke={MACRO_COLORS.protein} strokeWidth={2.5} dot={{ r: 4 }} />
                 <Line type="monotone" dataKey="Carbs" stroke={MACRO_COLORS.carbohydrates} strokeWidth={2.5} dot={{ r: 4 }} />

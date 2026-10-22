@@ -19,7 +19,7 @@ const ProtectedRoute = ({ children }) => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#ECEEF1] flex flex-col items-center justify-center gap-3">
+      <div className="min-h-screen bg-[#0B0C10] flex flex-col items-center justify-center gap-3">
         <div className="w-10 h-10 rounded-2xl bg-amber-500 flex items-center justify-center text-white font-black text-lg shadow-md animate-bounce">
           C
         </div>

@@ -44,7 +44,7 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#ECEEF1] flex flex-col justify-center items-center px-4 py-12 selection:bg-amber-500 selection:text-white relative overflow-hidden">
+    <div className="min-h-screen bg-[#0B0C10] flex flex-col justify-center items-center px-4 py-12 selection:bg-amber-500 selection:text-white relative overflow-hidden">
       {/* Ambient background glows */}
       <div className="absolute -top-32 -left-32 w-96 h-96 bg-amber-200/40 rounded-full blur-3xl pointer-events-none"></div>
       <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-rose-200/30 rounded-full blur-3xl pointer-events-none"></div>
@@ -130,7 +130,7 @@ const Login = () => {
             <button
               type="submit"
               disabled={loading || !usernameOrEmail || !password}
-              className="w-full mt-2 py-3.5 px-4 bg-[#18181B] hover:bg-black text-white font-bold text-sm rounded-2xl shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 group"
+              className="w-full mt-2 py-3.5 px-4 bg-amber-400 hover:bg-amber-300 text-[#0B0C10] font-bold text-sm rounded-2xl shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 group"
             >
               {loading ? (
                 <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>

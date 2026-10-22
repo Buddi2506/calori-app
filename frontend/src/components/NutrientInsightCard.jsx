@@ -15,7 +15,7 @@ const NutrientInsightCard = ({ caloriesEaten = 0, calorieGoal = 2000, proteinEat
       
       {/* Glossy Badge */}
       <div className="relative z-10">
-        <span className="text-[11px] font-bold px-3 py-1 rounded-full bg-white/20 backdrop-blur-md border border-white/30 inline-flex items-center gap-1.5 shadow-sm">
+        <span className="text-[11px] font-bold px-3 py-1 rounded-full bg-[#fff]/20 backdrop-blur-md border border-white/30 inline-flex items-center gap-1.5 shadow-sm">
           <Sparkles size={13} /> Nutrient Insight
         </span>
 

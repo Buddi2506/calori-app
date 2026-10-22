@@ -28,7 +28,7 @@ const Sidebar = () => {
               className={({ isActive }) =>
                 `flex flex-col items-center justify-center py-1.5 px-3 rounded-full transition-all ${
                   isActive 
-                    ? 'bg-[#18181B] text-white shadow-sm' 
+                    ? 'pill-active shadow-sm' 
                     : 'text-gray-500 hover:text-gray-900'
                 }`
               }
