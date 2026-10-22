@@ -93,19 +93,4 @@
       #D97706 10px
     );
   }
-
-  /* Frosted Grain Insight Card */
-  .gradient-insight {
-    background: linear-gradient(135deg, #3B4F7A 0%, #8A4A5E 50%, #A8682A 100%);
-    position: relative;
-    overflow: hidden;
-  }
-  .gradient-insight::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background-image: radial-gradient(rgba(255, 255, 255, 0.12) 1px, transparent 1px);
-    background-size: 6px 6px;
-    opacity: 0.7;
-  }
 }

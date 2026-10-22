@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 from datetime import date
 
@@ -7,6 +8,7 @@ from ..models.diary import DiaryEntry
 from ..models.food import Food
 from ..models.user import User
 from ..schemas.diary import DiaryEntryCreate, DiaryEntryRead
+from ..schemas.food import FoodRead
 from ..services.calculations import calculate_nutrients
 from ..services.security import get_current_user
 
@@ -71,6 +73,37 @@ def _entry_to_dict(e: DiaryEntry) -> dict:
         **{k: round(getattr(e, k, 0) or 0, 2) for k in NUTRIENT_KEYS},
         "created_at": str(e.created_at),
     }
+
+
+# Declared before "/{date_str}" so "recent-foods" isn't parsed as a date.
+@router.get("/recent-foods")
+def recent_foods(
+    limit: int = 8,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """The user's most recently logged foods, newest first, with the portion last used."""
+    latest = (
+        db.query(DiaryEntry.food_id, func.max(DiaryEntry.id).label("last_id"))
+        .filter(DiaryEntry.user_id == current_user.id)
+        .group_by(DiaryEntry.food_id)
+        .subquery()
+    )
+    entries = (
+        db.query(DiaryEntry)
+        .join(latest, DiaryEntry.id == latest.c.last_id)
+        .order_by(DiaryEntry.id.desc())
+        .limit(max(1, min(limit, 20)))
+        .all()
+    )
+    return [
+        {
+            "food": FoodRead.model_validate(e.food).model_dump(),
+            "quantity_display": e.quantity_display,
+            "quantity_unit": e.quantity_unit,
+        }
+        for e in entries if e.food
+    ]
 
 
 @router.get("/{date_str}")

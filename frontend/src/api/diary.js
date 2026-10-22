@@ -19,3 +19,8 @@ export const deleteDiaryEntry = async (id) => {
   const { data } = await client.delete(`/diary/entries/${id}`);
   return data;
 };
+
+export const getRecentFoods = async (limit = 8) => {
+  const { data } = await client.get('/diary/recent-foods', { params: { limit } });
+  return data;
+};

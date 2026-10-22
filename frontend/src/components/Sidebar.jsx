@@ -26,7 +26,7 @@ const Sidebar = () => {
               key={item.path}
               to={item.path}
               className={({ isActive }) =>
-                `flex flex-col items-center justify-center py-1.5 px-3 rounded-full transition-all ${
+                `flex-1 min-w-0 flex flex-col items-center justify-center py-1.5 px-1 rounded-full transition-all ${
                   isActive 
                     ? 'pill-active shadow-sm' 
                     : 'text-gray-500 hover:text-gray-900'
