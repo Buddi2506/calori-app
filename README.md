@@ -48,6 +48,34 @@ Your data is always safe in Docker volumes — stopping doesn't delete anything.
 
 ---
 
+## 💾 Backups
+
+The `db-backup` service saves a backup to `backups/` when it starts and then once a day, and deletes
+backups older than 14 days. The `backups/` folder is ignored by git because it holds your personal data.
+
+Take a backup right now:
+
+```bash
+scripts/backup_db.sh
+```
+
+Restore one (replaces all current data, after saving a safety backup first):
+
+```bash
+scripts/restore_db.sh backups/calori_YYYY-MM-DD_HHMMSS.dump
+```
+
+## 🗄️ Database Changes
+
+The schema is managed with Alembic, and the backend applies pending migrations when it starts.
+To change the schema, edit the models in `backend/app/models/`, then create a migration:
+
+```bash
+docker exec calori_backend alembic revision --autogenerate -m "describe the change"
+```
+
+---
+
 ## 🔑 USDA API Key (Optional but Recommended)
 
 The app uses `DEMO_KEY` by default which has rate limits. For better micronutrient data:

@@ -71,3 +71,6 @@ calori.pub
 id_rsa*
 id_ed25519*
 .chrome-temp/
+
+# Database backups (contain personal data)
+backups/

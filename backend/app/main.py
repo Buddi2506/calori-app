@@ -1,7 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .routers import foods, diary, meals, goals, reports, auth, admin
-from .database import engine, Base, SessionLocal
+from .database import SessionLocal
+from .migrate import run_migrations
 from .models.food import Food
 from .models.user import User
 from .services.security import hash_password
@@ -152,7 +153,7 @@ def seed_admin_user(db):
 
 @app.on_event("startup")
 def startup():
-    Base.metadata.create_all(bind=engine)
+    run_migrations()
     db = SessionLocal()
     try:
         seed_admin_user(db)

@@ -22,6 +22,35 @@ services:
       retries: 5
 
   # ─────────────────────────────────────────────────────────────────
+  # Daily Database Backups — saved to ./backups, kept for 14 days
+  # Restore with: scripts/restore_db.sh backups/<file>.dump
+  # ─────────────────────────────────────────────────────────────────
+  db-backup:
+    image: postgres:16-alpine
+    container_name: calori_db_backup
+    restart: unless-stopped
+    environment:
+      PGHOST: db
+      PGUSER: ${POSTGRES_USER:-calori}
+      PGPASSWORD: ${POSTGRES_PASSWORD:-calori_secret}
+      PGDATABASE: ${POSTGRES_DB:-calori}
+      TZ: ${TZ:-Asia/Kolkata}
+    volumes:
+      - ./backups:/backups
+    depends_on:
+      db:
+        condition: service_healthy
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        while true; do
+          f=/backups/calori_$$(date +%Y-%m-%d_%H%M%S).dump
+          if pg_dump -Fc -f "$$f.tmp"; then mv "$$f.tmp" "$$f"; echo "Saved $$f"; else rm -f "$$f.tmp"; echo "Backup failed"; fi
+          find /backups -name 'calori_*.dump' -mtime +14 -delete
+          sleep 86400
+        done
+
+  # ─────────────────────────────────────────────────────────────────
   # Redis Cache — stores API results for offline use
   # ─────────────────────────────────────────────────────────────────
   redis:

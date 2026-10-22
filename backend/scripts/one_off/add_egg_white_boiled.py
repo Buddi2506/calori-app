@@ -6,7 +6,7 @@ import sys
 import json
 from datetime import datetime
 
-sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
 from app.database import SessionLocal
 from app.models.food import Food
@@ -92,7 +92,7 @@ def add_to_db():
         db.close()
 
 def add_to_seed_json():
-    json_path = os.path.join(os.path.dirname(__file__), "seeds", "south_indian_foods.json")
+    json_path = os.path.join(os.path.dirname(__file__), "..", "..", "seeds", "south_indian_foods.json")
     if not os.path.exists(json_path):
         print(f"Seed file not found: {json_path}")
         return

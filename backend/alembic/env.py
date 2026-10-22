@@ -8,11 +8,13 @@ import app.models.food
 import app.models.diary
 import app.models.meal
 import app.models.goal
+import app.models.user
 
 config = context.config
 config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)
 if config.config_file_name is not None:
-    fileConfig(config.config_file_name)
+    # Keep uvicorn's loggers working when migrations run inside the app on startup
+    fileConfig(config.config_file_name, disable_existing_loggers=False)
 
 target_metadata = Base.metadata
 
