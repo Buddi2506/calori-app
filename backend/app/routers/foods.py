@@ -6,10 +6,14 @@ import json
 import time
 from ..database import get_db, SessionLocal
 from ..models.food import Food
+from ..models.diary import DiaryEntry
+from ..models.meal import CustomMealItem
 from ..schemas.food import FoodRead, FoodCreate
 from ..services.nutrition_api import search_external, get_redis
+from ..services.security import get_current_user, require_admin
 
-router = APIRouter(prefix="/api/foods", tags=["Foods"])
+# Every food endpoint needs a signed-in user; editing or deleting shared foods needs an admin.
+router = APIRouter(prefix="/api/foods", tags=["Foods"], dependencies=[Depends(get_current_user)])
 
 _library_mem_cache: Dict[str, Any] = {}
 _library_mem_cache_time: float = 0.0
@@ -495,7 +499,7 @@ def create_custom_food(food: FoodCreate, db: Session = Depends(get_db)):
     return f
 
 
-@router.put("/custom/{food_id}", response_model=FoodRead)
+@router.put("/custom/{food_id}", response_model=FoodRead, dependencies=[Depends(require_admin)])
 def update_custom_food(food_id: int, food: FoodCreate, db: Session = Depends(get_db)):
     f = db.query(Food).filter(Food.id == food_id, Food.is_custom == True).first()
     if not f:
@@ -508,11 +512,17 @@ def update_custom_food(food_id: int, food: FoodCreate, db: Session = Depends(get
     return f
 
 
-@router.delete("/custom/{food_id}")
+@router.delete("/custom/{food_id}", dependencies=[Depends(require_admin)])
 def delete_custom_food(food_id: int, db: Session = Depends(get_db)):
     f = db.query(Food).filter(Food.id == food_id, Food.is_custom == True).first()
     if not f:
         raise HTTPException(status_code=404, detail="Custom food not found")
+    in_use = (
+        db.query(DiaryEntry.id).filter(DiaryEntry.food_id == food_id).first()
+        or db.query(CustomMealItem.id).filter(CustomMealItem.food_id == food_id).first()
+    )
+    if in_use:
+        raise HTTPException(status_code=409, detail="This food is used in a diary or custom meal and can't be deleted")
     db.delete(f)
     db.commit()
     _invalidate_library_cache()

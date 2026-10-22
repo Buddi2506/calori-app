@@ -1,7 +1,7 @@
 """
 Safe database migration script:
 1. Creates users table if missing.
-2. Creates the initial Super Admin account (Nithin-Kiran / Nithin@987).
+2. Creates the initial Super Admin account (password from ADMIN_PASSWORD in the environment).
 3. Adds user_id columns to diary_entries, nutrition_goals, and custom_meals.
 4. Migrates all existing records to the Super Admin account without data loss.
 """
@@ -17,7 +17,7 @@ from app.models.goal import NutritionGoal
 from app.services.security import hash_password
 
 ADMIN_USERNAME = "Nithin-Kiran"
-ADMIN_PASSWORD = "Nithin@987"
+ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD")
 ADMIN_FULL_NAME = "Nithin Kiran"
 ADMIN_EMAIL = "nithin.kiran@calori.app"
 
@@ -52,6 +52,8 @@ def run_migration():
         # 2. Find or create Super Admin
         admin = db.query(User).filter(User.username == ADMIN_USERNAME).first()
         if not admin:
+            if not ADMIN_PASSWORD:
+                sys.exit("Set ADMIN_PASSWORD in the environment to create the Super Admin account.")
             admin = User(
                 username=ADMIN_USERNAME,
                 email=ADMIN_EMAIL,

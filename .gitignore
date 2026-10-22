@@ -63,3 +63,11 @@ calori_redis_data/
 
 # Logs
 *.log
+
+# SSH keys and local tool data (never commit)
+calori
+calori.pub
+*.pem
+id_rsa*
+id_ed25519*
+.chrome-temp/

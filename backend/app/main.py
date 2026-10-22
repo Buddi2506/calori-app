@@ -15,7 +15,8 @@ app = FastAPI(title="Calori — Personal Nutrition Tracker", version="1.0.0")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    # The UI calls the API through the Vite proxy (same origin), so only local dev origins are allowed here.
+    allow_origins=os.getenv("CORS_ORIGINS", "http://localhost:3000,http://localhost:5173").split(","),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -125,22 +126,28 @@ def create_default_goals(db):
 
 
 def seed_admin_user(db):
-    """Ensure Super Admin Nithin-Kiran exists."""
-    admin = db.query(User).filter(User.username == "Nithin-Kiran").first()
-    if not admin:
-        admin = User(
-            username="Nithin-Kiran",
-            email="nithin@calori.app",
-            full_name="Nithin Kiran",
-            hashed_password=hash_password("Nithin@987"),
-            role="admin",
-            is_active=True,
-            must_change_password=False,
-            calorie_target=2000.0,
-        )
-        db.add(admin)
-        db.commit()
-        logger.info("✅ Seeded super admin account: Nithin-Kiran")
+    """Create the first admin from ADMIN_USERNAME / ADMIN_PASSWORD in .env if no admin exists yet."""
+    if db.query(User).filter(User.role == "admin").first():
+        return
+
+    username = os.getenv("ADMIN_USERNAME", "Nithin-Kiran")
+    password = os.getenv("ADMIN_PASSWORD")
+    if not password:
+        logger.warning("No admin account exists. Set ADMIN_PASSWORD in .env to create one on startup.")
+        return
+
+    db.add(User(
+        username=username,
+        email=os.getenv("ADMIN_EMAIL", "nithin@calori.app"),
+        full_name=os.getenv("ADMIN_FULL_NAME", "Nithin Kiran"),
+        hashed_password=hash_password(password),
+        role="admin",
+        is_active=True,
+        must_change_password=True,
+        calorie_target=2000.0,
+    ))
+    db.commit()
+    logger.info("✅ Seeded admin account: %s", username)
 
 
 @app.on_event("startup")

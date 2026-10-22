@@ -10,7 +10,14 @@ from sqlalchemy.orm import Session
 from ..database import get_db
 from ..models.user import User
 
-SECRET_KEY = os.getenv("JWT_SECRET_KEY", "calori-super-secret-jwt-key-2026-prod-secure")
+SECRET_KEY = os.getenv("JWT_SECRET_KEY", "")
+# Refuse to start with no secret, or with the old default that is public in git history,
+# since anyone who knows the key can sign a login token for any account.
+if len(SECRET_KEY) < 32 or SECRET_KEY == "calori-super-secret-jwt-key-2026-prod-secure":
+    raise RuntimeError(
+        "JWT_SECRET_KEY is missing or insecure. Generate one with "
+        "`python -c \"import secrets; print(secrets.token_urlsafe(48))\"` and set it in .env"
+    )
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_DAYS = 30
 
