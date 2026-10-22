@@ -8,6 +8,22 @@ const initialPortion = (food) => {
   return unit !== 'g' && unit !== 'ml' ? { unit, quantity: 1 } : { unit: 'g', quantity: 100 };
 };
 
+// Grams for an amount, mirroring resolve_quantity_in_grams in backend/app/routers/diary.py
+// so the preview matches what the server logs.
+const portionGrams = (food, quantity, unit) => {
+  const qty = parseFloat(quantity) || 0;
+  const weight = food.serving_unit_weight_g;
+  if (unit === 'g' || unit === 'ml') return qty;
+  if (unit === 'scoop') return qty * (weight || 33);
+  if (unit === 'piece' && weight) return qty * weight;
+  if (unit === 'glass') return qty * (food.serving_unit === 'glass' ? weight : 200);
+  if (unit === 'cup') return qty * (food.serving_unit === 'cup' ? weight : 240);
+  if (unit === 'tbsp') return qty * 15;
+  if (unit === 'tsp') return qty * 5;
+  if (food.serving_unit && unit === food.serving_unit.toLowerCase() && weight) return qty * weight;
+  return qty;
+};
+
 // Log a library food straight to the diary. Meal and date live in the page so they persist between logs.
 const QuickLogModal = ({ food: logModalFood, logMealType, setLogMealType, logDate, setLogDate, onClose }) => {
   const [logQuantity, setLogQuantity] = useState(() => initialPortion(logModalFood).quantity);
@@ -122,7 +138,7 @@ const QuickLogModal = ({ food: logModalFood, logMealType, setLogMealType, logDat
                       1 {logModalFood.serving_unit.charAt(0).toUpperCase() + logModalFood.serving_unit.slice(1)} ({logModalFood.serving_unit_weight_g}g)
                     </option>
                   )}
-                  <option value="cup">Cup (~150g)</option>
+                  <option value="cup">Cup (~240g)</option>
                   <option value="tbsp">Tablespoon (15g)</option>
                   <option value="tsp">Teaspoon (5g)</option>
                   <option value="ml">Milliliters (ml)</option>
@@ -135,19 +151,11 @@ const QuickLogModal = ({ food: logModalFood, logMealType, setLogMealType, logDat
               <span className="text-xs font-bold text-emerald-800">Total Nutrition for this entry:</span>
               <span className="text-sm font-black text-emerald-900">
                 {(() => {
-                  const qty = parseFloat(logQuantity) || 0;
-                  let grams = qty;
-                  if (logUnit === logModalFood.serving_unit && logModalFood.serving_unit_weight_g) {
-                    grams = qty * logModalFood.serving_unit_weight_g;
-                  } else if (logUnit === 'cup') {
-                    grams = qty * 150;
-                  } else if (logUnit === 'tbsp') {
-                    grams = qty * 15;
-                  } else if (logUnit === 'tsp') {
-                    grams = qty * 5;
-                  }
-                  const cal = Math.round(((logModalFood.calories || 0) * grams) / 100);
-                  const pro = (((logModalFood.protein || 0) * grams) / 100).toFixed(1);
+                  // Library foods carry their nutrients in per_100g, not at the top level
+                  const per100 = logModalFood.per_100g || logModalFood;
+                  const grams = portionGrams(logModalFood, logQuantity, logUnit);
+                  const cal = Math.round(((per100.calories || 0) * grams) / 100);
+                  const pro = (((per100.protein || 0) * grams) / 100).toFixed(1);
                   return `${cal} kcal • ${pro}g Protein (${Math.round(grams)}g)`;
                 })()}
               </span>

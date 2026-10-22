@@ -71,8 +71,12 @@ const FoodList = () => {
     setExpandedCategories(all);
   };
 
+  // Categories missing from the map count as open, so collapse each one explicitly
   const collapseAll = () => {
-    setExpandedCategories({});
+    if (!libraryData) return;
+    const none = {};
+    libraryData.categories.forEach(c => { none[c.id] = false; });
+    setExpandedCategories(none);
   };
 
   // Filter categories and items based on search & category filter
