@@ -4,7 +4,7 @@ import ExerciseLog from './ExerciseLog';
 import ExercisePicker from '../../components/workouts/ExercisePicker';
 import ExerciseInfoModal from '../../components/workouts/ExerciseInfoModal';
 import { getWorkout, getLastSets, updateWorkout, deleteWorkout } from '../../api/workouts';
-import { formatDuration } from '../../utils/workouts';
+import { formatDuration, bodyPartForName } from '../../utils/workouts';
 
 const RECORD_LABELS = { weight: 'heaviest weight', est_1rm: 'best estimated max', reps: 'most reps', hold: 'longest hold' };
 
@@ -89,7 +89,7 @@ const WorkoutSessionView = ({ initialSession, plan, openPicker, onDeleted, onToa
   const t = totals(session);
   const summary = [
     t.sets ? `${t.sets} working ${t.sets === 1 ? 'set' : 'sets'}` : null,
-    t.volume ? `${t.volume.toLocaleString()} kg lifted` : null,
+    t.volume ? `${t.volume.toLocaleString()} kg volume` : null,
     t.cardioSeconds ? `${formatDuration(t.cardioSeconds)} cardio` : null,
   ].filter(Boolean).join(' · ');
 
@@ -177,6 +177,7 @@ const WorkoutSessionView = ({ initialSession, plan, openPicker, onDeleted, onToa
         <ExercisePicker
           title={picker === 'cardio' ? 'Add cardio' : 'Add exercise'}
           cardioOnly={picker === 'cardio'}
+          initialPart={bodyPartForName(session.name)}
           excludeIds={entries.map((e) => e.exercise.id)}
           onClose={() => setPicker(null)}
           onPick={(exercise) => {

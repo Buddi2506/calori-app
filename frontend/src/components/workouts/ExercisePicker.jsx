@@ -4,9 +4,11 @@ import Modal, { FieldLabel } from '../ui/Modal';
 import Segmented from '../ui/Segmented';
 import MuscleMap from './MuscleMap';
 import { getExercises, getExerciseOptions, createExercise } from '../../api/workouts';
-import { CATEGORY_LABELS, KIND_LABELS, musclesLabel, apiErrorMessage } from '../../utils/workouts';
+import { CATEGORY_LABELS, KIND_LABELS, BODY_PARTS, inBodyPart, musclesLabel, apiErrorMessage } from '../../utils/workouts';
 
-const CATEGORY_TABS = [{ id: 'all', label: 'All' }, ...Object.entries(CATEGORY_LABELS).map(([id, label]) => ({ id, label }))];
+const PART_TABS = [{ id: 'all', label: 'All' }, ...BODY_PARTS.map(({ id, label }) => ({ id, label }))];
+// Starting "day type" for a new exercise created while browsing a body part
+const CATEGORY_FOR_PART = { chest: 'push', shoulders: 'push', arms: 'push', back: 'pull', legs: 'legs', core: 'core', cardio: 'cardio' };
 
 // Toggle chips for picking muscles.
 const MuscleChips = ({ options, value, onChange, disabled = [] }) => (
@@ -118,11 +120,11 @@ const CustomExerciseForm = ({ initialName, initialCategory, onCreated, onBack })
   );
 };
 
-// Search the exercise list and pick one. `cardioOnly` limits it to cardio.
-const ExercisePicker = ({ title = 'Add exercise', initialCategory = 'all', cardioOnly = false, excludeIds = [], onPick, onClose }) => {
+// Search the exercise list and pick one, browsing by body part. `cardioOnly` limits it to cardio.
+const ExercisePicker = ({ title = 'Add exercise', initialPart = 'all', cardioOnly = false, excludeIds = [], onPick, onClose }) => {
   const [all, setAll] = useState(null);
   const [query, setQuery] = useState('');
-  const [category, setCategory] = useState(cardioOnly ? 'cardio' : initialCategory);
+  const [part, setPart] = useState(cardioOnly ? 'cardio' : initialPart);
   const [creating, setCreating] = useState(false);
 
   useEffect(() => {
@@ -133,16 +135,16 @@ const ExercisePicker = ({ title = 'Add exercise', initialCategory = 'all', cardi
     const q = query.trim().toLowerCase();
     return (all || []).filter((e) =>
       !excludeIds.includes(e.id) &&
-      (category === 'all' || e.category === category) &&
+      inBodyPart(e, part) &&
       (!q || e.name.toLowerCase().includes(q) || musclesLabel(e).includes(q) || (e.equipment || '').includes(q))
     );
-  }, [all, query, category, excludeIds]);
+  }, [all, query, part, excludeIds]);
 
   return (
     <Modal title={creating ? 'New exercise' : title} size="lg" onClose={onClose} bodyClassName="p-0">
       {creating ? (
         <div className="p-5 sm:p-6">
-          <CustomExerciseForm initialName={query} initialCategory={category} onCreated={onPick} onBack={() => setCreating(false)} />
+          <CustomExerciseForm initialName={query} initialCategory={CATEGORY_FOR_PART[part]} onCreated={onPick} onBack={() => setCreating(false)} />
         </div>
       ) : (
         <div className="flex flex-col">
@@ -160,7 +162,7 @@ const ExercisePicker = ({ title = 'Add exercise', initialCategory = 'all', cardi
             </div>
             {!cardioOnly && (
               <div className="overflow-x-auto -mx-1 px-1">
-                <Segmented label="Exercise type" options={CATEGORY_TABS} value={category} onChange={setCategory} className="w-max" />
+                <Segmented label="Body part" options={PART_TABS} value={part} onChange={setPart} className="w-max" />
               </div>
             )}
           </div>

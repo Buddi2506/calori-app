@@ -8,14 +8,14 @@ import WorkoutTabs from '../components/workouts/WorkoutTabs';
 import { PeriodNav } from './reports/shared';
 import { listWorkouts, getSplit } from '../api/workouts';
 import { formatApiDate } from '../utils/formatters';
-import { workoutColor, CARDIO_COLOR, OTHER_COLOR } from '../utils/workouts';
+import { workoutColor, CARDIO_COLOR, OTHER_COLOR, VOLUME_EXPLANATION } from '../utils/workouts';
 
 const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 const summaryLine = (w) => [
   w.exercise_count ? `${w.exercise_count} ${w.exercise_count === 1 ? 'exercise' : 'exercises'}` : null,
   w.working_sets ? `${w.working_sets} sets` : null,
-  w.volume_kg ? `${Math.round(w.volume_kg).toLocaleString()} kg` : null,
+  w.volume_kg ? `${Math.round(w.volume_kg).toLocaleString()} kg volume` : null,
   w.cardio_minutes ? `${Math.round(w.cardio_minutes)} min cardio` : null,
 ].filter(Boolean).join(' · ') || 'Nothing logged';
 
@@ -27,7 +27,7 @@ const WorkoutHistory = () => {
   const [splitNames, setSplitNames] = useState([]);
 
   useEffect(() => {
-    getSplit().then((s) => setSplitNames(s.map((d) => d.name))).catch(() => {});
+    getSplit().then((s) => setSplitNames(s.filter((d) => !d.is_rest).map((d) => d.name))).catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -75,7 +75,8 @@ const WorkoutHistory = () => {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard label="Days trained" value={workouts ? totals.days : '–'} accent="stripe-amber" />
         <StatCard label="Working sets" value={workouts ? totals.sets : '–'} accent="stripe-green" />
-        <StatCard label="Lifted" value={workouts ? Math.round(totals.volume).toLocaleString() : '–'} unit="kg" accent="stripe-blue" />
+        <StatCard label="Volume" value={workouts ? Math.round(totals.volume).toLocaleString() : '–'} unit="kg"
+          note="Weight × reps, all working sets" title={VOLUME_EXPLANATION} accent="stripe-blue" />
         <StatCard label="Cardio" value={workouts ? Math.round(totals.cardio) : '–'} unit="min" accent="stripe-pink" />
       </div>
 

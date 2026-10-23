@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { format, parseISO } from 'date-fns';
-import { Play, HeartPulse, Plus, Settings2 } from 'lucide-react';
+import { Play, HeartPulse, Plus, Settings2, Moon } from 'lucide-react';
 import MuscleMap from '../../components/workouts/MuscleMap';
 import Segmented from '../../components/ui/Segmented';
 import { getLastSets } from '../../api/workouts';
@@ -9,8 +9,14 @@ import { formatSet, formatTarget } from '../../utils/workouts';
 
 // Before a workout starts: pick the split day (the next one in rotation is preselected),
 // see the plan with last time's numbers, then start. Also the way in for cardio-only days.
-const StartCard = ({ split, suggestedDayId, isToday, onStart, starting }) => {
-  const [dayId, setDayId] = useState(suggestedDayId ?? split[0]?.id ?? null);
+// On a rest day it shows a rest card first, with the option to train anyway.
+const StartCard = ({ split: fullSplit, suggestedDayId, nextTrainingDayId, isToday, onStart, starting }) => {
+  const split = fullSplit.filter((d) => !d.is_rest);
+  const suggested = fullSplit.find((d) => d.id === suggestedDayId);
+  const restDay = Boolean(suggested?.is_rest);
+  const [trainAnyway, setTrainAnyway] = useState(false);
+  const firstPick = restDay ? nextTrainingDayId : suggestedDayId;
+  const [dayId, setDayId] = useState(firstPick ?? split[0]?.id ?? null);
   const [last, setLast] = useState({});
   const day = split.find((d) => d.id === dayId);
 
@@ -18,6 +24,34 @@ const StartCard = ({ split, suggestedDayId, isToday, onStart, starting }) => {
     const ids = (day?.exercises || []).map((e) => e.exercise.id);
     getLastSets(ids).then(setLast).catch(() => setLast({}));
   }, [day]);
+
+  if (restDay && !trainAnyway) {
+    const next = split.find((d) => d.id === nextTrainingDayId);
+    return (
+      <section className="zentra-card p-6 flex flex-col gap-4">
+        <div className="flex items-start gap-4">
+          <span className="w-12 h-12 rounded-2xl bg-gray-100 text-gray-700 flex items-center justify-center shrink-0" aria-hidden="true">
+            <Moon size={22} />
+          </span>
+          <div>
+            <span className="text-xs font-bold uppercase tracking-wider text-gray-500">{isToday ? 'Today' : 'This day'} · in your rotation</span>
+            <h2 className="text-2xl font-black tracking-tight text-gray-900">Rest day</h2>
+            <p className="text-sm text-gray-500 mt-1">
+              Recovery is when muscles grow. {next ? <>Next up: <span className="font-bold text-gray-900">{next.name}</span>.</> : null}
+            </p>
+          </div>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <button onClick={() => onStart({ cardio: true })} disabled={starting} className="btn-secondary h-11 text-sm flex items-center gap-2">
+            <HeartPulse size={17} /> Light cardio
+          </button>
+          <button onClick={() => setTrainAnyway(true)} className="btn-secondary h-11 text-sm flex items-center gap-2">
+            <Play size={16} /> Train anyway
+          </button>
+        </div>
+      </section>
+    );
+  }
 
   if (!split.length) {
     return (
@@ -47,7 +81,7 @@ const StartCard = ({ split, suggestedDayId, isToday, onStart, starting }) => {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <span className="text-xs font-bold uppercase tracking-wider text-gray-500">
-            {isToday ? 'Today' : 'This day'}{dayId === suggestedDayId ? ' · next in your rotation' : ''}
+            {isToday ? 'Today' : 'This day'}{dayId === firstPick ? (restDay ? ' · next after your rest day' : ' · next in your rotation') : ''}
           </span>
           <h2 className="text-2xl font-black tracking-tight text-gray-900">{day?.name}</h2>
         </div>

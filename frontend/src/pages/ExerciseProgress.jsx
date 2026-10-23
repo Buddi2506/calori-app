@@ -9,7 +9,7 @@ import PageHeader from '../components/ui/PageHeader';
 import Segmented from '../components/ui/Segmented';
 import MuscleMap from '../components/workouts/MuscleMap';
 import { getExerciseProgress } from '../api/workouts';
-import { CATEGORY_LABELS, formatDuration, formatPace } from '../utils/workouts';
+import { CATEGORY_LABELS, formatDuration, formatPace, VOLUME_EXPLANATION } from '../utils/workouts';
 
 const RANGES = [{ id: 90, label: '3M' }, { id: 180, label: '6M' }, { id: 365, label: '1Y' }, { id: 3650, label: 'All' }];
 const AXIS = { fontSize: 12, fill: '#8E8E98' };
@@ -25,7 +25,7 @@ const RECORD_CARDS = {
   strength: [
     { key: 'heaviest_kg', label: 'Heaviest weight', show: (v) => `${v} kg` },
     { key: 'best_est_1rm_kg', label: 'Best estimated max', show: (v) => `${Math.round(v)} kg`, note: 'One-rep max worked out from your sets' },
-    { key: 'best_volume_kg', label: 'Most in one workout', show: (v) => `${Math.round(v).toLocaleString()} kg`, note: 'Weight × reps, added up' },
+    { key: 'best_volume_kg', label: 'Best volume', show: (v) => `${Math.round(v).toLocaleString()} kg`, note: 'Most in one workout (weight × reps, added up)' },
     { key: 'most_reps', label: 'Most reps in a set', show: (v) => `${v}` },
   ],
   timed: [{ key: 'longest_hold_seconds', label: 'Longest hold', show: (v) => formatDuration(v) }],
@@ -36,9 +36,12 @@ const RECORD_CARDS = {
   ],
 };
 
-const ChartCard = ({ title, children }) => (
+const ChartCard = ({ title, note, children }) => (
   <section className="zentra-card p-5 sm:p-6 flex flex-col gap-3">
-    <h2 className="text-base font-extrabold text-gray-900">{title}</h2>
+    <div>
+      <h2 className="text-base font-extrabold text-gray-900">{title}</h2>
+      {note && <p className="text-xs text-gray-500 mt-0.5">{note}</p>}
+    </div>
     <ResponsiveContainer width="100%" height={240}>{children}</ResponsiveContainer>
   </section>
 );
@@ -55,7 +58,7 @@ const sessionLine = (kind, p) => {
   if (kind === 'cardio') return [`${Math.round(p.minutes)} min`, p.distance_km && `${p.distance_km} km`, formatPace(p.pace_min_per_km)].filter(Boolean).join(' · ');
   if (kind === 'timed') return `Best ${formatDuration(p.best_seconds)} · ${p.sets} ${p.sets === 1 ? 'set' : 'sets'}`;
   const top = p.top_weight_kg ? `${p.top_weight_kg} kg × ${p.top_reps}` : `${p.max_reps} reps`;
-  return `Top ${top} · ${p.sets} sets${p.volume_kg ? ` · ${Math.round(p.volume_kg).toLocaleString()} kg` : ''}`;
+  return `Top ${top} · ${p.sets} sets${p.volume_kg ? ` · ${Math.round(p.volume_kg).toLocaleString()} kg volume` : ''}`;
 };
 
 // Charts and personal records for one exercise.
@@ -139,10 +142,10 @@ const ExerciseProgress = () => {
                       <Line type="monotone" dataKey="top_weight_kg" name="Heaviest set" stroke="#60A5FA" strokeWidth={2.5} dot={{ r: 3 }} />
                     </LineChart>
                   </ChartCard>
-                  <ChartCard title="Volume per workout">
+                  <ChartCard title="Volume per workout" note={VOLUME_EXPLANATION}>
                     <BarChart data={points}>
                       {axes(' kg')}
-                      <Bar dataKey="volume_kg" name="Weight × reps" fill="#34D399" radius={[6, 6, 0, 0]} />
+                      <Bar dataKey="volume_kg" name="Volume" fill="#34D399" radius={[6, 6, 0, 0]} />
                     </BarChart>
                   </ChartCard>
                 </>

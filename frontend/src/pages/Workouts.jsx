@@ -75,6 +75,7 @@ const Workouts = () => {
         subtitle={
           !today ? 'Loading…'
             : sessions.length ? null // each workout below has its own heading
+            : today.suggested_day?.is_rest ? `Rest day · next up: ${today.next_training_day?.name}`
             : today.suggested_day ? `Up next: ${today.suggested_day.name}` : 'No workout logged'
         }
       >
@@ -111,6 +112,7 @@ const Workouts = () => {
           key={dateStr}
           split={split}
           suggestedDayId={today.suggested_day?.id}
+          nextTrainingDayId={today.next_training_day?.id}
           isToday={isToday}
           starting={starting}
           onStart={handleStart}

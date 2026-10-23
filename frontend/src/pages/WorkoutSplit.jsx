@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Check, Plus, ChevronUp, ChevronDown, Trash2, ArrowLeft } from 'lucide-react';
+import { Check, Plus, ChevronUp, ChevronDown, Trash2, ArrowLeft, Moon } from 'lucide-react';
 import PageHeader from '../components/ui/PageHeader';
 import Toast from '../components/Toast';
 import { useToast } from '../hooks/useToast';
@@ -8,7 +8,7 @@ import MuscleMap from '../components/workouts/MuscleMap';
 import ExercisePicker from '../components/workouts/ExercisePicker';
 import ExerciseInfoModal from '../components/workouts/ExerciseInfoModal';
 import { getSplit, saveSplit, getExercises } from '../api/workouts';
-import { SPLIT_TEMPLATES, apiErrorMessage } from '../utils/workouts';
+import { SPLIT_TEMPLATES, bodyPartForName, apiErrorMessage } from '../utils/workouts';
 
 let nextKey = 1;
 const key = () => nextKey++;
@@ -17,6 +17,7 @@ const fromServer = (days) => days.map((d) => ({
   key: key(),
   id: d.id,
   name: d.name,
+  is_rest: d.is_rest,
   exercises: d.exercises.map((item) => ({
     key: key(),
     exercise: item.exercise,
@@ -26,7 +27,7 @@ const fromServer = (days) => days.map((d) => ({
   })),
 }));
 
-const toPayload = (days) => days.map((d) => ({
+const toPayload = (days) => days.map((d) => (d.is_rest ? { ...(d.id ? { id: d.id } : {}), is_rest: true, name: 'Rest', exercises: [] } : {
   ...(d.id ? { id: d.id } : {}),
   name: d.name.trim(),
   exercises: d.exercises.map((e) => ({
@@ -37,15 +38,7 @@ const toPayload = (days) => days.map((d) => ({
   })),
 }));
 
-// Guess which exercises to show first when adding to a day, from its name.
-const categoryFor = (name) => {
-  const n = name.toLowerCase();
-  if (n.includes('push') || n.includes('chest')) return 'push';
-  if (n.includes('pull') || n.includes('back')) return 'pull';
-  if (n.includes('leg') || n.includes('lower')) return 'legs';
-  if (n.includes('abs') || n.includes('core')) return 'core';
-  return 'all';
-};
+const restDay = () => ({ key: key(), name: 'Rest', is_rest: true, exercises: [] });
 
 const move = (list, from, to) => {
   if (to < 0 || to >= list.length) return list;
@@ -124,6 +117,7 @@ const WorkoutSplit = () => {
   const [error, setError] = useState('');
   const [picking, setPicking] = useState(null); // day key the exercise picker is open for
   const [info, setInfo] = useState(null);
+  const [restAfterRound, setRestAfterRound] = useState(true);
   const [toast, showToast] = useToast();
   const exercisesByName = useRef(null);
 
@@ -145,20 +139,26 @@ const WorkoutSplit = () => {
   const applyTemplate = (template) => {
     if (days.length && !window.confirm(`Replace your current split with “${template.label}”?`)) return;
     const byName = exercisesByName.current || new Map();
-    setDays(template.days.map((d, i) => ({
+    const trainingIds = days.filter((d) => !d.is_rest).map((d) => d.id);
+    const restIds = days.filter((d) => d.is_rest).map((d) => d.id);
+    const trainingDays = template.days.map((d, i) => ({
       key: key(),
-      id: days[i]?.id, // reuse existing day ids so past workouts stay linked
+      id: trainingIds[i], // reuse existing day ids so past workouts stay linked
       name: d.name,
       exercises: d.exercises
         .filter((e) => byName.has(e.name))
         .map((e) => ({ key: key(), exercise: byName.get(e.name), ...e, name: undefined })),
-    })));
+    }));
+    setDays(restAfterRound ? [...trainingDays, { ...restDay(), id: restIds[0] }] : trainingDays);
   };
 
-  const addDay = () => setDays((ds) => [...ds, { key: key(), name: `Day ${ds.length + 1}`, exercises: [] }]);
+  const addDay = () => setDays((ds) => [...ds, { key: key(), name: `Day ${ds.filter((d) => !d.is_rest).length + 1}`, exercises: [] }]);
+  const addRestDay = () => setDays((ds) => [...ds, restDay()]);
 
   const handleSave = async () => {
-    const names = days.map((d) => d.name.trim().toLowerCase());
+    const training = days.filter((d) => !d.is_rest);
+    if (days.length && !training.length) return setError('Add at least one training day.');
+    const names = training.map((d) => d.name.trim().toLowerCase());
     if (names.some((n) => !n)) return setError('Every day needs a name.');
     if (new Set(names).size !== names.length) return setError('Each day needs a different name.');
     const badRange = days.flatMap((d) => d.exercises).find((e) => e.target_reps_min && e.target_reps_max && e.target_reps_min > e.target_reps_max);
@@ -191,7 +191,7 @@ const WorkoutSplit = () => {
       <PageHeader
         eyebrow="Workouts"
         title="Your split"
-        subtitle="Days rotate in order. After the last day, the first comes round again."
+        subtitle="Days rotate in order. Rest days pass on their own; a training day waits until you do it."
       >
         {dirty && <span className="text-xs font-bold text-amber-400">Unsaved changes</span>}
         <button onClick={handleSave} disabled={!dirty || saving || !days} className="btn-primary h-11 min-w-[120px] flex items-center justify-center gap-2">
@@ -207,7 +207,12 @@ const WorkoutSplit = () => {
         <>
           {(() => {
             const templateButtons = (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
+              <div className="flex flex-col gap-3">
+              <label className="flex items-center gap-2.5 text-sm text-gray-700 cursor-pointer select-none self-start">
+                <input type="checkbox" checked={restAfterRound} onChange={(e) => setRestAfterRound(e.target.checked)} className="w-4 h-4 accent-amber-400" />
+                Add a rest day after each round
+              </label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
                 {SPLIT_TEMPLATES.map((t) => (
                   <button
                     key={t.id}
@@ -216,10 +221,11 @@ const WorkoutSplit = () => {
                   >
                     <span className="block text-sm font-bold text-gray-900">{t.label}</span>
                     <span className="block text-xs text-gray-500 mt-0.5">
-                      {t.days.length} {t.days.length === 1 ? 'day' : 'days'} · {t.days.reduce((n, d) => n + d.exercises.length, 0)} exercises
+                      {t.days.length} {t.days.length === 1 ? 'day' : 'days'}{restAfterRound ? ' + rest' : ''} · {t.days.reduce((n, d) => n + d.exercises.length, 0)} exercises
                     </span>
                   </button>
                 ))}
+              </div>
               </div>
             );
             // With no split yet the templates are the way in; afterwards they fold away.
@@ -242,11 +248,24 @@ const WorkoutSplit = () => {
             );
           })()}
 
-          {days.map((day, di) => (
+          {days.map((day, di) => (day.is_rest ? (
+            <section key={day.key} className="rounded-[28px] border border-dashed border-gray-300 px-5 py-3.5 flex items-center gap-2">
+              <span className="w-9 h-9 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center shrink-0" aria-hidden="true">
+                <Moon size={16} />
+              </span>
+              <span className="flex-1 min-w-0">
+                <span className="block text-base font-extrabold text-gray-900">Rest day</span>
+                <span className="block text-xs text-gray-500">No training; the rotation moves on the next day</span>
+              </span>
+              <IconButton label="Move rest day up" onClick={() => setDays((ds) => move(ds, di, di - 1))} disabled={di === 0}><ChevronUp size={18} /></IconButton>
+              <IconButton label="Move rest day down" onClick={() => setDays((ds) => move(ds, di, di + 1))} disabled={di === days.length - 1}><ChevronDown size={18} /></IconButton>
+              <IconButton label="Delete rest day" danger onClick={() => setDays((ds) => ds.filter((d) => d.key !== day.key))}><Trash2 size={16} /></IconButton>
+            </section>
+          ) : (
             <section key={day.key} className="zentra-card p-5 flex flex-col gap-2">
               <div className="flex items-center gap-2">
                 <span className="w-9 h-9 rounded-full bg-amber-400 text-[#0B0C10] text-sm font-black flex items-center justify-center shrink-0">
-                  {di + 1}
+                  {days.slice(0, di + 1).filter((d) => !d.is_rest).length}
                 </span>
                 <input
                   value={day.name}
@@ -294,22 +313,31 @@ const WorkoutSplit = () => {
                 <Plus size={16} /> Add exercise
               </button>
             </section>
-          ))}
+          )))}
 
-          <button
-            onClick={addDay}
-            disabled={days.length >= 14}
-            className="h-12 rounded-[28px] border border-dashed border-gray-300 text-sm font-bold text-gray-700 hover:border-amber-400 hover:text-gray-900 flex items-center justify-center gap-2 disabled:opacity-40"
-          >
-            <Plus size={17} /> Add a day
-          </button>
+          <div className="grid grid-cols-2 gap-3">
+            <button
+              onClick={addDay}
+              disabled={days.length >= 14}
+              className="h-12 rounded-[28px] border border-dashed border-gray-300 text-sm font-bold text-gray-700 hover:border-amber-400 hover:text-gray-900 flex items-center justify-center gap-2 disabled:opacity-40"
+            >
+              <Plus size={17} /> Add a day
+            </button>
+            <button
+              onClick={addRestDay}
+              disabled={days.length >= 14}
+              className="h-12 rounded-[28px] border border-dashed border-gray-300 text-sm font-bold text-gray-700 hover:border-amber-400 hover:text-gray-900 flex items-center justify-center gap-2 disabled:opacity-40"
+            >
+              <Moon size={16} /> Add rest day
+            </button>
+          </div>
         </>
       )}
 
       {pickingDay && (
         <ExercisePicker
           title={`Add to ${pickingDay.name || 'this day'}`}
-          initialCategory={categoryFor(pickingDay.name)}
+          initialPart={bodyPartForName(pickingDay.name)}
           excludeIds={pickingDay.exercises.map((e) => e.exercise.id)}
           onClose={() => setPicking(null)}
           onPick={(exercise) => {

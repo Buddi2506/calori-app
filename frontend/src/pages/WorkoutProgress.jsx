@@ -69,7 +69,7 @@ const WorkoutProgress = () => {
 
   useEffect(() => {
     getExercisesDone().then(setExercises).catch(() => setExercises([]));
-    getSplit().then((s) => setSplitNames(s.map((d) => d.name))).catch(() => {});
+    getSplit().then((s) => setSplitNames(s.filter((d) => !d.is_rest).map((d) => d.name))).catch(() => {});
   }, []);
 
   useEffect(() => {
