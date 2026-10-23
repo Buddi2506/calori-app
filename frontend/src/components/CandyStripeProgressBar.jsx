@@ -2,7 +2,7 @@ import React from 'react';
 
 /**
  * CandyStripeProgressBar
- * Diagonal hatched progress bar matching the Zentra volume progress bars.
+ * Labelled amount-vs-goal bar with the diagonal stripe fill.
  */
 const CandyStripeProgressBar = ({ 
   label, 
@@ -32,24 +32,27 @@ const CandyStripeProgressBar = ({
     : Number(goal).toFixed(goal < 1 ? 2 : 1);
 
   return (
-    <div className="space-y-1.5">
-      <div className="flex justify-between items-baseline text-xs font-bold text-gray-700">
-        <span className="flex items-center gap-1.5">
-          <span className={`w-2 h-2 rounded-full ${stripeClass}`}></span>
-          {label}
-        </span>
-        <span className="font-extrabold text-gray-900">
-          {formattedCurrent}{unit}{' '}
-          <span className="text-gray-400 font-normal">/ {formattedGoal}{unit}</span>
-          <span className="ml-1.5 text-[10px] text-gray-500 font-semibold">({percentage}%)</span>
+    <div className="flex flex-col gap-1.5">
+      <div className="flex justify-between items-baseline gap-3 text-sm">
+        <span className="font-bold text-gray-700">{label}</span>
+        <span className="text-gray-600 whitespace-nowrap">
+          <span className="font-extrabold text-gray-900">{formattedCurrent}</span> / {formattedGoal} {unit}
+          <span className="ml-2 text-xs text-gray-500">{percentage}%</span>
         </span>
       </div>
 
-      <div className="w-full bg-gray-100 h-3.5 rounded-full overflow-hidden p-0.5 border border-gray-200/50">
-        <div 
+      <div
+        className="h-2 rounded-full bg-gray-100 overflow-hidden"
+        role="progressbar"
+        aria-label={label}
+        aria-valuenow={percentage}
+        aria-valuemin={0}
+        aria-valuemax={100}
+      >
+        <div
           className={`${stripeClass} h-full rounded-full transition-all duration-700 ease-out`}
           style={{ width: `${clampedWidth}%` }}
-        ></div>
+        />
       </div>
     </div>
   );

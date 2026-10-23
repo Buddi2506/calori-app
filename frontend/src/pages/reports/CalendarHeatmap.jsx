@@ -1,44 +1,64 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
-// ─── Calendar Heatmap Component ──────────────────────────────────────────────
-const CalendarHeatmap = ({ calendarData, calorieGoal }) => {
-  const getCellColor = (calories) => {
-    if (!calories) return 'bg-gray-100 text-gray-400';
-    const ratio = calories / calorieGoal;
-    if (ratio >= 0.9 && ratio <= 1.1) return 'bg-emerald-600 text-white shadow-sm';
-    if (ratio >= 0.7) return 'bg-emerald-100 text-emerald-800';
-    if (ratio > 1.1) return 'bg-amber-500 text-white shadow-sm';
-    return 'bg-gray-200 text-gray-700';
-  };
+const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
+// Same ±10% rule and colors as the Overview's 7-day card.
+const STYLES = {
+  target: 'bg-emerald-50 ring-emerald-200 text-emerald-700',
+  under: 'bg-amber-50 ring-amber-200 text-amber-700',
+  over: 'bg-rose-50 ring-rose-200 text-rose-700',
+  empty: 'bg-white ring-gray-100 text-gray-500',
+};
+
+const dayStatus = (calories, goal) => {
+  if (!calories) return 'empty';
+  const ratio = calories / (goal || 1);
+  if (ratio > 1.1) return 'over';
+  if (ratio < 0.9) return 'under';
+  return 'target';
+};
+
+const pad = (n) => String(n).padStart(2, '0');
+
+// Month grid: each day colored by calories vs goal, linking to that day's diary.
+const CalendarHeatmap = ({ calendarData, calorieGoal, year, month }) => {
   const days = Object.entries(calendarData).sort(([a], [b]) => Number(a) - Number(b));
+  // Blank cells before day 1 so it lands under the right weekday (Monday first)
+  const leading = (new Date(year, month - 1, 1).getDay() + 6) % 7;
 
   return (
-    <div>
-      <div className="grid grid-cols-7 gap-2 mb-2">
-        {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(d => (
-          <div key={d} className="text-center text-xs text-gray-400 font-bold uppercase tracking-wider">{d}</div>
+    <div className="flex flex-col gap-2">
+      <div className="grid grid-cols-7 gap-1.5 sm:gap-2">
+        {WEEKDAYS.map((d) => (
+          <div key={d} className="text-center text-xs font-bold text-gray-500">{d}</div>
         ))}
       </div>
-      <div className="grid grid-cols-7 gap-2">
+      <ol className="grid grid-cols-7 gap-1.5 sm:gap-2">
+        {Array.from({ length: leading }).map((_, i) => <li key={`blank-${i}`} aria-hidden="true" />)}
         {days.map(([day, data]) => {
-          const cal = data?.calories || 0;
+          const cal = Math.round(data?.calories || 0);
+          const status = dayStatus(cal, calorieGoal);
           return (
-            <div
-              key={day}
-              title={`Day ${day}: ${Math.round(cal)} kcal`}
-              className={`aspect-square rounded-xl flex items-center justify-center text-xs font-bold cursor-default transition-all ${getCellColor(cal)}`}
-            >
-              {day}
-            </div>
+            <li key={day}>
+              <Link
+                to={`/diary/${year}-${pad(month)}-${pad(day)}`}
+                title={`${day}: ${cal} kcal`}
+                aria-label={`Open diary for day ${day}: ${cal} kcal`}
+                className={`aspect-square rounded-xl ring-1 ring-inset flex flex-col items-center justify-center text-xs font-bold transition-all hover:ring-2 hover:ring-gray-300 ${STYLES[status]}`}
+              >
+                {day}
+                {cal > 0 && <span className="hidden sm:block text-[10px] font-semibold opacity-80">{cal}</span>}
+              </Link>
+            </li>
           );
         })}
-      </div>
-      <div className="flex gap-4 mt-4 text-xs text-gray-500 font-medium">
-        <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded bg-emerald-600 inline-block"></span> At goal</span>
-        <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded bg-emerald-100 inline-block"></span> Under</span>
-        <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded bg-amber-500 inline-block"></span> Over</span>
-        <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded bg-gray-100 inline-block"></span> No data</span>
+      </ol>
+      <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-xs text-gray-500">
+        <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded bg-emerald-50 ring-1 ring-emerald-200" />Within 10% of goal</span>
+        <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded bg-amber-50 ring-1 ring-amber-200" />Under</span>
+        <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded bg-rose-50 ring-1 ring-rose-200" />Over</span>
+        <span className="ml-auto">Tap a day to see its log</span>
       </div>
     </div>
   );

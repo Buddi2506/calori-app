@@ -1,23 +1,28 @@
 import React, { useState, useEffect } from 'react';
+import { Check } from 'lucide-react';
 import { getGoals, updateGoals } from '../api/goals';
+import PageHeader from '../components/ui/PageHeader';
+import MacroSplitBar from '../components/ui/MacroSplitBar';
+import Toast from '../components/Toast';
+import { useToast } from '../hooks/useToast';
 
 const GOAL_FIELDS = [
   { key: 'calories', label: 'Calories', unit: 'kcal', section: 'energy' },
-  { key: 'protein', label: 'Protein', unit: 'g', section: 'macro' },
-  { key: 'carbohydrates', label: 'Carbohydrates', unit: 'g', section: 'macro' },
-  { key: 'fat', label: 'Fat', unit: 'g', section: 'macro' },
-  { key: 'fiber', label: 'Fiber', unit: 'g', section: 'macro' },
-  { key: 'saturated_fat', label: 'Saturated Fat', unit: 'g', section: 'macro' },
-  { key: 'sodium', label: 'Sodium', unit: 'mg', section: 'micro' },
+  { key: 'protein', label: 'Protein', unit: 'g', section: 'macro', dot: 'stripe-green' },
+  { key: 'carbohydrates', label: 'Carbs', unit: 'g', section: 'macro', dot: 'stripe-blue' },
+  { key: 'fat', label: 'Fat', unit: 'g', section: 'macro', dot: 'stripe-pink' },
+  { key: 'fiber', label: 'Fiber', unit: 'g', section: 'macro', dot: 'stripe-amber' },
+  { key: 'saturated_fat', label: 'Saturated fat', unit: 'g', section: 'limit' },
+  { key: 'sodium', label: 'Sodium', unit: 'mg', section: 'limit' },
+  { key: 'cholesterol', label: 'Cholesterol', unit: 'mg', section: 'limit' },
   { key: 'potassium', label: 'Potassium', unit: 'mg', section: 'micro' },
   { key: 'iron', label: 'Iron', unit: 'mg', section: 'micro' },
   { key: 'calcium', label: 'Calcium', unit: 'mg', section: 'micro' },
+  { key: 'magnesium', label: 'Magnesium', unit: 'mg', section: 'micro' },
+  { key: 'zinc', label: 'Zinc', unit: 'mg', section: 'micro' },
   { key: 'vitamin_c', label: 'Vitamin C', unit: 'mg', section: 'micro' },
   { key: 'vitamin_d', label: 'Vitamin D', unit: 'mcg', section: 'micro' },
   { key: 'vitamin_b12', label: 'Vitamin B12', unit: 'mcg', section: 'micro' },
-  { key: 'magnesium', label: 'Magnesium', unit: 'mg', section: 'micro' },
-  { key: 'zinc', label: 'Zinc', unit: 'mg', section: 'micro' },
-  { key: 'cholesterol', label: 'Cholesterol', unit: 'mg', section: 'micro' },
 ];
 
 const DEFAULTS = {
@@ -26,24 +31,81 @@ const DEFAULTS = {
   vitamin_c: 90, vitamin_d: 20, vitamin_b12: 2.4, magnesium: 420, zinc: 11, cholesterol: 300,
 };
 
+const fieldsIn = (section) => GOAL_FIELDS.filter((f) => f.section === section);
+
+// Number input with its unit shown inside the box.
+const GoalInput = ({ field, value, onChange, large }) => (
+  <div className="flex flex-col gap-1.5">
+    <label htmlFor={`goal-${field.key}`} className="text-xs font-bold text-gray-600 flex items-center gap-1.5">
+      {field.dot && <span className={`w-2 h-2 rounded-full ${field.dot}`} aria-hidden="true" />}
+      {field.label}
+    </label>
+    <div className="flex items-center rounded-2xl bg-[#0E0F13] border border-gray-200 focus-within:border-amber-400 focus-within:ring-2 focus-within:ring-amber-400/30 transition-colors">
+      <input
+        id={`goal-${field.key}`}
+        type="number"
+        name={field.key}
+        value={value}
+        min="0"
+        step="any"
+        onChange={onChange}
+        className={`flex-1 min-w-0 bg-transparent outline-none px-4 font-bold text-gray-900 ${large ? 'h-14 text-3xl font-black' : 'h-11 text-base'}`}
+      />
+      <span className="pr-4 text-sm text-gray-500">{field.unit}</span>
+    </div>
+  </div>
+);
+
+const Section = ({ title, note, children }) => (
+  <section className="zentra-card p-6 flex flex-col gap-5">
+    <div>
+      <h2 className="text-base font-extrabold text-gray-900">{title}</h2>
+      {note && <p className="text-xs text-gray-500 mt-0.5">{note}</p>}
+    </div>
+    {children}
+  </section>
+);
+
+// How the protein / carbs / fat goals add up against the calorie goal.
+const MacroCheck = ({ goals }) => {
+  const fromMacros = Math.round((goals.protein || 0) * 4 + (goals.carbohydrates || 0) * 4 + (goals.fat || 0) * 9);
+  const diff = fromMacros - (goals.calories || 0);
+  const close = Math.abs(diff) <= (goals.calories || 0) * 0.05;
+  return (
+    <div className="rounded-2xl bg-gray-50 border border-gray-100 p-4 flex flex-col gap-2.5">
+      <div className="flex flex-wrap items-baseline justify-between gap-2 text-sm">
+        <span className="text-gray-600">
+          Your macros add up to <span className="font-extrabold text-gray-900">{fromMacros.toLocaleString()} kcal</span>
+        </span>
+        <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${close ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}`}>
+          {close
+            ? 'Matches your calorie goal'
+            : `${Math.abs(diff).toLocaleString()} kcal ${diff > 0 ? 'over' : 'under'} your calorie goal`}
+        </span>
+      </div>
+      <MacroSplitBar nutrients={goals} className="h-2" />
+      <p className="text-xs text-gray-500">Protein and carbs count 4 kcal per gram, fat 9 kcal.</p>
+    </div>
+  );
+};
+
 const Goals = () => {
   const [goals, setGoals] = useState(DEFAULTS);
+  const [savedGoals, setSavedGoals] = useState(DEFAULTS);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [saved, setSaved] = useState(false);
   const [error, setError] = useState(null);
+  const [toast, showToast] = useToast();
 
   useEffect(() => {
     const fetchGoals = async () => {
       try {
         const data = await getGoals();
         if (data) {
-          // Strip non-goal fields (id, updated_at) before setting state
-          const cleaned = {};
-          GOAL_FIELDS.forEach(f => {
-            cleaned[f.key] = data[f.key] ?? DEFAULTS[f.key];
-          });
+          // Keep only goal fields (drop id, updated_at)
+          const cleaned = Object.fromEntries(GOAL_FIELDS.map((f) => [f.key, data[f.key] ?? DEFAULTS[f.key]]));
           setGoals(cleaned);
+          setSavedGoals(cleaned);
         }
       } catch (err) {
         console.error(err);
@@ -54,21 +116,21 @@ const Goals = () => {
     fetchGoals();
   }, []);
 
+  const dirty = GOAL_FIELDS.some((f) => goals[f.key] !== savedGoals[f.key]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setGoals(prev => ({ ...prev, [name]: parseFloat(value) || 0 }));
+    setGoals((prev) => ({ ...prev, [name]: parseFloat(value) || 0 }));
   };
 
   const handleSave = async () => {
     setSaving(true);
     setError(null);
     try {
-      // Only send known goal fields — strip id, updated_at, etc.
-      const payload = {};
-      GOAL_FIELDS.forEach(f => { payload[f.key] = goals[f.key]; });
+      const payload = Object.fromEntries(GOAL_FIELDS.map((f) => [f.key, goals[f.key]]));
       await updateGoals(payload);
-      setSaved(true);
-      setTimeout(() => setSaved(false), 3000);
+      setSavedGoals(payload);
+      showToast('Goals saved');
     } catch (err) {
       console.error(err);
       setError('Failed to save goals. Please try again.');
@@ -77,116 +139,70 @@ const Goals = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-40">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
-    );
-  }
-
-  const energy = GOAL_FIELDS.filter(f => f.section === 'energy');
-  const macros = GOAL_FIELDS.filter(f => f.section === 'macro');
-  const micros = GOAL_FIELDS.filter(f => f.section === 'micro');
+  const saveButton = (
+    <button onClick={handleSave} disabled={saving || !dirty} className="btn-primary h-11 min-w-[130px] flex items-center justify-center gap-2">
+      <Check size={17} /> {saving ? 'Saving…' : dirty ? 'Save goals' : 'Saved'}
+    </button>
+  );
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6 pb-12">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h2 className="text-3xl font-black tracking-tight text-gray-900">🎯 Nutrition Goals</h2>
-          <p className="text-gray-500 text-sm mt-1 font-medium">Set your personalized daily targets across all macro & micronutrients.</p>
-        </div>
-        <button
-          onClick={handleSave}
-          disabled={saving}
-          className={`btn-primary min-w-[130px] self-start sm:self-auto ${saving ? 'opacity-70 cursor-not-allowed' : ''}`}
-        >
-          {saving ? (
-            <span className="flex items-center gap-2 justify-center">
-              <span className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></span>
-              Saving...
-            </span>
-          ) : saved ? '✅ Saved!' : 'Save Goals'}
-        </button>
-      </div>
+    <div className="flex flex-col gap-5">
+      <Toast message={toast} />
 
-      {/* Error */}
+      <PageHeader
+        eyebrow="Goals"
+        title="Daily goals"
+        subtitle="Used by your Overview, Diary and Reports"
+      >
+        {dirty && <span className="text-xs font-bold text-amber-400">Unsaved changes</span>}
+        {saveButton}
+      </PageHeader>
+
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-2xl text-sm font-medium shadow-sm">
-          ⚠️ {error}
+        <div role="alert" className="bg-rose-50 border border-rose-200 text-rose-700 px-4 py-3 rounded-2xl text-sm font-medium">
+          {error}
         </div>
       )}
 
-      {/* Energy */}
-      <div className="zentra-card p-6 md:p-8">
-        <h3 className="text-base font-extrabold text-gray-900 border-b border-gray-100 pb-3 mb-5 flex items-center gap-2">
-          <span>⚡</span> Energy Target
-        </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {energy.map(f => (
-            <GoalInput key={f.key} field={f} value={goals[f.key]} onChange={handleChange} />
-          ))}
-        </div>
-      </div>
+      {loading ? (
+        <div className="zentra-card h-64 animate-pulse" aria-label="Loading goals" />
+      ) : (
+        <>
+          <Section title="Energy and macros">
+            <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] gap-5">
+              <GoalInput field={fieldsIn('energy')[0]} value={goals.calories} onChange={handleChange} large />
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                {fieldsIn('macro').map((f) => (
+                  <GoalInput key={f.key} field={f} value={goals[f.key]} onChange={handleChange} />
+                ))}
+              </div>
+            </div>
+            <MacroCheck goals={goals} />
+          </Section>
 
-      {/* Macronutrients */}
-      <div className="zentra-card p-6 md:p-8">
-        <h3 className="text-base font-extrabold text-gray-900 border-b border-gray-100 pb-3 mb-5 flex items-center gap-2">
-          <span>🥩</span> Macronutrients
-        </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {macros.map(f => (
-            <GoalInput key={f.key} field={f} value={goals[f.key]} onChange={handleChange} />
-          ))}
-        </div>
-      </div>
+          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] gap-5 items-start">
+            <Section title="Daily limits" note="Try to stay under these">
+              <div className="grid grid-cols-1 gap-3">
+                {fieldsIn('limit').map((f) => (
+                  <GoalInput key={f.key} field={f} value={goals[f.key]} onChange={handleChange} />
+                ))}
+              </div>
+            </Section>
 
-      {/* Micronutrients */}
-      <div className="zentra-card p-6 md:p-8">
-        <h3 className="text-base font-extrabold text-gray-900 border-b border-gray-100 pb-3 mb-5 flex items-center gap-2">
-          <span>💊</span> Micronutrients & Minerals
-        </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {micros.map(f => (
-            <GoalInput key={f.key} field={f} value={goals[f.key]} onChange={handleChange} />
-          ))}
-        </div>
-        <p className="text-xs text-gray-400 mt-6 font-medium">
-          * Targets are aligned with Indian Council of Medical Research (ICMR-NIN) and WHO recommended daily allowances (RDA).
-        </p>
-      </div>
+            <Section title="Vitamins and minerals" note="Defaults follow ICMR-NIN and WHO recommended daily allowances">
+              <div className="grid grid-cols-2 gap-3">
+                {fieldsIn('micro').map((f) => (
+                  <GoalInput key={f.key} field={f} value={goals[f.key]} onChange={handleChange} />
+                ))}
+              </div>
+            </Section>
+          </div>
 
-      {/* Save button at bottom */}
-      <div className="flex justify-end pt-2">
-        <button
-          onClick={handleSave}
-          disabled={saving}
-          className={`btn-primary min-w-[150px] ${saving ? 'opacity-70' : ''}`}
-        >
-          {saving ? 'Saving...' : saved ? '✅ Saved!' : '💾 Save Goals'}
-        </button>
-      </div>
+          <div className="flex justify-end">{saveButton}</div>
+        </>
+      )}
     </div>
   );
 };
-
-const GoalInput = ({ field, value, onChange }) => (
-  <div className="space-y-1.5">
-    <label className="block text-xs font-bold text-gray-700">
-      {field.label}
-      <span className="text-gray-400 font-normal ml-1">({field.unit})</span>
-    </label>
-    <input
-      type="number"
-      name={field.key}
-      value={value}
-      min="0"
-      step="any"
-      onChange={onChange}
-      className="w-full bg-gray-50/70 hover:bg-white focus:bg-white border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition-all shadow-2xs"
-    />
-  </div>
-);
 
 export default Goals;

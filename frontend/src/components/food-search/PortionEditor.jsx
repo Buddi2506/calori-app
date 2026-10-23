@@ -16,66 +16,52 @@ const PortionEditor = ({ food: selectedFood, quantity, setQuantity, unit, setUni
 
   return (
     <div className="p-6">
-      <div className="flex items-start justify-between mb-4">
+      <div className="flex items-start justify-between gap-3 mb-4">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">{selectedFood.name}</h2>
+          <h2 className="text-xl font-black tracking-tight text-gray-900">{selectedFood.name}</h2>
           {selectedFood.name_local && (
             <p className="text-sm text-orange-600 font-medium mt-0.5">{selectedFood.name_local}</p>
           )}
-          <p className="text-xs text-gray-400 mt-0.5">
+          <p className="text-xs text-gray-500 mt-0.5">
             Base: {Math.round(selectedFood.calories ?? 0)} kcal per {isLiquid ? '100ml' : '100g'} {isMeat ? '(Raw/Uncooked)' : selectedFood.name.toLowerCase().includes('(raw)') ? '(Raw weight)' : ''}
           </p>
         </div>
-        <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
-          isMeat
-            ? 'bg-rose-100 text-rose-800'
-            : isCooked
-            ? 'bg-blue-100 text-blue-800'
-            : isFruit(selectedFood)
-            ? 'bg-amber-100 text-amber-800'
-            : isSeed
-            ? 'bg-emerald-100 text-emerald-800'
-            : isScoop
-            ? 'bg-purple-100 text-purple-800'
-            : isLiquid
-            ? 'bg-blue-100 text-blue-800'
-            : 'bg-green-100 text-green-800'
-        }`}>
+        <span className="text-[11px] font-semibold px-2 py-1 rounded-md bg-gray-100 text-gray-600 shrink-0">
           {isMeat
-            ? '🥩 Raw Meat (Uncooked)'
+            ? 'Raw meat'
             : isCooked
-            ? '🍲 Cooked / Boiled'
+            ? 'Cooked'
             : isFruit(selectedFood)
-            ? '🍎 Fresh Fruit'
+            ? 'Fruit'
             : isSeed
-            ? '🌱 Seeds & Nuts'
+            ? 'Seeds & nuts'
             : isScoop
-            ? '💪 Whey Protein'
+            ? 'Whey'
             : isLiquid
-            ? '💧 Beverage / Liquid'
+            ? 'Drink'
             : (selectedFood.category || 'Food')}
         </span>
       </div>
 
-      <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 mb-6">
+      <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 mb-5">
         <div className="grid grid-cols-2 gap-4 mb-3">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-xs font-bold text-gray-600 mb-1.5">
               {isScoop ? 'Number of Scoops' : isMeat || isSeed ? 'Quantity (Grams)' : 'Quantity'}
             </label>
             <input
               type="number"
               min="0.1"
               step="any"
-              className="input-field text-lg font-semibold bg-white"
+              className="input-field text-lg font-semibold"
               value={quantity}
               onChange={(e) => setQuantity(e.target.value)}
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Unit</label>
+            <label className="block text-xs font-bold text-gray-600 mb-1.5">Unit</label>
             <select
-              className="input-field text-base font-medium bg-white"
+              className="input-field text-base font-medium"
               value={unit}
               onChange={(e) => setUnit(e.target.value)}
             >
@@ -181,31 +167,26 @@ const PortionEditor = ({ food: selectedFood, quantity, setQuantity, unit, setUni
         )}
       </div>
 
-      {/* Macronutrient preview cards */}
+      {/* Macronutrient preview */}
       <div className="grid grid-cols-4 gap-2.5 mb-4 text-center">
-        <div className="bg-white border border-gray-200 rounded-xl p-3 shadow-sm">
-          <span className="block text-2xl font-bold text-green-700">{nutrition.calories}</span>
-          <span className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mt-0.5">Calories</span>
-        </div>
-        <div className="bg-white border border-rose-200 rounded-xl p-3 shadow-sm bg-rose-50/20">
-          <span className="block text-2xl font-bold text-rose-600">{nutrition.protein}g</span>
-          <span className="block text-xs font-semibold text-rose-700 uppercase tracking-wider mt-0.5">Protein</span>
-        </div>
-        <div className="bg-white border border-gray-200 rounded-xl p-3 shadow-sm">
-          <span className="block text-2xl font-bold text-yellow-600">{nutrition.carbs}g</span>
-          <span className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mt-0.5">Carbs</span>
-        </div>
-        <div className="bg-white border border-gray-200 rounded-xl p-3 shadow-sm">
-          <span className="block text-2xl font-bold text-red-500">{nutrition.fat}g</span>
-          <span className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mt-0.5">Fat</span>
-        </div>
+        {[
+          { label: 'kcal', value: nutrition.calories, cls: 'text-gray-900' },
+          { label: 'Protein', value: `${nutrition.protein}g`, cls: 'text-emerald-700' },
+          { label: 'Carbs', value: `${nutrition.carbs}g`, cls: 'text-blue-700' },
+          { label: 'Fat', value: `${nutrition.fat}g`, cls: 'text-pink-700' },
+        ].map((m) => (
+          <div key={m.label} className="rounded-2xl border border-gray-100 bg-gray-50 p-3">
+            <span className={`block text-xl font-black ${m.cls}`}>{m.value}</span>
+            <span className="block text-xs text-gray-500 mt-0.5">{m.label}</span>
+          </div>
+        ))}
       </div>
 
       {/* Micronutrients breakdown strip */}
       {(nutrition.fiber > 0 || nutrition.calcium > 0 || nutrition.potassium > 0 || nutrition.sodium > 0 || nutrition.iron > 0 || nutrition.magnesium > 0 || nutrition.zinc > 0) && (
-        <div className="bg-gray-50 rounded-xl p-3 mb-6 border border-gray-100">
-          <p className="text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">
-            Micronutrients for {nutrition.totalGrams}g:
+        <div className="rounded-2xl p-3 mb-5 border border-gray-100">
+          <p className="text-xs font-bold text-gray-500 mb-1.5">
+            Also in {nutrition.totalGrams}g
           </p>
           <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-700">
             {nutrition.fiber > 0 && <span>Fiber: <strong className="text-emerald-700">{nutrition.fiber} g</strong></span>}
@@ -221,7 +202,7 @@ const PortionEditor = ({ food: selectedFood, quantity, setQuantity, unit, setUni
 
       <button
         onClick={onAdd}
-        className="w-full btn-primary flex items-center justify-center gap-2 py-3.5 text-base font-semibold shadow-md shadow-green-600/20"
+        className="w-full btn-primary h-12 flex items-center justify-center gap-2 text-base"
       >
         <Check size={20} /> {submitLabel || <>Add {quantity}{unit === 'g' || unit === 'ml' ? unit : ` ${unit}`} to {mealLabel}</>}
       </button>

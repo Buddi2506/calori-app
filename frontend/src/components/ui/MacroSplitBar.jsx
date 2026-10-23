@@ -1,5 +1,5 @@
 import React from 'react';
-import { MACRO_COLORS, macroSplit } from './nutrition';
+import { MACRO_COLORS, macroSplit } from '../../utils/macros';
 
 const LABELS = { protein: 'protein', carbohydrates: 'carbs', fat: 'fat' };
 

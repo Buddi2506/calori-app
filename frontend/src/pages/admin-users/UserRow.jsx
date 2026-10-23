@@ -1,132 +1,80 @@
 import React from 'react';
-import { Shield, Key, Edit3, Trash2, Eye, Flame } from 'lucide-react';
+import { Key, Pencil, Trash2, BookOpen } from 'lucide-react';
+import { userInitials } from '../../components/UserMenu';
 
-// One account in the users table, with its action buttons.
+const IconButton = ({ label, onClick, danger, children }) => (
+  <button
+    onClick={onClick}
+    aria-label={label}
+    title={label}
+    className={`p-2 rounded-full text-gray-500 hover:bg-gray-100 transition-colors ${danger ? 'hover:text-rose-600' : 'hover:text-gray-900'}`}
+  >
+    {children}
+  </button>
+);
+
+// One account in the members table, with its action buttons.
 const UserRow = ({ u, currentAdmin, onInspect, onReset, onEdit, onDelete }) => {
-  const initials = (u.full_name || u.username)
-    .split(' ')
-    .map((n) => n[0])
-    .join('')
-    .substring(0, 2)
-    .toUpperCase();
   const isCurrentAdmin = u.id === currentAdmin?.id;
+  const today = Math.round(u.stats?.today_calories || 0);
+  const target = Math.round(u.calorie_target || 2000);
 
   return (
-    <tr className="hover:bg-gray-50/60 transition-colors">
-      {/* User Info */}
-      <td className="py-4 px-5">
+    <tr className="hover:bg-gray-50 transition-colors">
+      <td className="py-3.5 px-5">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-2xl bg-gradient-to-tr from-amber-400 to-rose-400 text-white font-black text-xs flex items-center justify-center shadow-sm shrink-0">
-            {initials}
-          </div>
-          <div>
-            <div className="font-bold text-gray-900 flex items-center gap-1.5">
-              <span>{u.full_name || u.username}</span>
-              {isCurrentAdmin && (
-                <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 font-bold">
-                  You
-                </span>
-              )}
+          <span className="w-9 h-9 rounded-full bg-amber-400 text-[#0B0C10] font-black text-xs flex items-center justify-center shrink-0">
+            {userInitials(u)}
+          </span>
+          <div className="min-w-0">
+            <div className="font-bold text-sm text-gray-900 flex items-center gap-1.5">
+              <span className="truncate">{u.full_name || u.username}</span>
+              {isCurrentAdmin && <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-gray-100 text-gray-700 font-bold">You</span>}
             </div>
-            <div className="text-[11px] text-gray-400 font-medium">
-              @{u.username} &bull; {u.email}
-            </div>
+            <div className="text-xs text-gray-500 truncate">@{u.username} · {u.email}</div>
           </div>
         </div>
       </td>
 
-      {/* Role */}
-      <td className="py-4 px-4">
-        {u.role === 'admin' ? (
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-amber-500/10 text-amber-700 font-bold text-[11px]">
-            <Shield size={12} /> Admin
-          </span>
-        ) : (
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-gray-100 text-gray-600 font-semibold text-[11px]">
-            Member
-          </span>
-        )}
-      </td>
-
-      {/* Calorie Target */}
-      <td className="py-4 px-4">
-        <div className="font-bold text-gray-800 flex items-center gap-1">
-          <Flame size={13} className="text-amber-500" />
-          <span>{Math.round(u.calorie_target || 2000)} kcal</span>
-        </div>
-      </td>
-
-      {/* Today's Calories */}
-      <td className="py-4 px-4">
-        <span className="font-extrabold text-gray-900">
-          {Math.round(u.stats?.today_calories || 0)} kcal
+      <td className="py-3.5 px-4">
+        <span className={`px-2.5 py-1 rounded-full text-[11px] font-bold ${u.role === 'admin' ? 'bg-amber-50 text-amber-700' : 'bg-gray-100 text-gray-600'}`}>
+          {u.role === 'admin' ? 'Admin' : 'Member'}
         </span>
       </td>
 
-      {/* Activity metrics */}
-      <td className="py-4 px-4">
-        <div className="text-[11px] text-gray-500">
-          <span className="font-bold text-gray-700">{u.stats?.total_days_logged || 0}</span> days &bull;{' '}
-          <span className="font-bold text-gray-700">{u.stats?.total_entries || 0}</span> meals
-        </div>
+      <td className="py-3.5 px-4 whitespace-nowrap">
+        <span className="font-extrabold text-gray-900">{today.toLocaleString()}</span>
+        <span className="text-gray-500"> / {target.toLocaleString()} kcal</span>
       </td>
 
-      {/* Status */}
-      <td className="py-4 px-4">
+      <td className="py-3.5 px-4 text-gray-500 whitespace-nowrap">
+        <span className="font-bold text-gray-700">{u.stats?.total_days_logged || 0}</span> days ·{' '}
+        <span className="font-bold text-gray-700">{u.stats?.total_entries || 0}</span> entries
+      </td>
+
+      <td className="py-3.5 px-4 whitespace-nowrap">
         {u.must_change_password ? (
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-50 border border-amber-200/70 text-amber-700 font-semibold text-[10px]" title="User must change password on next login">
-            <Key size={10} /> Needs Pwd Change
+          <span className="inline-flex items-center gap-1.5 text-amber-700 font-bold text-[11px]" title="Must change password at next sign-in">
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-400" /> New password needed
           </span>
         ) : u.is_active ? (
-          <span className="inline-flex items-center gap-1 text-emerald-600 font-bold text-[11px]">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Active
+          <span className="inline-flex items-center gap-1.5 text-emerald-700 font-bold text-[11px]">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> Active
           </span>
         ) : (
-          <span className="inline-flex items-center gap-1 text-rose-500 font-bold text-[11px]">
-            <span className="w-1.5 h-1.5 rounded-full bg-rose-500"></span> Inactive
+          <span className="inline-flex items-center gap-1.5 text-rose-700 font-bold text-[11px]">
+            <span className="w-1.5 h-1.5 rounded-full bg-rose-500" /> Inactive
           </span>
         )}
       </td>
 
-      {/* Action buttons */}
-      <td className="py-4 px-5 text-right">
-        <div className="flex items-center justify-end gap-1.5">
-          {/* Inspect Diary */}
-          <button
-            onClick={() => onInspect(u)}
-            className="p-2 rounded-xl text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition-colors"
-            title="Inspect Food Diary"
-          >
-            <Eye size={15} />
-          </button>
-
-          {/* Reset Password */}
-          <button
-            onClick={() => onReset(u)}
-            className="p-2 rounded-xl text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
-            title="Reset Temporary Password"
-          >
-            <Key size={15} />
-          </button>
-
-          {/* Edit User */}
-          <button
-            onClick={() => onEdit(u)}
-            className="p-2 rounded-xl text-gray-400 hover:text-gray-800 hover:bg-gray-100 transition-colors"
-            title="Edit Member Details"
-          >
-            <Edit3 size={15} />
-          </button>
-
-          {/* Delete User */}
+      <td className="py-3.5 px-5">
+        <div className="flex items-center justify-end">
+          <IconButton label={`View diary of ${u.username}`} onClick={() => onInspect(u)}><BookOpen size={16} /></IconButton>
+          <IconButton label={`Reset password for ${u.username}`} onClick={() => onReset(u)}><Key size={16} /></IconButton>
+          <IconButton label={`Edit ${u.username}`} onClick={() => onEdit(u)}><Pencil size={16} /></IconButton>
           {!isCurrentAdmin && (
-            <button
-              onClick={() => onDelete(u)}
-              className="p-2 rounded-xl text-gray-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
-              title="Delete Member"
-            >
-              <Trash2 size={15} />
-            </button>
+            <IconButton label={`Delete ${u.username}`} onClick={() => onDelete(u)} danger><Trash2 size={16} /></IconButton>
           )}
         </div>
       </td>

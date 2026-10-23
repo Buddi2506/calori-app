@@ -42,10 +42,10 @@ const ForcePasswordChangeModal = () => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md p-4 animate-in fade-in duration-200">
       {/* Modal Container — Notice NO close (X) button, backdrop clicks do nothing */}
-      <div className="w-full max-w-md bg-white rounded-3xl p-6 sm:p-8 shadow-2xl border border-gray-100 flex flex-col relative">
+      <div className="w-full max-w-md bg-white rounded-[28px] p-6 sm:p-8 shadow-2xl border border-gray-100 flex flex-col relative">
         {/* Warning Icon Badge */}
         <div className="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-600 flex items-center justify-center mb-5 mx-auto">
-          <KeyRound size={28} className="animate-pulse" />
+          <KeyRound size={28} />
         </div>
 
         {/* Title and Explanation */}
@@ -86,7 +86,7 @@ const ForcePasswordChangeModal = () => {
                 required
                 minLength={6}
                 placeholder="Enter at least 6 characters"
-                className="w-full pl-10 pr-10 py-3 bg-gray-50 border border-gray-200 rounded-2xl text-sm font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all"
+                className="w-full pl-10 pr-10 h-12 bg-[#0E0F13] border border-gray-200 rounded-2xl text-[15px] text-gray-900 placeholder-gray-500 focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-400/30 transition-colors"
               />
               <button
                 type="button"
@@ -113,7 +113,7 @@ const ForcePasswordChangeModal = () => {
                 required
                 minLength={6}
                 placeholder="Re-type new password"
-                className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl text-sm font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition-all"
+                className="w-full pl-10 pr-4 h-12 bg-[#0E0F13] border border-gray-200 rounded-2xl text-[15px] text-gray-900 placeholder-gray-500 focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-400/30 transition-colors"
               />
             </div>
           </div>
@@ -128,13 +128,13 @@ const ForcePasswordChangeModal = () => {
           <button
             type="submit"
             disabled={loading || !newPassword || !confirmPassword}
-            className="w-full py-3.5 px-4 bg-amber-400 hover:bg-amber-300 text-[#0B0C10] font-bold text-sm rounded-2xl shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
+            className="w-full h-12 btn-primary text-sm flex items-center justify-center gap-2"
           >
             {loading ? (
-              <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+              <span className="inline-block w-4 h-4 border-2 border-[#0B0C10] border-t-transparent rounded-full animate-spin"></span>
             ) : (
               <>
-                <span>Save Password & Enter App</span>
+                <span>Save password and continue</span>
                 <ArrowRight size={16} />
               </>
             )}

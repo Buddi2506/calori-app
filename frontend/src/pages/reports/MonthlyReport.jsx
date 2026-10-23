@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { format } from 'date-fns';
 import { getMonthlyReport } from '../../api/reports';
+import StatCard from '../../components/ui/StatCard';
 import CalendarHeatmap from './CalendarHeatmap';
-import { Spinner, EmptyState } from './shared';
+import { Spinner, EmptyState, PeriodNav, GoalDaysCard } from './shared';
 
-// ─── Helpers ────────────────────────────────────────────────────────────────
-const pct = (val, goal) => (goal > 0 ? Math.min(100, Math.round((val / goal) * 100)) : 0);
-
-// ─── Monthly Report Tab ──────────────────────────────────────────────────────
 const MonthlyReport = () => {
   const now = new Date();
   const [year, setYear] = useState(now.getFullYear());
@@ -22,107 +20,78 @@ const MonthlyReport = () => {
       .finally(() => setLoading(false));
   }, [year, month]);
 
-  const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  // Move by whole months; Date handles the year rollover
+  const shift = (delta) => {
+    const d = new Date(year, month - 1 + delta, 1);
+    setYear(d.getFullYear());
+    setMonth(d.getMonth() + 1);
+  };
+  const isCurrent = year === now.getFullYear() && month === now.getMonth() + 1;
+  const logged = report?.total_logged_days || 0;
 
   return (
-    <div className="space-y-6">
-      {/* Month picker */}
-      <div className="zentra-card p-5 md:p-6 flex items-center gap-4 flex-wrap">
-        <label className="text-sm font-bold text-gray-800">Select Month:</label>
-        <select
-          value={month}
-          onChange={e => setMonth(Number(e.target.value))}
-          className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-sm font-semibold text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-500/30"
-        >
-          {MONTH_NAMES.map((m, i) => (
-            <option key={i + 1} value={i + 1}>{m}</option>
-          ))}
-        </select>
-        <select
-          value={year}
-          onChange={e => setYear(Number(e.target.value))}
-          className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-sm font-semibold text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-500/30"
-        >
-          {[now.getFullYear(), now.getFullYear() - 1].map(y => (
-            <option key={y} value={y}>{y}</option>
-          ))}
-        </select>
-      </div>
+    <div className="flex flex-col gap-5">
+      <PeriodNav
+        label={format(new Date(year, month - 1, 1), 'MMMM yyyy')}
+        onPrev={() => shift(-1)}
+        onNext={() => shift(1)}
+        onReset={() => { setYear(now.getFullYear()); setMonth(now.getMonth() + 1); }}
+        resetLabel="This month"
+        atLatest={isCurrent}
+      />
 
-      {loading ? <Spinner /> : report ? (
+      {loading ? <Spinner /> : !report ? (
+        <EmptyState message="Couldn't load this month's report." />
+      ) : (
         <>
-          {/* Summary sentences from API */}
-          {report.summary_sentences?.length > 0 && (
-            <div className="zentra-card p-6 bg-emerald-50/70 border border-emerald-200/70">
-              <h3 className="font-extrabold text-emerald-900 mb-3 text-base">📝 Monthly Summary</h3>
-              <ul className="space-y-2">
-                {report.summary_sentences.map((s, i) => (
-                  <li key={i} className="text-sm text-emerald-800 flex gap-2 font-medium">
-                    <span className="text-emerald-600 font-bold">✓</span>
-                    <span>{s}</span>
-                  </li>
-                ))}
-              </ul>
+          {logged > 0 && (
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              <StatCard label="Avg. calories" value={Math.round(report.averages?.calories || 0).toLocaleString()} unit="kcal"
+                note={`${logged} ${logged === 1 ? 'day' : 'days'} logged`} accent="stripe-amber" />
+              <StatCard label="Avg. protein" value={(report.averages?.protein || 0).toFixed(1)} unit="g"
+                note={`goal ${Math.round(report.goals?.protein || 0)} g`} accent="stripe-green" />
+              <StatCard label="Avg. fiber" value={(report.averages?.fiber || 0).toFixed(1)} unit="g"
+                note={`goal ${Math.round(report.goals?.fiber || 0)} g`} accent="stripe-amber" />
+              <StatCard label="Avg. fat" value={(report.averages?.fat || 0).toFixed(1)} unit="g"
+                note={`goal ${Math.round(report.goals?.fat || 0)} g`} accent="stripe-pink" />
             </div>
           )}
 
-          {/* Average Cards */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {[
-              { label: 'Avg. Daily Calories', val: Math.round(report.averages?.calories || 0), unit: 'kcal', color: 'text-gray-900' },
-              { label: 'Avg. Protein', val: (report.averages?.protein || 0).toFixed(1), unit: 'g', color: 'text-emerald-600' },
-              { label: 'Avg. Fiber', val: (report.averages?.fiber || 0).toFixed(1), unit: 'g', color: 'text-emerald-700' },
-              { label: 'Avg. Fat', val: (report.averages?.fat || 0).toFixed(1), unit: 'g', color: 'text-pink-600' },
-            ].map(c => (
-              <div key={c.label} className="zentra-card p-5 text-center">
-                <p className={`text-3xl font-black ${c.color}`}>{c.val}</p>
-                <p className="text-xs font-bold text-gray-400 mt-1 uppercase tracking-wider">{c.label} ({c.unit})</p>
-              </div>
-            ))}
+          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] gap-4 items-start">
+            {report.calendar_data && (
+              <section className="zentra-card p-6">
+                <h3 className="text-base font-extrabold text-gray-900 mb-4">Calories vs goal</h3>
+                <CalendarHeatmap
+                  calendarData={report.calendar_data}
+                  calorieGoal={report.averages?.goal_calories || 2000}
+                  year={year}
+                  month={month}
+                />
+              </section>
+            )}
+
+            <section className="zentra-card p-6 flex flex-col gap-3">
+              <h3 className="text-base font-extrabold text-gray-900">Summary</h3>
+              {report.summary_sentences?.length > 0 ? (
+                <ul className="flex flex-col gap-2.5">
+                  {report.summary_sentences.map((s, i) => (
+                    <li key={i} className="text-sm text-gray-700 flex gap-2.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-2 shrink-0" aria-hidden="true" />
+                      <span>{s}</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-sm text-gray-500">Nothing logged this month yet. A summary appears once you log a few days.</p>
+              )}
+            </section>
           </div>
 
-          {/* Calendar Heatmap */}
-          {report.calendar_data && (
-            <div className="zentra-card p-6 md:p-8">
-              <h3 className="font-extrabold text-gray-900 mb-5 text-base">
-                Calorie Goal Achievement — {MONTH_NAMES[month - 1]} {year}
-              </h3>
-              <CalendarHeatmap calendarData={report.calendar_data} calorieGoal={report.averages?.goal_calories || 2000} />
-            </div>
-          )}
-
-          {/* Days goal met per nutrient with Candy-Stripes */}
-          {report.days_goal_met && (
-            <div className="zentra-card p-6 md:p-8">
-              <h3 className="font-extrabold text-gray-900 mb-5 text-base">
-                Days Goal Was Met (out of {report.total_logged_days || 30})
-              </h3>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {Object.entries(report.days_goal_met).map(([nutrient, days]) => {
-                  const total = report.total_logged_days || 30;
-                  const pctVal = pct(days, total);
-                  const stripeClass = pctVal >= 70 ? 'stripe-green' : pctVal >= 40 ? 'stripe-amber' : 'stripe-pink';
-
-                  return (
-                    <div key={nutrient} className="bg-gray-50/80 border border-gray-200/70 rounded-2xl p-4 text-center">
-                      <p className="text-3xl font-black text-gray-900">
-                        {days}<span className="text-base text-gray-400 font-normal">/{total}</span>
-                      </p>
-                      <p className="text-xs font-bold text-gray-600 capitalize mt-1 mb-2.5">{nutrient.replace(/_/g, ' ')}</p>
-                      <div className="w-full bg-gray-200/70 rounded-full h-2 overflow-hidden">
-                        <div
-                          className={`h-full rounded-full transition-all duration-700 ${stripeClass}`}
-                          style={{ width: `${pctVal}%` }}
-                        />
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
+          {logged > 0 && report.days_goal_met && (
+            <GoalDaysCard daysMet={report.days_goal_met} loggedDays={logged} />
           )}
         </>
-      ) : <EmptyState message="No data found for this month. Start logging to see your monthly report!" />}
+      )}
     </div>
   );
 };

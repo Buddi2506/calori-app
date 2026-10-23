@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Dialog } from '@headlessui/react';
 import { X, Plus } from 'lucide-react';
-import Segmented from './Segmented';
+import Segmented from '../../components/ui/Segmented';
 import { MACRO_COLORS, macroSplit, nutrientsFor, portionLabel, proteinDensity, foodTags } from './nutrition';
 
 const MACROS = [

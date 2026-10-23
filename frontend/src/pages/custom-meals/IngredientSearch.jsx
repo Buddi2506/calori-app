@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Search } from 'lucide-react';
+import { Search, Plus } from 'lucide-react';
 import { searchFoods } from '../../api/foods';
 import { useDebounce } from '../../hooks/useDebounce';
 
-// Search box with a results dropdown; picking a food clears the search.
+// Search box with a results list; picking a food clears the search.
 const IngredientSearch = ({ onPick }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const debouncedSearch = useDebounce(searchQuery, 400);
@@ -29,45 +29,45 @@ const IngredientSearch = ({ onPick }) => {
   };
 
   return (
-    <>
-      {/* Search input */}
-      <div className="relative mb-2">
-        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-          <Search className="h-4 w-4 text-gray-400" />
-        </div>
+    <div className="flex flex-col gap-2">
+      <div className="flex items-center gap-3 h-12 px-4 rounded-2xl bg-[#0E0F13] border border-gray-200 focus-within:border-amber-400 focus-within:ring-2 focus-within:ring-amber-400/30 transition-colors">
+        <Search size={17} className="text-gray-600 shrink-0" aria-hidden="true" />
         <input
           type="text"
-          className="input-field pl-9 text-sm"
-          placeholder="Search foods to add (e.g. Oats, Mix Seeds, Milk, Dosa)..."
+          aria-label="Search foods to add"
+          className="flex-1 min-w-0 h-11 bg-transparent outline-none text-sm text-gray-900 placeholder-gray-500"
+          placeholder="Search foods to add — oats, seeds, milk, dosa…"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
       </div>
 
-      {/* Search Results Dropdown */}
       {searching ? (
-        <div className="p-3 text-center text-xs text-gray-500">Searching...</div>
+        <p className="px-1 text-xs text-gray-500">Searching…</p>
       ) : searchResults.length > 0 ? (
-        <div className="max-h-48 overflow-y-auto border border-gray-200 rounded-xl divide-y divide-gray-100 bg-white shadow-md mb-3">
+        <ul className="max-h-52 overflow-y-auto rounded-2xl border border-gray-200 bg-white p-1.5">
           {searchResults.map(food => (
-            <div
-              key={food.id}
-              onClick={() => handlePick(food)}
-              className="p-2.5 hover:bg-green-50/70 cursor-pointer flex justify-between items-center text-sm transition-colors"
-            >
-              <div>
-                <span className="font-semibold text-gray-900">{food.name}</span>
-                {food.name_local && <span className="text-xs text-orange-600 ml-2 font-medium">{food.name_local}</span>}
-                <span className="text-xs text-gray-400 ml-2">({Math.round(food.calories || 0)} kcal/100g)</span>
-              </div>
-              <span className="text-xs font-semibold text-primary px-2.5 py-1 bg-green-50 rounded-md">
-                + Add
-              </span>
-            </div>
+            <li key={food.id}>
+              <button
+                onClick={() => handlePick(food)}
+                className="w-full text-left px-3 py-2.5 rounded-xl hover:bg-gray-100 flex items-center gap-3 transition-colors"
+              >
+                <span className="flex-1 min-w-0">
+                  <span className="block text-sm font-semibold text-gray-900 truncate">{food.name}</span>
+                  <span className="block text-xs text-gray-500 truncate">
+                    {food.name_local && <span className="text-orange-600">{food.name_local} · </span>}
+                    {Math.round(food.calories || 0)} kcal / 100g
+                  </span>
+                </span>
+                <span className="h-7 px-2.5 rounded-full border border-gray-200 text-xs font-bold text-gray-900 flex items-center gap-1 shrink-0">
+                  <Plus size={13} /> Add
+                </span>
+              </button>
+            </li>
           ))}
-        </div>
+        </ul>
       ) : null}
-    </>
+    </div>
   );
 };
 

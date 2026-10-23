@@ -1,8 +1,37 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { format, addDays, subDays, parseISO } from 'date-fns';
 import { formatApiDate } from '../../utils/formatters';
 import { getDailyReport } from '../../api/reports';
 import CandyStripeProgressBar from '../../components/CandyStripeProgressBar';
-import { Spinner, EmptyState } from './shared';
+import StatCard from '../../components/ui/StatCard';
+import Segmented from '../../components/ui/Segmented';
+import { MEAL_COLORS } from '../../components/dashboard/CaloriesCard';
+import { mealLabel } from '../../utils/quickAdd';
+import { Spinner, EmptyState, PeriodNav } from './shared';
+
+const GOAL_BARS = {
+  macros: [
+    { label: 'Calories', key: 'calories', unit: 'kcal', color: 'amber' },
+    { label: 'Protein', key: 'protein', unit: 'g', color: 'green' },
+    { label: 'Carbs', key: 'carbohydrates', unit: 'g', color: 'blue' },
+    { label: 'Fat', key: 'fat', unit: 'g', color: 'pink' },
+    { label: 'Fiber', key: 'fiber', unit: 'g', color: 'amber' },
+    { label: 'Sodium (limit)', key: 'sodium', unit: 'mg', color: 'pink' },
+  ],
+  micros: [
+    { label: 'Iron', key: 'iron', unit: 'mg', color: 'green' },
+    { label: 'Calcium', key: 'calcium', unit: 'mg', color: 'blue' },
+    { label: 'Potassium', key: 'potassium', unit: 'mg', color: 'blue' },
+    { label: 'Magnesium', key: 'magnesium', unit: 'mg', color: 'green' },
+    { label: 'Zinc', key: 'zinc', unit: 'mg', color: 'green' },
+    { label: 'Vitamin C', key: 'vitamin_c', unit: 'mg', color: 'amber' },
+    { label: 'Vitamin D', key: 'vitamin_d', unit: 'mcg', color: 'amber' },
+    { label: 'Vitamin B12', key: 'vitamin_b12', unit: 'mcg', color: 'pink' },
+  ],
+};
+
+const MEAL_ORDER = ['breakfast', 'lunch', 'snack', 'dinner'];
 
 // ─── Daily Report Nutrient Columns ──────────────────────────────────────────
 const ALL_NUTRIENT_COLS = [
@@ -25,7 +54,8 @@ const ALL_NUTRIENT_COLS = [
 
 // ─── Daily Report Tab ────────────────────────────────────────────────────────
 const DailyReport = () => {
-  const [date, setDate] = useState(formatApiDate(new Date()));
+  const today = formatApiDate(new Date());
+  const [date, setDate] = useState(today);
   const [report, setReport] = useState(null);
   const [loading, setLoading] = useState(false);
   const [nutrientFilter, setNutrientFilter] = useState('all');
@@ -39,110 +69,70 @@ const DailyReport = () => {
   }, [date]);
 
   return (
-    <div className="space-y-6">
-      <div className="zentra-card p-5 md:p-6 flex items-center gap-4 flex-wrap">
-        <label className="text-sm font-bold text-gray-800">Select Date:</label>
-        <input
-          type="date"
-          value={date}
-          max={formatApiDate(new Date())}
-          onChange={e => setDate(e.target.value)}
-          className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-sm font-semibold text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-500/30"
-        />
-      </div>
+    <div className="flex flex-col gap-5">
+      <PeriodNav
+        label={format(parseISO(date), 'EEEE, d MMM')}
+        onPrev={() => setDate(formatApiDate(subDays(parseISO(date), 1)))}
+        onNext={() => setDate(formatApiDate(addDays(parseISO(date), 1)))}
+        onReset={() => setDate(today)}
+        resetLabel="Today"
+        atLatest={date >= today}
+      />
 
       {loading ? <Spinner /> : report ? (
         <>
-          {/* Summary Cards */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {[
-              { label: 'Calories', val: Math.round(report.totals?.calories || 0), unit: 'kcal', color: 'text-gray-900' },
-              { label: 'Protein', val: (report.totals?.protein || 0).toFixed(1), unit: 'g', color: 'text-emerald-600' },
-              { label: 'Carbs', val: (report.totals?.carbohydrates || 0).toFixed(1), unit: 'g', color: 'text-blue-600' },
-              { label: 'Fat', val: (report.totals?.fat || 0).toFixed(1), unit: 'g', color: 'text-pink-600' },
-            ].map(c => (
-              <div key={c.label} className="zentra-card p-5 text-center">
-                <p className={`text-3xl font-black ${c.color}`}>{c.val}</p>
-                <p className="text-xs font-bold text-gray-400 mt-1 uppercase tracking-wider">{c.label} ({c.unit})</p>
-              </div>
-            ))}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <StatCard label="Calories" value={Math.round(report.totals?.calories || 0).toLocaleString()} unit="kcal"
+              note={`of ${Math.round(report.goals?.calories || 0).toLocaleString()} goal`} accent="stripe-amber" />
+            <StatCard label="Protein" value={(report.totals?.protein || 0).toFixed(1)} unit="g"
+              note={`of ${Math.round(report.goals?.protein || 0)} g goal`} accent="stripe-green" />
+            <StatCard label="Carbs" value={(report.totals?.carbohydrates || 0).toFixed(1)} unit="g"
+              note={`of ${Math.round(report.goals?.carbohydrates || 0)} g goal`} accent="stripe-blue" />
+            <StatCard label="Fat" value={(report.totals?.fat || 0).toFixed(1)} unit="g"
+              note={`of ${Math.round(report.goals?.fat || 0)} g goal`} accent="stripe-pink" />
           </div>
 
-          {/* Goal progress with modern Candy-Stripe status bars */}
-          <div className="zentra-card p-6 md:p-8">
-            <div className="flex justify-between items-center mb-6">
-              <div>
-                <h3 className="text-base font-extrabold text-gray-900">Goal Achievement</h3>
-                <p className="text-xs text-gray-400 font-medium">Daily nutritional intake vs target goals</p>
-              </div>
-              <span className="text-xs font-bold px-3 py-1 bg-gray-100 text-gray-700 rounded-full">
-                Zentra Bio-Meter
-              </span>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-5">
-              {[
-                { label: 'Calories', key: 'calories', unit: 'kcal', color: 'amber' },
-                { label: 'Protein', key: 'protein', unit: 'g', color: 'green' },
-                { label: 'Carbohydrates', key: 'carbohydrates', unit: 'g', color: 'blue' },
-                { label: 'Healthy Fat', key: 'fat', unit: 'g', color: 'pink' },
-                { label: 'Dietary Fiber', key: 'fiber', unit: 'g', color: 'green' },
-                { label: 'Iron (Fe)', key: 'iron', unit: 'mg', color: 'green' },
-                { label: 'Calcium (Ca)', key: 'calcium', unit: 'mg', color: 'blue' },
-                { label: 'Potassium (K)', key: 'potassium', unit: 'mg', color: 'blue' },
-                { label: 'Vitamin C', key: 'vitamin_c', unit: 'mg', color: 'amber' },
-                { label: 'Vitamin D', key: 'vitamin_d', unit: 'mcg', color: 'amber' },
-                { label: 'Vitamin B12', key: 'vitamin_b12', unit: 'mcg', color: 'pink' },
-                { label: 'Zinc (Zn)', key: 'zinc', unit: 'mg', color: 'green' },
-                { label: 'Magnesium', key: 'magnesium', unit: 'mg', color: 'green' },
-                { label: 'Sodium (Na)', key: 'sodium', unit: 'mg', color: 'pink' },
-              ].map(n => (
-                <CandyStripeProgressBar
-                  key={n.key}
-                  label={n.label}
-                  current={report.totals?.[n.key] || 0}
-                  goal={report.goals?.[n.key] || 1}
-                  unit={n.unit}
-                  color={n.color}
-                />
-              ))}
-            </div>
-          </div>
-
-          {/* Food log & comprehensive micronutrient breakdown */}
-          <div className="space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2">
-              <div>
-                <h3 className="text-lg font-black text-gray-900 tracking-tight flex items-center gap-2">
-                  <span>🍽️ Meal Intake & Micronutrient Breakdown</span>
-                </h3>
-                <p className="text-xs text-gray-500 font-medium mt-0.5">
-                  Complete breakdown of vitamins, minerals, and macronutrients calculated by portion weight
-                </p>
-              </div>
-
-              {/* View filter switcher */}
-              <div className="flex items-center gap-1 bg-white p-1 rounded-full border border-gray-200/80 shadow-sm self-start sm:self-auto text-xs font-bold">
-                {[
-                  { id: 'all', label: 'All Nutrients (15)' },
-                  { id: 'micros', label: 'Micronutrients Only' },
-                  { id: 'macros', label: 'Macros Only' },
-                ].map((f) => (
-                  <button
-                    key={f.id}
-                    onClick={() => setNutrientFilter(f.id)}
-                    className={`px-3 py-1 rounded-full transition-all ${
-                      nutrientFilter === f.id
-                        ? 'pill-active shadow-sm'
-                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100/60'
-                    }`}
-                  >
-                    {f.label}
-                  </button>
+          <section className="zentra-card p-6 grid grid-cols-1 lg:grid-cols-2 gap-x-10 gap-y-6">
+            {[['Energy and macros', GOAL_BARS.macros], ['Vitamins and minerals', GOAL_BARS.micros]].map(([title, bars]) => (
+              <div key={title} className="flex flex-col gap-4">
+                <h3 className="text-base font-extrabold text-gray-900">{title}</h3>
+                {bars.map((n) => (
+                  <CandyStripeProgressBar
+                    key={n.key}
+                    label={n.label}
+                    current={report.totals?.[n.key] || 0}
+                    goal={report.goals?.[n.key] || 1}
+                    unit={n.unit}
+                    color={n.color}
+                  />
                 ))}
               </div>
+            ))}
+          </section>
+
+          {/* Food log & comprehensive micronutrient breakdown */}
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-wrap items-end justify-between gap-3 pt-2">
+              <div>
+                <h3 className="text-lg font-black text-gray-900 tracking-tight">Food breakdown</h3>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  Every nutrient for each food, by portion weight ·{' '}
+                  <Link to={`/diary/${date}`} className="font-bold text-amber-400 hover:text-amber-300">Open diary</Link>
+                </p>
+              </div>
+              <Segmented
+                label="Columns"
+                value={nutrientFilter}
+                onChange={setNutrientFilter}
+                options={[
+                  { id: 'all', label: 'All' },
+                  { id: 'macros', label: 'Macros' },
+                  { id: 'micros', label: 'Vitamins & minerals' },
+                ]}
+              />
             </div>
 
-            {Object.entries(report.entries || report.by_meal || {}).map(([mealType, items]) => {
+            {MEAL_ORDER.map((mealType) => [mealType, (report.entries || report.by_meal || {})[mealType]]).map(([mealType, items]) => {
               if (!items || items.length === 0) return null;
 
               // Compute meal totals
@@ -173,33 +163,26 @@ const DailyReport = () => {
               });
 
               return (
-                <div key={mealType} className="zentra-card p-5 sm:p-7 overflow-hidden">
-                  <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
-                    <h4 className="font-extrabold text-gray-900 capitalize flex items-center gap-2 text-base">
-                      <span>
-                        {mealType === 'snack' ? '🍿' : mealType === 'breakfast' ? '🌅' : mealType === 'lunch' ? '🌞' : '🌙'}
-                      </span>
-                      <span>{mealType}</span>
-                      <span className="text-xs font-semibold text-gray-400">
-                        ({items.length} item{items.length > 1 ? 's' : ''} &bull; {Math.round(mealTotals.quantity_g)}g)
-                      </span>
-                    </h4>
-
-                    <div className="flex items-center gap-3 text-xs">
-                      <span className="font-black text-gray-900 bg-amber-50 text-amber-800 px-2.5 py-1 rounded-xl border border-amber-200/60">
-                        {Math.round(mealTotals.calories)} kcal
-                      </span>
-                      <span className="text-gray-400 font-medium hidden sm:inline text-[11px]">
-                        👉 Scroll horizontally for all micronutrients
-                      </span>
+                <div key={mealType} className="zentra-card p-5 sm:p-6 overflow-hidden">
+                  <div className="flex items-center gap-3 mb-4">
+                    <span className="w-1.5 h-9 rounded-full shrink-0" style={{ background: MEAL_COLORS[mealType] }} aria-hidden="true" />
+                    <div className="flex-1 min-w-0">
+                      <h4 className="text-base font-extrabold text-gray-900">{mealLabel(mealType)}</h4>
+                      <p className="text-xs text-gray-500">
+                        {items.length} {items.length === 1 ? 'item' : 'items'} · {Math.round(mealTotals.quantity_g)} g
+                        <span className="hidden sm:inline"> · scroll the table sideways for more</span>
+                      </p>
                     </div>
+                    <span className="text-lg font-black text-gray-900">
+                      {Math.round(mealTotals.calories)} <span className="text-xs font-normal text-gray-500">kcal</span>
+                    </span>
                   </div>
 
-                  <div className="overflow-x-auto rounded-2xl border border-gray-200/80 shadow-sm">
+                  <div className="overflow-x-auto rounded-2xl border border-gray-100">
                     <table className="w-full text-xs border-collapse">
                       <thead>
-                        <tr className="bg-gray-50/90 text-[11px] font-extrabold text-gray-500 uppercase tracking-wider border-b border-gray-200">
-                          <th className="sticky left-0 bg-gray-100 py-3 px-4 text-left z-20 border-r border-gray-200 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.4)] min-w-[190px]">
+                        <tr className="bg-gray-50 text-[11px] font-bold text-gray-500 border-b border-gray-100">
+                          <th className="sticky left-0 bg-gray-50 py-3 px-4 text-left z-20 border-r border-gray-200 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.4)] min-w-[190px]">
                             Food
                           </th>
                           <th className="py-3 px-3 text-right min-w-[90px] border-b border-gray-200">Portion</th>
@@ -214,13 +197,13 @@ const DailyReport = () => {
                       </thead>
                       <tbody className="divide-y divide-gray-100 bg-white">
                         {items.map((item) => (
-                          <tr key={item.id} className="group hover:bg-amber-50/20 transition-colors">
+                          <tr key={item.id} className="group hover:bg-gray-50 transition-colors">
                             {/* Sticky Food Name Column */}
-                            <td className="sticky left-0 bg-white group-hover:bg-[#1E2027] py-3.5 px-4 font-bold text-gray-900 z-10 border-r border-gray-100 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.4)] whitespace-nowrap">
+                            <td className="sticky left-0 bg-white group-hover:bg-gray-50 py-3.5 px-4 font-bold text-gray-900 z-10 border-r border-gray-100 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.4)] whitespace-nowrap">
                               <div className="flex flex-col">
                                 <span className="text-xs font-black text-gray-900">{item.food?.name || item.food_name || 'Food'}</span>
                                 {item.food?.category && (
-                                  <span className="text-[10px] font-semibold text-amber-700/80 uppercase tracking-wider">{item.food.category}</span>
+                                  <span className="text-[11px] font-medium text-gray-500">{item.food.category}</span>
                                 )}
                               </div>
                             </td>
@@ -260,10 +243,10 @@ const DailyReport = () => {
                         ))}
 
                         {/* Meal Totals Summary Row */}
-                        <tr className="bg-gray-50/90 border-t-2 border-gray-200 font-black text-xs">
-                          <td className="sticky left-0 bg-gray-100 py-3.5 px-4 z-10 border-r border-gray-200 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.4)] whitespace-nowrap">
-                            <span className="font-black text-gray-900 uppercase tracking-wider text-[11px]">
-                              Total {mealType}
+                        <tr className="bg-gray-50 border-t border-gray-200 font-black text-xs">
+                          <td className="sticky left-0 bg-gray-50 py-3.5 px-4 z-10 border-r border-gray-200 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.4)] whitespace-nowrap">
+                            <span className="font-black text-gray-900 text-xs">
+                              {mealLabel(mealType)} total
                             </span>
                           </td>
                           <td className="py-3.5 px-3 text-right text-gray-500 whitespace-nowrap">
@@ -301,7 +284,7 @@ const DailyReport = () => {
             })}
           </div>
         </>
-      ) : <EmptyState message="No data found for this date." />}
+      ) : <EmptyState message="Couldn't load this day's report." />}
     </div>
   );
 };

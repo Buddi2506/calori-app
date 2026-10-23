@@ -3,7 +3,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { Users, Shield, LogOut, Flame } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
-export const userInitials = (user) => (user?.full_name || user?.username || 'NK')
+export const userInitials = (user) => (user?.full_name || user?.username || '?')
   .split(' ')
   .map((n) => n[0])
   .join('')

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { getFoodLibrary } from '../api/foods';
 import { useDebounce } from '../hooks/useDebounce';
 import { formatApiDate } from '../utils/formatters';
-import Segmented from './food-list/Segmented';
+import Segmented from '../components/ui/Segmented';
 import FoodToolbar from './food-list/FoodToolbar';
 import FoodCategorySection from './food-list/FoodCategorySection';
 import FoodTile from './food-list/FoodTile';

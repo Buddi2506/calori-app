@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { Dialog } from '@headlessui/react';
-import { X, Check, Trash2, AlertCircle } from 'lucide-react';
+import { Check, Trash2, AlertCircle } from 'lucide-react';
 import { createMeal, updateMeal } from '../../api/meals';
 import IngredientSearch from './IngredientSearch';
+import Modal, { FieldLabel } from '../../components/ui/Modal';
+import MacroSplitBar from '../../components/ui/MacroSplitBar';
 import {
   EMOJI_OPTIONS, UNIT_OPTIONS, itemFromSaved, itemFromFood, withQuantity, withUnit, mealTotals,
 } from './mealItems';
@@ -80,10 +81,10 @@ const MealEditorModal = ({ meal: editingMeal, onClose, onSaved }) => {
 
       if (editingMeal) {
         await updateMeal(editingMeal.id, payload);
-        onSaved(`Updated "${finalName}" successfully! ✨`);
+        onSaved(`Saved changes to ${finalName}`);
       } else {
         await createMeal(payload);
-        onSaved(`Created "${finalName}" successfully! 🎉`);
+        onSaved(`Created ${finalName}`);
       }
     } catch (err) {
       console.error('Save meal error:', err);
@@ -94,187 +95,170 @@ const MealEditorModal = ({ meal: editingMeal, onClose, onSaved }) => {
   };
 
   return (
-    <Dialog open onClose={onClose} className="relative z-50">
-      <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" aria-hidden="true" />
-      <div className="fixed inset-0 flex w-screen items-center justify-center p-4">
-        <Dialog.Panel className="mx-auto max-w-xl w-full bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col h-[90vh] max-h-[740px]">
-          {/* Modal Header */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gray-50/50">
-            <Dialog.Title className="text-lg font-bold text-gray-900 flex items-center gap-2">
-              <span>{editingMeal ? '✏️ Edit Custom Meal' : '✨ Create Custom Meal'}</span>
-            </Dialog.Title>
-            <button
-              onClick={onClose}
-              className="p-1.5 hover:bg-gray-100 rounded-lg text-gray-500"
-            >
-              <X size={20} />
-            </button>
+    <Modal
+      title={editingMeal ? 'Edit meal' : 'New meal'}
+      subtitle={items.length ? `${items.length} ${items.length === 1 ? 'food' : 'foods'} · ${totalMealNutrition.calories} kcal` : 'Add the foods you eat together'}
+      icon={emoji}
+      size="lg"
+      onClose={onClose}
+      footer={
+        <>
+          <button onClick={onClose} className="btn-secondary text-sm">Cancel</button>
+          <button
+            onClick={handleSaveMeal}
+            disabled={saving || items.length === 0}
+            className="btn-primary text-sm flex items-center gap-1.5"
+          >
+            <Check size={17} /> {saving ? 'Saving…' : editingMeal ? 'Save changes' : 'Save meal'}
+          </button>
+        </>
+      }
+    >
+      <div className="flex flex-col gap-5">
+        {errorMessage && (
+          <div role="alert" className="bg-rose-50 border border-rose-200 text-rose-700 px-4 py-3 rounded-2xl flex items-center gap-2 text-sm">
+            <AlertCircle size={18} className="shrink-0" />
+            <span>{errorMessage}</span>
           </div>
+        )}
 
-          <div className="flex-1 overflow-y-auto p-6 space-y-6">
-            {/* Inline Error Alert */}
-            {errorMessage && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl flex items-center gap-2 text-sm">
-                <AlertCircle size={18} className="text-red-500 flex-shrink-0" />
-                <span>{errorMessage}</span>
-              </div>
+        {/* Emoji and name */}
+        <div className="flex gap-3 items-start">
+          <div>
+            <FieldLabel htmlFor="meal-emoji">Icon</FieldLabel>
+            <select
+              id="meal-emoji"
+              value={emoji}
+              onChange={(e) => setEmoji(e.target.value)}
+              className="input-field text-2xl py-1.5 px-2 text-center w-16"
+            >
+              {EMOJI_OPTIONS.map(em => (
+                <option key={em} value={em}>{em}</option>
+              ))}
+            </select>
+          </div>
+          <div className="flex-1">
+            <FieldLabel htmlFor="meal-name">Name</FieldLabel>
+            <input
+              id="meal-name"
+              type="text"
+              placeholder="e.g. Oats with mixed seeds"
+              value={mealName}
+              onChange={(e) => {
+                setMealName(e.target.value);
+                if (errorMessage) setErrorMessage('');
+              }}
+              className="input-field text-base font-semibold"
+              autoFocus
+            />
+            {!mealName.trim() && items.length > 0 && (
+              <p className="text-xs text-gray-500 mt-1.5">
+                Leave empty to name it “{items.map(i => i.food_name).slice(0, 3).join(' + ')}”
+              </p>
             )}
+          </div>
+        </div>
 
-            {/* Meal Name & Emoji */}
-            <div className="flex gap-4 items-start">
-              <div>
-                <label className="block text-xs font-semibold text-gray-600 mb-1">Emoji</label>
-                <select
-                  value={emoji}
-                  onChange={(e) => setEmoji(e.target.value)}
-                  className="input-field text-2xl py-2 px-2 text-center w-16 bg-white"
+        <div>
+          <FieldLabel htmlFor="meal-description">Description (optional)</FieldLabel>
+          <input
+            id="meal-description"
+            type="text"
+            placeholder="e.g. 80g oats + 20g seeds + 1 cup warm milk"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            className="input-field text-sm"
+          />
+        </div>
+
+        {/* Foods in the meal */}
+        <div className="flex flex-col gap-3 pt-4 border-t border-gray-100">
+          <h3 className="text-sm font-bold text-gray-600">Foods</h3>
+          <IngredientSearch onPick={handleAddFoodToMeal} />
+
+          {items.length > 0 ? (
+            <ul className="flex flex-col">
+              {items.map((item, idx) => (
+                <li
+                  key={idx}
+                  className="py-3 border-t border-gray-100 first:border-t-0 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3"
                 >
-                  {EMOJI_OPTIONS.map(em => (
-                    <option key={em} value={em}>{em}</option>
-                  ))}
-                </select>
-              </div>
-              <div className="flex-1">
-                <label className="block text-xs font-semibold text-gray-600 mb-1">
-                  Meal Name <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  placeholder="e.g. Oats with Mix Seeds, Andhra Lunch Thali"
-                  value={mealName}
-                  onChange={(e) => {
-                    setMealName(e.target.value);
-                    if (errorMessage) setErrorMessage('');
-                  }}
-                  className={`input-field text-base font-semibold ${!mealName.trim() && items.length > 0 ? 'border-amber-400 focus:border-amber-500' : ''}`}
-                  autoFocus
-                />
-                {!mealName.trim() && items.length > 0 && (
-                  <p className="text-[11px] text-amber-600 mt-1">
-                    💡 Tip: Leave empty to auto-name as "{items.map(i => i.food_name).slice(0, 2).join(' + ')}"
-                  </p>
-                )}
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-gray-600 mb-1">Description (optional)</label>
-              <input
-                type="text"
-                placeholder="e.g. 80g Oats + 20g Mix Seeds + 1 cup warm milk"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                className="input-field text-sm"
-              />
-            </div>
-
-            {/* Add Foods Section */}
-            <div className="border-t border-gray-100 pt-4">
-              <label className="block text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wider">
-                Add Foods to this Meal
-              </label>
-
-              <IngredientSearch onPick={handleAddFoodToMeal} />
-
-              {/* Selected Items List */}
-              {items.length > 0 ? (
-                <div className="space-y-2 mt-3">
-                  {items.map((item, idx) => (
-                    <div
-                      key={idx}
-                      className="p-3 bg-gray-50 rounded-xl border border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                  <div className="flex-1 min-w-0">
+                    <p className="font-bold text-gray-900 text-sm truncate">{item.food_name}</p>
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      <span className="font-semibold text-gray-700">{item.calories} kcal</span>
+                      <span className="text-emerald-700"> · {item.protein}g P</span>
+                      <span className="text-blue-700"> · {item.carbs}g C</span>
+                      <span className="text-pink-700"> · {item.fat}g F</span>
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="number"
+                      min="0.1"
+                      step="any"
+                      aria-label={`Amount of ${item.food_name}`}
+                      value={item.quantity_display}
+                      onChange={(e) => handleItemQtyChange(idx, e.target.value)}
+                      className="input-field w-20 py-1.5 px-2 text-sm text-center font-bold"
+                    />
+                    <select
+                      aria-label={`Unit for ${item.food_name}`}
+                      value={item.quantity_unit}
+                      onChange={(e) => handleItemUnitChange(idx, e.target.value)}
+                      className="input-field py-1.5 px-2 text-xs font-medium w-28"
                     >
-                      <div className="flex-1">
-                        <p className="font-bold text-gray-900 text-sm">{item.food_name}</p>
-                        <p className="text-xs text-gray-500 mt-0.5">
-                          {item.calories} kcal • P: {item.protein}g • C: {item.carbs}g • F: {item.fat}g
-                          {item.fiber > 0 && <span> • Fiber: {item.fiber}g</span>}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="number"
-                          min="0.1"
-                          step="any"
-                          value={item.quantity_display}
-                          onChange={(e) => handleItemQtyChange(idx, e.target.value)}
-                          className="input-field w-20 py-1 px-2 text-sm text-center font-bold bg-white"
-                        />
-                        <select
-                          value={item.quantity_unit}
-                          onChange={(e) => handleItemUnitChange(idx, e.target.value)}
-                          className="input-field py-1 px-2 text-xs font-medium bg-white w-28"
-                        >
-                          {UNIT_OPTIONS.map(u => (
-                            <option key={u.value} value={u.value}>{u.label}</option>
-                          ))}
-                        </select>
-                        <button
-                          onClick={() => handleRemoveItem(idx)}
-                          className="p-1.5 text-gray-400 hover:text-red-500 rounded-lg transition-colors"
-                          title="Remove item"
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="p-8 text-center bg-gray-50 rounded-xl border border-dashed border-gray-200 text-xs text-gray-500">
-                  <p className="font-medium text-gray-700 mb-1">No foods added to this meal yet</p>
-                  <p className="text-gray-400">Search above (e.g. Oats, Mix Seeds) and click "+ Add" to include ingredients.</p>
-                </div>
+                      {UNIT_OPTIONS.map(u => (
+                        <option key={u.value} value={u.value}>{u.label}</option>
+                      ))}
+                    </select>
+                    <button
+                      onClick={() => handleRemoveItem(idx)}
+                      aria-label={`Remove ${item.food_name}`}
+                      className="p-2 rounded-full text-gray-500 hover:text-rose-600 hover:bg-gray-100 transition-colors"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <div className="p-6 text-center rounded-2xl border border-dashed border-gray-200 text-sm text-gray-500">
+              No foods yet. Search above and tap Add.
+            </div>
+          )}
+        </div>
+
+        {/* Meal totals */}
+        {items.length > 0 && (
+          <div className="rounded-2xl bg-gray-50 border border-gray-100 p-4 flex flex-col gap-3">
+            <div className="flex items-baseline justify-between">
+              <span className="text-sm font-bold text-gray-600">Meal total</span>
+              <span>
+                <span className="text-2xl font-black text-gray-900">{totalMealNutrition.calories}</span>
+                <span className="text-xs text-gray-500"> kcal</span>
+              </span>
+            </div>
+            <MacroSplitBar
+              nutrients={{
+                protein: totalMealNutrition.protein,
+                carbohydrates: totalMealNutrition.carbs,
+                fat: totalMealNutrition.fat,
+              }}
+            />
+            <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs">
+              <span className="text-emerald-700 font-bold">{totalMealNutrition.protein}g <span className="font-normal text-gray-500">protein</span></span>
+              <span className="text-blue-700 font-bold">{totalMealNutrition.carbs}g <span className="font-normal text-gray-500">carbs</span></span>
+              <span className="text-pink-700 font-bold">{totalMealNutrition.fat}g <span className="font-normal text-gray-500">fat</span></span>
+              {totalMealNutrition.fiber > 0 && (
+                <span className="text-gray-700 font-bold">{totalMealNutrition.fiber}g <span className="font-normal text-gray-500">fiber</span></span>
               )}
             </div>
-
-            {/* Total Nutrition Summary */}
-            {items.length > 0 && (
-              <div className="bg-green-50/80 border border-green-200/70 p-4 rounded-xl">
-                <p className="text-xs font-bold text-green-900 uppercase tracking-wider mb-2">Meal Nutrition Total</p>
-                <div className="grid grid-cols-4 gap-2 text-center">
-                  <div>
-                    <span className="block text-xl font-bold text-primary-dark">{totalMealNutrition.calories}</span>
-                    <span className="block text-xs text-gray-600 font-medium">kcal</span>
-                  </div>
-                  <div>
-                    <span className="block text-xl font-bold text-orange-600">{totalMealNutrition.protein}g</span>
-                    <span className="block text-xs text-gray-600 font-medium">Protein</span>
-                  </div>
-                  <div>
-                    <span className="block text-xl font-bold text-yellow-600">{totalMealNutrition.carbs}g</span>
-                    <span className="block text-xs text-gray-600 font-medium">Carbs</span>
-                  </div>
-                  <div>
-                    <span className="block text-xl font-bold text-red-500">{totalMealNutrition.fat}g</span>
-                    <span className="block text-xs text-gray-600 font-medium">Fat</span>
-                  </div>
-                </div>
-                {totalMealNutrition.fiber > 0 && (
-                  <p className="text-center text-xs text-emerald-800 font-semibold mt-2 pt-2 border-t border-green-200/50">
-                    Total Dietary Fiber: {totalMealNutrition.fiber}g
-                  </p>
-                )}
-              </div>
-            )}
           </div>
-
-          {/* Modal Footer */}
-          <div className="p-4 border-t border-gray-100 flex justify-end gap-3 bg-gray-50/50">
-            <button onClick={onClose} className="btn-secondary text-sm">
-              Cancel
-            </button>
-            <button
-              onClick={handleSaveMeal}
-              disabled={saving || items.length === 0}
-              className={`btn-primary text-sm flex items-center gap-1.5 ${saving ? 'opacity-70' : ''} ${items.length === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
-            >
-              <Check size={18} /> {saving ? 'Saving...' : editingMeal ? 'Update Meal' : 'Save Meal'}
-            </button>
-          </div>
-        </Dialog.Panel>
+        )}
       </div>
-    </Dialog>
+    </Modal>
   );
 };
 

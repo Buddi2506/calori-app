@@ -1,6 +1,6 @@
 import React from 'react';
 import { Plus } from 'lucide-react';
-import MacroSplitBar from './MacroSplitBar';
+import MacroSplitBar from '../../components/ui/MacroSplitBar';
 import { nutrientsFor, portionLabel, foodTags } from './nutrition';
 
 const fmt = (v) => Math.round((v || 0) * 10) / 10;

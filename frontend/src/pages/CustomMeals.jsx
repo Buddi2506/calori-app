@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import MealCard from '../components/MealCard';
+import PageHeader from '../components/ui/PageHeader';
+import Toast from '../components/Toast';
+import { useToast } from '../hooks/useToast';
 import { getMeals, deleteMeal } from '../api/meals';
-import { Plus, Check } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import MealEditorModal from './custom-meals/MealEditorModal';
 import LogMealModal from './custom-meals/LogMealModal';
 
 const CustomMeals = () => {
   const [meals, setMeals] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [toastMessage, setToastMessage] = useState('');
+  const [toastMessage, showToast] = useToast();
 
   // { meal: null } to create, { meal } to edit, null when the editor is closed
   const [editor, setEditor] = useState(null);
@@ -17,11 +20,6 @@ const CustomMeals = () => {
   useEffect(() => {
     fetchMeals();
   }, []);
-
-  const showToast = (msg) => {
-    setToastMessage(msg);
-    setTimeout(() => setToastMessage(''), 4000);
-  };
 
   const fetchMeals = async () => {
     try {
@@ -40,7 +38,7 @@ const CustomMeals = () => {
     if (window.confirm('Are you sure you want to delete this custom meal?')) {
       try {
         await deleteMeal(id);
-        showToast('Meal deleted successfully.');
+        showToast('Meal deleted.');
         fetchMeals();
       } catch (err) {
         console.error('Delete error:', err);
@@ -61,35 +59,29 @@ const CustomMeals = () => {
   };
 
   return (
-    <div className="space-y-6 pb-12">
-      {/* Toast Notification */}
-      {toastMessage && (
-        <div className="fixed top-5 right-5 z-50 bg-gray-900 text-white px-5 py-3 rounded-xl shadow-xl flex items-center gap-2 text-sm animate-fade-in border border-gray-700">
-          <Check size={18} className="text-green-400" />
-          <span>{toastMessage}</span>
-        </div>
-      )}
+    <div className="flex flex-col gap-5">
+      <Toast message={toastMessage} />
 
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900">🥘 Custom Meals</h2>
-          <p className="text-gray-500 text-sm mt-1">
-            Create and edit reusable meals with multiple foods. Log them to any diary day in 1 click!
-          </p>
-        </div>
-        <button onClick={handleOpenCreate} className="btn-primary flex items-center gap-2">
-          <Plus size={18} /> Create New Meal
+      <PageHeader
+        eyebrow="Meals"
+        title="Saved meals"
+        subtitle={loading ? 'Loading…' : meals.length
+          ? `${meals.length} ${meals.length === 1 ? 'meal' : 'meals'} · log a whole combo in one tap`
+          : 'Save foods you eat together and log them in one tap'}
+      >
+        <button onClick={handleOpenCreate} className="btn-primary h-11 flex items-center gap-2">
+          <Plus size={18} /> New meal
         </button>
-      </div>
+      </PageHeader>
 
       {loading ? (
-        <div className="text-center py-16">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-          <p className="text-gray-500 text-sm mt-3">Loading custom meals...</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4" aria-label="Loading meals">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="zentra-card !rounded-3xl h-[230px] animate-pulse" />
+          ))}
         </div>
       ) : meals.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {meals.map(meal => (
             <MealCard
               key={meal.id}
@@ -101,15 +93,15 @@ const CustomMeals = () => {
           ))}
         </div>
       ) : (
-        <div className="text-center py-16 bg-white rounded-2xl border border-gray-100 shadow-sm mt-4 p-8">
-          <span className="text-5xl mb-4 block">🍛</span>
-          <h3 className="text-xl font-bold text-gray-900 mb-2">No custom meals yet</h3>
-          <p className="text-gray-500 mb-6 max-w-md mx-auto text-sm leading-relaxed">
-            Create meals for combinations you eat often, like "2 Idlies + Sambar + Chutney" or "Oats + Mix Seeds".
-            Then log everything with just one click!
+        <div className="zentra-card p-10 text-center flex flex-col items-center gap-3">
+          <span className="text-5xl" aria-hidden="true">🍛</span>
+          <h2 className="text-lg font-bold text-gray-900">No saved meals yet</h2>
+          <p className="text-sm text-gray-500 max-w-md leading-relaxed">
+            Save combinations you eat often, like “2 idli + sambar + chutney” or “oats + mixed seeds”,
+            then log the whole meal in one tap.
           </p>
-          <button onClick={handleOpenCreate} className="btn-primary">
-            + Create Your First Meal
+          <button onClick={handleOpenCreate} className="btn-primary flex items-center gap-2">
+            <Plus size={18} /> Create your first meal
           </button>
         </div>
       )}

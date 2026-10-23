@@ -1,6 +1,6 @@
 // Display helpers for library foods (`per_100g` / `per_serving` nutrient blocks from /foods/library).
 
-export const MACRO_COLORS = { protein: '#10B981', carbohydrates: '#3B82F6', fat: '#EC4899' };
+export { MACRO_COLORS, macroSplit } from '../../utils/macros';
 
 // Nutrients for the chosen portion mode, falling back to per 100 g.
 export const nutrientsFor = (item, portionMode) =>
@@ -10,22 +10,6 @@ export const portionLabel = (item, portionMode) =>
   portionMode === 'serving'
     ? `per 1 ${item.serving_unit}${item.serving_unit !== 'g' && item.serving_unit !== 'ml' ? ` (${item.serving_unit_weight_g}g)` : ''}`
     : `per ${item.base_unit}`;
-
-// Share of calories from each macro (4/4/9 kcal per gram), or null when there are none.
-export const macroSplit = (n) => {
-  const kcal = {
-    protein: (n.protein || 0) * 4,
-    carbohydrates: (n.carbohydrates || 0) * 4,
-    fat: (n.fat || 0) * 9,
-  };
-  const total = kcal.protein + kcal.carbohydrates + kcal.fat;
-  if (!total) return null;
-  return {
-    protein: kcal.protein / total,
-    carbohydrates: kcal.carbohydrates / total,
-    fat: kcal.fat / total,
-  };
-};
 
 // Grams of protein per 100 kcal; the same for any portion size.
 export const proteinDensity = (item) => {

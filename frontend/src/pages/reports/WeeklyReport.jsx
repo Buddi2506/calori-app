@@ -1,19 +1,37 @@
 import React, { useState, useEffect } from 'react';
-import { format, startOfWeek } from 'date-fns';
+import { format, startOfWeek, addDays, subDays, parseISO } from 'date-fns';
+import { useNavigate } from 'react-router-dom';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  LineChart, Line, Legend
+  LineChart, Line, Legend, ReferenceLine, Cell,
 } from 'recharts';
 import { formatApiDate } from '../../utils/formatters';
 import { getWeeklyReport } from '../../api/reports';
-import { Spinner, EmptyState } from './shared';
+import { MACRO_COLORS } from '../../utils/macros';
+import StatCard from '../../components/ui/StatCard';
+import { Spinner, EmptyState, PeriodNav, GoalDaysCard } from './shared';
 
-const MACRO_COLORS = { protein: '#10B981', carbohydrates: '#3B82F6', fat: '#EC4899', fiber: '#F59E0B' };
+const AXIS = { fontSize: 12, fill: '#8E8E98' };
+const TOOLTIP = {
+  contentStyle: { background: '#1A1B21', border: '1px solid #2A2C34', borderRadius: 12, color: '#F4F4F5' },
+  itemStyle: { color: '#F4F4F5' },
+  labelStyle: { color: '#A1A1AA', fontWeight: 700 },
+  cursor: { fill: 'rgba(255,255,255,0.04)' },
+};
 
-// ─── Weekly Report Tab ───────────────────────────────────────────────────────
+// Bar color by how close the day was to the calorie goal (same ±10% rule as the Overview).
+const barColor = (calories, goal) => {
+  if (!calories) return '#2A2C34';
+  const ratio = calories / (goal || 1);
+  if (ratio > 1.1) return '#FB7185';
+  if (ratio < 0.9) return '#FBBF24';
+  return '#34D399';
+};
+
 const WeeklyReport = () => {
-  const defaultStart = formatApiDate(startOfWeek(new Date(), { weekStartsOn: 1 }));
-  const [startDate, setStartDate] = useState(defaultStart);
+  const navigate = useNavigate();
+  const thisWeek = formatApiDate(startOfWeek(new Date(), { weekStartsOn: 1 }));
+  const [startDate, setStartDate] = useState(thisWeek);
   const [report, setReport] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -25,8 +43,15 @@ const WeeklyReport = () => {
       .finally(() => setLoading(false));
   }, [startDate]);
 
+  const start = parseISO(startDate);
+  const end = addDays(start, 6);
+  const label = `${format(start, 'd MMM')} – ${format(end, 'd MMM')}`;
+  const goal = report?.goals?.calories || 2000;
+  const logged = report?.total_logged_days || 0;
+
   const chartData = report?.days?.map(d => ({
-    day: format(new Date(d.date + 'T00:00:00'), 'EEE'),
+    date: d.date,
+    day: format(parseISO(d.date), 'EEE'),
     Calories: Math.round(d.totals?.calories || 0),
     Protein: Math.round(d.totals?.protein || 0),
     Carbs: Math.round(d.totals?.carbohydrates || 0),
@@ -34,96 +59,82 @@ const WeeklyReport = () => {
   })) || [];
 
   return (
-    <div className="space-y-6">
-      <div className="zentra-card p-5 md:p-6 flex items-center gap-4 flex-wrap">
-        <label className="text-sm font-bold text-gray-800">Week Starting:</label>
-        <input
-          type="date"
-          value={startDate}
-          onChange={e => setStartDate(e.target.value)}
-          className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-sm font-semibold text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-500/30"
-        />
-      </div>
+    <div className="flex flex-col gap-5">
+      <PeriodNav
+        label={label}
+        onPrev={() => setStartDate(formatApiDate(subDays(start, 7)))}
+        onNext={() => setStartDate(formatApiDate(addDays(start, 7)))}
+        onReset={() => setStartDate(thisWeek)}
+        resetLabel="This week"
+        atLatest={startDate >= thisWeek}
+      />
 
-      {loading ? <Spinner /> : report ? (
+      {loading ? <Spinner /> : !report ? (
+        <EmptyState message="Couldn't load this week's report." />
+      ) : logged === 0 ? (
+        <EmptyState message="Nothing logged this week yet. Averages and charts appear once you log a day." />
+      ) : (
         <>
-          {/* Average Summary */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {[
-              { label: 'Avg. Calories', val: Math.round(report.averages?.calories || 0), unit: 'kcal', color: 'text-gray-900' },
-              { label: 'Avg. Protein', val: (report.averages?.protein || 0).toFixed(1), unit: 'g', color: 'text-emerald-600' },
-              { label: 'Avg. Carbs', val: (report.averages?.carbohydrates || 0).toFixed(1), unit: 'g', color: 'text-blue-600' },
-              { label: 'Avg. Fat', val: (report.averages?.fat || 0).toFixed(1), unit: 'g', color: 'text-pink-600' },
-            ].map(c => (
-              <div key={c.label} className="zentra-card p-5 text-center">
-                <p className={`text-3xl font-black ${c.color}`}>{c.val}</p>
-                <p className="text-xs font-bold text-gray-400 mt-1 uppercase tracking-wider">{c.label} ({c.unit})</p>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <StatCard label="Avg. calories" value={Math.round(report.averages?.calories || 0).toLocaleString()} unit="kcal"
+              note={`${logged} of 7 days logged`} accent="stripe-amber" />
+            <StatCard label="Avg. protein" value={(report.averages?.protein || 0).toFixed(1)} unit="g"
+              note={`goal ${Math.round(report.goals?.protein || 0)} g`} accent="stripe-green" />
+            <StatCard label="Avg. carbs" value={(report.averages?.carbohydrates || 0).toFixed(1)} unit="g"
+              note={`goal ${Math.round(report.goals?.carbohydrates || 0)} g`} accent="stripe-blue" />
+            <StatCard label="Avg. fat" value={(report.averages?.fat || 0).toFixed(1)} unit="g"
+              note={`goal ${Math.round(report.goals?.fat || 0)} g`} accent="stripe-pink" />
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <section className="zentra-card p-6">
+              <div className="flex items-baseline justify-between gap-3 mb-4">
+                <h3 className="text-base font-extrabold text-gray-900">Calories per day</h3>
+                <span className="text-xs text-gray-500">Tap a bar to open that day</span>
               </div>
-            ))}
+              <ResponsiveContainer width="100%" height={240}>
+                <BarChart data={chartData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#2A2C34" vertical={false} />
+                  <XAxis dataKey="day" tick={AXIS} axisLine={false} tickLine={false} />
+                  {/* Always tall enough to show the goal line */}
+                  <YAxis tick={AXIS} axisLine={false} tickLine={false} width={44}
+                    domain={[0, (max) => Math.ceil((Math.max(max, goal) * 1.1) / 500) * 500]} />
+                  <Tooltip {...TOOLTIP} />
+                  <ReferenceLine y={goal} stroke="#FBBF24" strokeDasharray="4 4" label={{ value: 'Goal', fill: '#FBBF24', fontSize: 11, position: 'insideTopRight' }} />
+                  <Bar dataKey="Calories" radius={[8, 8, 0, 0]} cursor="pointer" onClick={(d) => navigate(`/diary/${d.payload?.date || d.date}`)}>
+                    {chartData.map((d) => <Cell key={d.date} fill={barColor(d.Calories, goal)} />)}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+              <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500 mt-2">
+                <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded bg-[#34D399]" />Within 10% of goal</span>
+                <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded bg-[#FBBF24]" />Under</span>
+                <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded bg-[#FB7185]" />Over</span>
+              </div>
+            </section>
+
+            <section className="zentra-card p-6">
+              <h3 className="text-base font-extrabold text-gray-900 mb-4">Macros per day (g)</h3>
+              <ResponsiveContainer width="100%" height={240}>
+                <LineChart data={chartData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#2A2C34" vertical={false} />
+                  <XAxis dataKey="day" tick={AXIS} axisLine={false} tickLine={false} />
+                  <YAxis tick={AXIS} axisLine={false} tickLine={false} width={44} />
+                  <Tooltip {...TOOLTIP} />
+                  <Legend wrapperStyle={{ fontSize: 12 }} />
+                  <Line type="monotone" dataKey="Protein" stroke={MACRO_COLORS.protein} strokeWidth={2.5} dot={{ r: 3 }} />
+                  <Line type="monotone" dataKey="Carbs" stroke={MACRO_COLORS.carbohydrates} strokeWidth={2.5} dot={{ r: 3 }} />
+                  <Line type="monotone" dataKey="Fat" stroke={MACRO_COLORS.fat} strokeWidth={2.5} dot={{ r: 3 }} />
+                </LineChart>
+              </ResponsiveContainer>
+            </section>
           </div>
 
-          {/* Calorie Bar Chart */}
-          <div className="zentra-card p-6 md:p-8">
-            <h3 className="font-extrabold text-gray-900 mb-4 text-base">Daily Calorie Intake</h3>
-            <ResponsiveContainer width="100%" height={240}>
-              <BarChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#2A2C34" />
-                <XAxis dataKey="day" tick={{ fontSize: 12, fill: '#8E8E98' }} />
-                <YAxis tick={{ fontSize: 12, fill: '#8E8E98' }} />
-                <Tooltip contentStyle={{ background: "#1A1B21", border: "1px solid #2A2C34", borderRadius: 12, color: "#F4F4F5" }} cursor={{ fill: "rgba(255,255,255,0.04)" }} />
-                <Bar dataKey="Calories" fill="#10B981" radius={[6, 6, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-
-          {/* Macro Trend Line Chart */}
-          <div className="zentra-card p-6 md:p-8">
-            <h3 className="font-extrabold text-gray-900 mb-4 text-base">Macro Trend (g/day)</h3>
-            <ResponsiveContainer width="100%" height={240}>
-              <LineChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#2A2C34" />
-                <XAxis dataKey="day" tick={{ fontSize: 12, fill: '#8E8E98' }} />
-                <YAxis tick={{ fontSize: 12, fill: '#8E8E98' }} />
-                <Tooltip contentStyle={{ background: "#1A1B21", border: "1px solid #2A2C34", borderRadius: 12, color: "#F4F4F5" }} cursor={{ fill: "rgba(255,255,255,0.04)" }} />
-                <Legend />
-                <Line type="monotone" dataKey="Protein" stroke={MACRO_COLORS.protein} strokeWidth={2.5} dot={{ r: 4 }} />
-                <Line type="monotone" dataKey="Carbs" stroke={MACRO_COLORS.carbohydrates} strokeWidth={2.5} dot={{ r: 4 }} />
-                <Line type="monotone" dataKey="Fat" stroke={MACRO_COLORS.fat} strokeWidth={2.5} dot={{ r: 4 }} />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-
-          {/* Goal Achievement Days with Candy-Stripes */}
           {report.goal_achievement_days && (
-            <div className="zentra-card p-6 md:p-8">
-              <h3 className="font-extrabold text-gray-900 mb-5 text-base">Days Goal Was Met (out of 7)</h3>
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                {Object.entries(report.goal_achievement_days).map(([nutrient, days]) => {
-                  const pctVal = Math.round((days / 7) * 100);
-                  const stripeClass = pctVal >= 70 ? 'stripe-green' : pctVal >= 40 ? 'stripe-amber' : 'stripe-pink';
-
-                  return (
-                    <div key={nutrient} className="bg-gray-50/80 border border-gray-200/70 rounded-2xl p-4 text-center">
-                      <p className="text-3xl font-black text-gray-900">
-                        {days}<span className="text-base text-gray-400 font-normal">/7</span>
-                      </p>
-                      <p className="text-xs font-bold text-gray-600 capitalize mt-1 mb-2.5">
-                        {nutrient.replace(/_/g, ' ')}
-                      </p>
-                      <div className="w-full bg-gray-200/70 rounded-full h-2 overflow-hidden">
-                        <div
-                          className={`h-full rounded-full transition-all duration-700 ${stripeClass}`}
-                          style={{ width: `${pctVal}%` }}
-                        />
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
+            <GoalDaysCard daysMet={report.goal_achievement_days} loggedDays={logged} />
           )}
         </>
-      ) : <EmptyState message="Log at least a few days to see your weekly report." />}
+      )}
     </div>
   );
 };

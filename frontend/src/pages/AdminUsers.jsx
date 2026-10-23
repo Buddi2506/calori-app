@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import adminApi from '../api/admin';
 import { useAuth } from '../context/AuthContext';
-import { X, AlertCircle, RefreshCw, CheckCircle2 } from 'lucide-react';
-import { format, subDays, addDays } from 'date-fns';
+import { X, AlertCircle, RefreshCw } from 'lucide-react';
+import { format, subDays, addDays, parseISO } from 'date-fns';
+import Toast from '../components/Toast';
+import { useToast } from '../hooks/useToast';
 import UsersHeader from './admin-users/UsersHeader';
 import UserRow from './admin-users/UserRow';
 import AddMemberModal from './admin-users/AddMemberModal';
@@ -16,7 +18,7 @@ const AdminUsers = () => {
   const [usersData, setUsersData] = useState({ total_users: 0, max_allowed: 10, users: [] });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [successMsg, setSuccessMsg] = useState('');
+  const [successMsg, showNotification] = useToast(4000);
 
   // Modals state
   const [showAddModal, setShowAddModal] = useState(false);
@@ -65,11 +67,6 @@ const AdminUsers = () => {
     fetchUsers();
   }, []);
 
-  const showNotification = (msg) => {
-    setSuccessMsg(msg);
-    setTimeout(() => setSuccessMsg(''), 4000);
-  };
-
   // Add Member
   const handleAddSubmit = async (e) => {
     e.preventDefault();
@@ -97,6 +94,7 @@ const AdminUsers = () => {
       calorie_target: u.calorie_target || 2000,
       is_active: u.is_active,
     });
+    setError('');
     setShowEditModal(true);
   };
 
@@ -119,6 +117,7 @@ const AdminUsers = () => {
   const handleResetOpen = (u) => {
     setSelectedUser(u);
     setResetPasswordVal('');
+    setError('');
     setShowResetModal(true);
   };
 
@@ -180,7 +179,7 @@ const AdminUsers = () => {
   };
 
   const handleDateChange = (daysDelta) => {
-    const current = new Date(inspectDate);
+    const current = parseISO(inspectDate); // local date; new Date('yyyy-MM-dd') would be UTC
     const updated = daysDelta > 0 ? addDays(current, daysDelta) : subDays(current, Math.abs(daysDelta));
     const newDateStr = format(updated, 'yyyy-MM-dd');
     setInspectDate(newDateStr);
@@ -190,68 +189,55 @@ const AdminUsers = () => {
   };
 
   const isMaxReached = usersData.total_users >= (usersData.max_allowed || 10);
+  const modalOpen = showAddModal || showEditModal || showResetModal;
 
   return (
-    <div className="space-y-6">
-      {/* Toast Notification */}
-      {successMsg && (
-        <div className="fixed top-20 right-6 z-50 bg-[#24262E] text-white px-5 py-3 rounded-2xl shadow-xl flex items-center gap-3 border border-gray-700 animate-in slide-in-from-top-4 duration-200">
-          <CheckCircle2 size={18} className="text-emerald-400 shrink-0" />
-          <span className="text-xs font-semibold">{successMsg}</span>
-        </div>
-      )}
+    <div className="flex flex-col gap-5">
+      <Toast message={successMsg} />
 
-      <UsersHeader usersData={usersData} isMaxReached={isMaxReached} onAdd={() => setShowAddModal(true)} />
+      <UsersHeader usersData={usersData} isMaxReached={isMaxReached} onAdd={() => { setError(''); setShowAddModal(true); }} />
 
       {/* Error Alert */}
-      {error && (
-        <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200/80 text-rose-700 text-xs font-semibold flex items-center justify-between">
+      {error && !modalOpen && (
+        <div role="alert" className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-sm flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <AlertCircle size={16} className="shrink-0" />
             <span>{error}</span>
           </div>
-          <button onClick={() => setError('')} className="text-rose-400 hover:text-rose-600">
+          <button onClick={() => setError('')} aria-label="Dismiss" className="text-rose-700 hover:text-rose-600">
             <X size={14} />
           </button>
         </div>
       )}
 
-      {/* Users Table / Card Grid */}
-      <div className="bg-white rounded-3xl border border-gray-200/70 shadow-sm overflow-hidden">
-        <div className="p-5 border-b border-gray-100 flex items-center justify-between">
-          <h2 className="text-sm font-black text-gray-900 tracking-tight flex items-center gap-2">
-            <span>Enrolled Accounts</span>
-            <span className="px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 text-[11px] font-bold">
-              {usersData.users.length}
-            </span>
+      <section className="zentra-card !rounded-3xl overflow-hidden">
+        <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+          <h2 className="text-base font-extrabold text-gray-900">
+            Accounts <span className="text-sm font-bold text-gray-500">{usersData.users.length}</span>
           </h2>
           <button
             onClick={fetchUsers}
             disabled={loading}
-            className="p-2 rounded-xl text-gray-400 hover:text-gray-700 hover:bg-gray-50 transition-colors"
-            title="Refresh List"
+            aria-label="Refresh list"
+            className="p-2 rounded-full text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors"
           >
-            <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
+            <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
           </button>
         </div>
 
         {loading ? (
-          <div className="p-12 text-center text-gray-400 flex flex-col items-center gap-3">
-            <span className="inline-block w-6 h-6 border-2 border-amber-500 border-t-transparent rounded-full animate-spin"></span>
-            <span className="text-xs font-medium">Loading user accounts...</span>
-          </div>
+          <p className="p-12 text-center text-sm text-gray-500">Loading accounts…</p>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
+            <table className="w-full text-left border-collapse min-w-[760px]">
               <thead>
-                <tr className="border-b border-gray-100 bg-gray-50/50 text-[11px] font-bold text-gray-400 uppercase tracking-wider">
-                  <th className="py-3 px-5">User</th>
-                  <th className="py-3 px-4">Role</th>
-                  <th className="py-3 px-4">Target Cal</th>
-                  <th className="py-3 px-4">Today Consumed</th>
-                  <th className="py-3 px-4">Activity</th>
-                  <th className="py-3 px-4">Status</th>
-                  <th className="py-3 px-5 text-right">Actions</th>
+                <tr className="border-b border-gray-100 text-xs font-bold text-gray-500">
+                  <th className="py-3 px-5 font-bold">Member</th>
+                  <th className="py-3 px-4 font-bold">Role</th>
+                  <th className="py-3 px-4 font-bold">Today</th>
+                  <th className="py-3 px-4 font-bold">Activity</th>
+                  <th className="py-3 px-4 font-bold">Status</th>
+                  <th className="py-3 px-5 font-bold text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 text-xs">
@@ -270,11 +256,12 @@ const AdminUsers = () => {
             </table>
           </div>
         )}
-      </div>
+      </section>
 
       {showAddModal && (
         <AddMemberModal
           usersData={usersData}
+          error={error}
           addForm={addForm}
           setAddForm={setAddForm}
           onSubmit={handleAddSubmit}
@@ -285,6 +272,7 @@ const AdminUsers = () => {
       {showEditModal && selectedUser && (
         <EditMemberModal
           selectedUser={selectedUser}
+          error={error}
           currentAdmin={currentAdmin}
           editForm={editForm}
           setEditForm={setEditForm}
@@ -296,6 +284,7 @@ const AdminUsers = () => {
       {showResetModal && selectedUser && (
         <ResetPasswordModal
           selectedUser={selectedUser}
+          error={error}
           resetPasswordVal={resetPasswordVal}
           setResetPasswordVal={setResetPasswordVal}
           onSubmit={handleResetSubmit}

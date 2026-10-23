@@ -72,24 +72,25 @@ const FoodSearchModal = ({ isOpen, onClose, onAdd, mealType }) => {
     <Dialog open={isOpen} onClose={onClose} className="relative z-50">
       <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" aria-hidden="true" />
       <div className="fixed inset-0 flex w-screen items-center justify-center p-4">
-        <Dialog.Panel className="mx-auto max-w-lg w-full bg-white rounded-[28px] shadow-2xl overflow-hidden flex flex-col h-[85vh] max-h-[640px] border border-gray-100">
+        <Dialog.Panel className="mx-auto max-w-lg w-full bg-white rounded-[28px] shadow-2xl overflow-hidden flex flex-col h-[85vh] max-h-[680px] border border-gray-100">
           {/* Header */}
-          <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 bg-gray-50/50">
+          <div className="flex items-center justify-between px-5 sm:px-6 py-4 border-b border-gray-100">
             {selectedFood ? (
               <button
                 onClick={handleBack}
-                className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors flex items-center gap-1.5 text-sm font-medium text-gray-700"
+                className="-ml-2 px-2 py-1.5 hover:bg-gray-100 rounded-full transition-colors flex items-center gap-1.5 text-sm font-bold text-gray-700"
               >
-                <ArrowLeft size={18} /> Back to Search
+                <ArrowLeft size={18} /> Back to search
               </button>
             ) : (
-              <Dialog.Title className="text-lg font-bold text-gray-900">
+              <Dialog.Title className="text-base font-extrabold text-gray-900">
                 Add to {mealLabel}
               </Dialog.Title>
             )}
             <button
               onClick={onClose}
-              className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors text-gray-500"
+              aria-label="Close"
+              className="p-2 -mr-2 hover:bg-gray-100 rounded-full transition-colors text-gray-500 hover:text-gray-900"
             >
               <X size={20} />
             </button>
@@ -99,14 +100,13 @@ const FoodSearchModal = ({ isOpen, onClose, onAdd, mealType }) => {
             {!selectedFood ? (
               <div className="p-5 flex flex-col h-full">
                 {/* Search input */}
-                <div className="relative mb-4">
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                    <Search className="h-5 w-5 text-gray-400" />
-                  </div>
+                <div className="flex items-center gap-3 h-[52px] px-4 mb-3 rounded-2xl bg-[#0E0F13] border border-gray-200 focus-within:border-amber-400 focus-within:ring-2 focus-within:ring-amber-400/30 transition-colors">
+                  <Search size={18} className="text-gray-600 shrink-0" aria-hidden="true" />
                   <input
                     type="text"
-                    className="block w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl leading-5 bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-sm shadow-sm"
-                    placeholder="Search chicken, breast, mutton, fish, carrot, seeds..."
+                    aria-label="Search foods"
+                    className="flex-1 min-w-0 h-12 bg-transparent outline-none text-[15px] text-gray-900 placeholder-gray-500"
+                    placeholder="Search foods — dosa, chicken breast, paneer…"
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     autoFocus
@@ -115,27 +115,22 @@ const FoodSearchModal = ({ isOpen, onClose, onAdd, mealType }) => {
 
                 <div className="flex-1 overflow-y-auto">
                   {loading ? (
-                    <div className="flex flex-col items-center justify-center p-12 text-center">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-3"></div>
-                      <p className="text-sm text-gray-700 font-medium">Searching foods & supplements...</p>
-                      <p className="text-xs text-gray-400 mt-1">Checking local database + nutrition registry 🌐</p>
-                    </div>
+                    <p className="p-10 text-center text-sm text-gray-500">Searching…</p>
                   ) : results.length > 0 ? (
-                    <ul className="divide-y divide-gray-100">
+                    <ul className="flex flex-col">
                       {results.map((food) => (
                         <FoodResultItem key={food.id} food={food} onSelect={handleSelectFood} />
                       ))}
                     </ul>
                   ) : query.trim().length > 0 && !loading ? (
-                    <div className="text-center p-10 text-gray-500">
-                      <p className="text-base font-medium text-gray-700 mb-1">No items found matching "{query}"</p>
-                      <p className="text-xs text-gray-400">Try searching: chicken, breast, boneless, mutton, fish, carrot, seeds...</p>
+                    <div className="text-center p-10">
+                      <p className="text-sm font-bold text-gray-900 mb-1">No foods match “{query}”</p>
+                      <p className="text-xs text-gray-500">Try another name, or the Telugu name.</p>
                     </div>
                   ) : (
-                    <div className="text-center p-10 text-gray-400 text-sm">
-                      <Search className="h-12 w-12 mx-auto text-gray-300 mb-3" />
-                      <p className="font-medium text-gray-600">Search for meats, vegetables, seeds, or supplements</p>
-                      <p className="text-xs text-gray-400 mt-1">Raw meats, chicken cuts, fish, veggies, and whey powders</p>
+                    <div className="text-center p-10 text-sm text-gray-500">
+                      <Search size={40} className="mx-auto text-gray-300 mb-3" aria-hidden="true" />
+                      Start typing to search the food library.
                     </div>
                   )}
                 </div>

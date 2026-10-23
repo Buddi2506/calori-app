@@ -1,6 +1,6 @@
 import React from 'react';
 import { Search, X, ArrowDownUp } from 'lucide-react';
-import Segmented from './Segmented';
+import Segmented from '../../components/ui/Segmented';
 import { SORTS, shortCategoryTitle } from './nutrition';
 
 const TYPES = [
