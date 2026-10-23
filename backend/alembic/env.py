@@ -9,6 +9,7 @@ import app.models.diary
 import app.models.meal
 import app.models.goal
 import app.models.user
+import app.models.workout
 
 config = context.config
 config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)

@@ -1,0 +1,1252 @@
+[
+ {
+  "name": "Barbell Bench Press",
+  "kind": "strength",
+  "category": "push",
+  "equipment": "barbell",
+  "primary_muscles": [
+   "chest"
+  ],
+  "secondary_muscles": [
+   "shoulders",
+   "triceps"
+  ],
+  "instructions": [
+   "Lower the bar to mid-chest, then press straight up."
+  ]
+ },
+ {
+  "name": "Incline Barbell Bench Press",
+  "kind": "strength",
+  "category": "push",
+  "equipment": "barbell",
+  "primary_muscles": [
+   "chest"
+  ],
+  "secondary_muscles": [
+   "shoulders",
+   "triceps"
+  ],
+  "instructions": [
+   "Bench at 30–45°; lower to the upper chest and press."
+  ]
+ },
+ {
+  "name": "Decline Bench Press",
+  "kind": "strength",
+  "category": "push",
+  "equipment": "barbell",
+  "primary_muscles": [
+   "chest"
+  ],
+  "secondary_muscles": [
+   "triceps",
+   "shoulders"
+  ],
+  "instructions": [
+   "Bench tilted head-down; lower to the lower chest and press."
+  ]
+ },
+ {
+  "name": "Dumbbell Bench Press",
+  "kind": "strength",
+  "category": "push",
+  "equipment": "dumbbell",
+  "primary_muscles": [
+   "chest"
+  ],
+  "secondary_muscles": [
+   "shoulders",
+   "triceps"
+  ],
+  "instructions": [
+   "Press the dumbbells up from chest level, bringing them together at the top."
+  ]
+ },
+ {
+  "name": "Incline Dumbbell Press",
+  "kind": "strength",
+  "category": "push",
+  "equipment": "dumbbell",
+  "primary_muscles": [
+   "chest"
+  ],
+  "secondary_muscles": [
+   "shoulders",
+   "triceps"
+  ],
+  "instructions": [
+   "Bench at 30–45°; press the dumbbells up over the upper chest."
+  ]
+ },
+ {
+  "name": "Machine Chest Press",
+  "kind": "strength",
+  "category": "push",
+  "equipment": "machine",
+  "primary_muscles": [
+   "chest"
+  ],
+  "secondary_muscles": [
+   "shoulders",
+   "triceps"
+  ],
+  "instructions": [
+   "Handles at chest height; press forward without locking the elbows."
+  ]
+ },
+ {
+  "name": "Pec Deck Fly",
+  "kind": "strength",
+  "category": "push",
+  "equipment": "machine",
+  "primary_muscles": [
+   "chest"
+  ],
+  "secondary_muscles": [
+   "shoulders"
+  ],
+  "instructions": [
+   "Arms slightly bent; bring the pads together in front of the chest."
+  ]
+ },
+ {
+  "name": "Cable Crossover",
+  "kind": "strength",
+  "category": "push",
+  "equipment": "cable",
+  "primary_muscles": [
+   "chest"
+  ],
+  "secondary_muscles": [
+   "shoulders"
+  ],
+  "instructions": [
+   "Pull the handles down and together in a wide hugging arc."
+  ]
+ },
+ {
+  "name": "Dumbbell Fly",
+  "kind": "strength",
+  "category": "push",
+  "equipment": "dumbbell",
+  "primary_muscles": [
+   "chest"
+  ],
+  "secondary_muscles": [
+   "shoulders"
+  ],
+  "instructions": [
+   "Lying on a bench, open the arms wide with soft elbows, then bring them back up."
+  ]
+ },
+ {
+  "name": "Push-Up",
+  "kind": "strength",
+  "category": "push",
+  "equipment": "body only",
+  "primary_muscles": [
+   "chest"
+  ],
+  "secondary_muscles": [
+   "triceps",
+   "shoulders"
+  ],
+  "instructions": [
+   "Body straight; lower the chest to the floor and push back up."
+  ]
+ },
+ {
+  "name": "Chest Dip",
+  "kind": "strength",
+  "category": "push",
+  "equipment": "body only",
+  "primary_muscles": [
+   "chest"
+  ],
+  "secondary_muscles": [
+   "triceps",
+   "shoulders"
+  ],
+  "instructions": [
+   "Lean forward on the bars and lower until the shoulders are below the elbows."
+  ]
+ },
+ {
+  "name": "Overhead Barbell Press",
+  "kind": "strength",
+  "category": "push",
+  "equipment": "barbell",
+  "primary_muscles": [
+   "shoulders"
+  ],
+  "secondary_muscles": [
+   "triceps"
+  ],
+  "instructions": [
+   "Standing, press the bar from the collarbone to overhead."
+  ]
+ },
+ {
+  "name": "Seated Dumbbell Shoulder Press",
+  "kind": "strength",
+  "category": "push",
+  "equipment": "dumbbell",
+  "primary_muscles": [
+   "shoulders"
+  ],
+  "secondary_muscles": [
+   "triceps"
+  ],
+  "instructions": [
+   "Seated upright, press the dumbbells from ear level to overhead."
+  ]
+ },
+ {
+  "name": "Machine Shoulder Press",
+  "kind": "strength",
+  "category": "push",
+  "equipment": "machine",
+  "primary_muscles": [
+   "shoulders"
+  ],
+  "secondary_muscles": [
+   "triceps"
+  ],
+  "instructions": [
+   "Press the handles overhead and lower to shoulder height."
+  ]
+ },
+ {
+  "name": "Arnold Press",
+  "kind": "strength",
+  "category": "push",
+  "equipment": "dumbbell",
+  "primary_muscles": [
+   "shoulders"
+  ],
+  "secondary_muscles": [
+   "triceps"
+  ],
+  "instructions": [
+   "Start palms facing you; rotate the palms forward as you press up."
+  ]
+ },
+ {
+  "name": "Dumbbell Lateral Raise",
+  "kind": "strength",
+  "category": "push",
+  "equipment": "dumbbell",
+  "primary_muscles": [
+   "shoulders"
+  ],
+  "secondary_muscles": [],
+  "instructions": [
+   "Raise the dumbbells out to the sides to shoulder height."
+  ]
+ },
+ {
+  "name": "Cable Lateral Raise",
+  "kind": "strength",
+  "category": "push",
+  "equipment": "cable",
+  "primary_muscles": [
+   "shoulders"
+  ],
+  "secondary_muscles": [],
+  "instructions": [
+   "One arm at a time, raise the handle out to the side to shoulder height."
+  ]
+ },
+ {
+  "name": "Dumbbell Front Raise",
+  "kind": "strength",
+  "category": "push",
+  "equipment": "dumbbell",
+  "primary_muscles": [
+   "shoulders"
+  ],
+  "secondary_muscles": [],
+  "instructions": [
+   "Raise the dumbbells straight in front to shoulder height."
+  ]
+ },
+ {
+  "name": "Triceps Pushdown (Rope)",
+  "kind": "strength",
+  "category": "push",
+  "equipment": "cable",
+  "primary_muscles": [
+   "triceps"
+  ],
+  "secondary_muscles": [],
+  "instructions": [
+   "Elbows pinned to the sides; push the rope down and spread it at the bottom."
+  ]
+ },
+ {
+  "name": "Triceps Pushdown (Bar)",
+  "kind": "strength",
+  "category": "push",
+  "equipment": "cable",
+  "primary_muscles": [
+   "triceps"
+  ],
+  "secondary_muscles": [],
+  "instructions": [
+   "Elbows pinned to the sides; push the bar down until the arms are straight."
+  ]
+ },
+ {
+  "name": "Overhead Cable Triceps Extension",
+  "kind": "strength",
+  "category": "push",
+  "equipment": "cable",
+  "primary_muscles": [
+   "triceps"
+  ],
+  "secondary_muscles": [],
+  "instructions": [
+   "Facing away from the cable, extend the rope from behind the head to overhead."
+  ]
+ },
+ {
+  "name": "Dumbbell Overhead Triceps Extension",
+  "kind": "strength",
+  "category": "push",
+  "equipment": "dumbbell",
+  "primary_muscles": [
+   "triceps"
+  ],
+  "secondary_muscles": [],
+  "instructions": [
+   "Hold one dumbbell overhead with both hands; lower it behind the head and extend."
+  ]
+ },
+ {
+  "name": "Skull Crusher (EZ Bar)",
+  "kind": "strength",
+  "category": "push",
+  "equipment": "e-z curl bar",
+  "primary_muscles": [
+   "triceps"
+  ],
+  "secondary_muscles": [],
+  "instructions": [
+   "Lying down, bend only at the elbows to lower the bar to the forehead, then extend."
+  ]
+ },
+ {
+  "name": "Close-Grip Bench Press",
+  "kind": "strength",
+  "category": "push",
+  "equipment": "barbell",
+  "primary_muscles": [
+   "triceps"
+  ],
+  "secondary_muscles": [
+   "chest",
+   "shoulders"
+  ],
+  "instructions": [
+   "Hands shoulder-width; keep the elbows close as you press."
+  ]
+ },
+ {
+  "name": "Bench Dip",
+  "kind": "strength",
+  "category": "push",
+  "equipment": "body only",
+  "primary_muscles": [
+   "triceps"
+  ],
+  "secondary_muscles": [
+   "chest",
+   "shoulders"
+  ],
+  "instructions": [
+   "Hands on a bench behind you; lower the hips by bending the elbows, then push up."
+  ]
+ },
+ {
+  "name": "Lat Pulldown (Wide Grip)",
+  "kind": "strength",
+  "category": "pull",
+  "equipment": "cable",
+  "primary_muscles": [
+   "lats"
+  ],
+  "secondary_muscles": [
+   "biceps",
+   "middle back"
+  ],
+  "instructions": [
+   "Pull the bar to the upper chest, leading with the elbows."
+  ]
+ },
+ {
+  "name": "Close-Grip Lat Pulldown (V-Bar)",
+  "kind": "strength",
+  "category": "pull",
+  "equipment": "cable",
+  "primary_muscles": [
+   "lats"
+  ],
+  "secondary_muscles": [
+   "biceps",
+   "middle back"
+  ],
+  "instructions": [
+   "Pull the V-handle to the upper chest, squeezing the shoulder blades."
+  ]
+ },
+ {
+  "name": "Pull-Up",
+  "kind": "strength",
+  "category": "pull",
+  "equipment": "body only",
+  "primary_muscles": [
+   "lats"
+  ],
+  "secondary_muscles": [
+   "biceps",
+   "middle back"
+  ],
+  "instructions": [
+   "Overhand grip; pull until the chin is over the bar."
+  ]
+ },
+ {
+  "name": "Chin-Up",
+  "kind": "strength",
+  "category": "pull",
+  "equipment": "body only",
+  "primary_muscles": [
+   "lats"
+  ],
+  "secondary_muscles": [
+   "biceps"
+  ],
+  "instructions": [
+   "Underhand grip; pull until the chin is over the bar."
+  ]
+ },
+ {
+  "name": "Seated Cable Row",
+  "kind": "strength",
+  "category": "pull",
+  "equipment": "cable",
+  "primary_muscles": [
+   "middle back"
+  ],
+  "secondary_muscles": [
+   "lats",
+   "biceps"
+  ],
+  "instructions": [
+   "Sit tall and pull the handle to the stomach, squeezing the shoulder blades."
+  ]
+ },
+ {
+  "name": "Barbell Bent-Over Row",
+  "kind": "strength",
+  "category": "pull",
+  "equipment": "barbell",
+  "primary_muscles": [
+   "middle back"
+  ],
+  "secondary_muscles": [
+   "lats",
+   "biceps",
+   "lower back"
+  ],
+  "instructions": [
+   "Hinge forward with a flat back; row the bar to the lower ribs."
+  ]
+ },
+ {
+  "name": "One-Arm Dumbbell Row",
+  "kind": "strength",
+  "category": "pull",
+  "equipment": "dumbbell",
+  "primary_muscles": [
+   "middle back"
+  ],
+  "secondary_muscles": [
+   "lats",
+   "biceps"
+  ],
+  "instructions": [
+   "One hand and knee on a bench; row the dumbbell to the hip."
+  ]
+ },
+ {
+  "name": "T-Bar Row",
+  "kind": "strength",
+  "category": "pull",
+  "equipment": "barbell",
+  "primary_muscles": [
+   "middle back"
+  ],
+  "secondary_muscles": [
+   "lats",
+   "biceps"
+  ],
+  "instructions": [
+   "Chest over the bar; row the handles to the chest."
+  ]
+ },
+ {
+  "name": "Chest-Supported Machine Row",
+  "kind": "strength",
+  "category": "pull",
+  "equipment": "machine",
+  "primary_muscles": [
+   "middle back"
+  ],
+  "secondary_muscles": [
+   "lats",
+   "biceps"
+  ],
+  "instructions": [
+   "Chest on the pad; pull the handles back, squeezing the shoulder blades."
+  ]
+ },
+ {
+  "name": "Straight-Arm Pulldown",
+  "kind": "strength",
+  "category": "pull",
+  "equipment": "cable",
+  "primary_muscles": [
+   "lats"
+  ],
+  "secondary_muscles": [],
+  "instructions": [
+   "Arms nearly straight; sweep the bar down to the thighs."
+  ]
+ },
+ {
+  "name": "Face Pull",
+  "kind": "strength",
+  "category": "pull",
+  "equipment": "cable",
+  "primary_muscles": [
+   "shoulders"
+  ],
+  "secondary_muscles": [
+   "traps",
+   "middle back"
+  ],
+  "instructions": [
+   "Rope at face height; pull it towards the forehead, hands ending beside the ears."
+  ]
+ },
+ {
+  "name": "Reverse Pec Deck",
+  "kind": "strength",
+  "category": "pull",
+  "equipment": "machine",
+  "primary_muscles": [
+   "shoulders"
+  ],
+  "secondary_muscles": [
+   "middle back"
+  ],
+  "instructions": [
+   "Facing the pad, open the arms back in a wide arc."
+  ]
+ },
+ {
+  "name": "Barbell Shrug",
+  "kind": "strength",
+  "category": "pull",
+  "equipment": "barbell",
+  "primary_muscles": [
+   "traps"
+  ],
+  "secondary_muscles": [],
+  "instructions": [
+   "Hold the bar at arm's length and lift the shoulders straight up."
+  ]
+ },
+ {
+  "name": "Dumbbell Shrug",
+  "kind": "strength",
+  "category": "pull",
+  "equipment": "dumbbell",
+  "primary_muscles": [
+   "traps"
+  ],
+  "secondary_muscles": [],
+  "instructions": [
+   "Dumbbells at the sides; lift the shoulders straight up."
+  ]
+ },
+ {
+  "name": "Deadlift",
+  "kind": "strength",
+  "category": "pull",
+  "equipment": "barbell",
+  "primary_muscles": [
+   "lower back"
+  ],
+  "secondary_muscles": [
+   "hamstrings",
+   "glutes",
+   "traps"
+  ],
+  "instructions": [
+   "Flat back; push the floor away and stand up with the bar close to the legs."
+  ]
+ },
+ {
+  "name": "Back Extension (Hyperextension)",
+  "kind": "strength",
+  "category": "pull",
+  "equipment": "body only",
+  "primary_muscles": [
+   "lower back"
+  ],
+  "secondary_muscles": [
+   "glutes",
+   "hamstrings"
+  ],
+  "instructions": [
+   "Hips on the pad; lower the upper body and raise it back to a straight line."
+  ]
+ },
+ {
+  "name": "Barbell Curl",
+  "kind": "strength",
+  "category": "pull",
+  "equipment": "barbell",
+  "primary_muscles": [
+   "biceps"
+  ],
+  "secondary_muscles": [
+   "forearms"
+  ],
+  "instructions": [
+   "Elbows at the sides; curl the bar to the shoulders."
+  ]
+ },
+ {
+  "name": "Dumbbell Curl",
+  "kind": "strength",
+  "category": "pull",
+  "equipment": "dumbbell",
+  "primary_muscles": [
+   "biceps"
+  ],
+  "secondary_muscles": [
+   "forearms"
+  ],
+  "instructions": [
+   "Curl the dumbbells up, turning the palms to face you."
+  ]
+ },
+ {
+  "name": "Hammer Curl",
+  "kind": "strength",
+  "category": "pull",
+  "equipment": "dumbbell",
+  "primary_muscles": [
+   "biceps"
+  ],
+  "secondary_muscles": [
+   "forearms"
+  ],
+  "instructions": [
+   "Palms facing each other; curl the dumbbells up."
+  ]
+ },
+ {
+  "name": "Preacher Curl (EZ Bar)",
+  "kind": "strength",
+  "category": "pull",
+  "equipment": "e-z curl bar",
+  "primary_muscles": [
+   "biceps"
+  ],
+  "secondary_muscles": [],
+  "instructions": [
+   "Upper arms on the preacher pad; curl the bar up and lower it fully."
+  ]
+ },
+ {
+  "name": "Cable Curl",
+  "kind": "strength",
+  "category": "pull",
+  "equipment": "cable",
+  "primary_muscles": [
+   "biceps"
+  ],
+  "secondary_muscles": [
+   "forearms"
+  ],
+  "instructions": [
+   "Facing the cable, curl the bar up with the elbows fixed."
+  ]
+ },
+ {
+  "name": "Incline Dumbbell Curl",
+  "kind": "strength",
+  "category": "pull",
+  "equipment": "dumbbell",
+  "primary_muscles": [
+   "biceps"
+  ],
+  "secondary_muscles": [],
+  "instructions": [
+   "Lying back on an incline bench, curl with the arms hanging behind the body."
+  ]
+ },
+ {
+  "name": "Barbell Back Squat",
+  "kind": "strength",
+  "category": "legs",
+  "equipment": "barbell",
+  "primary_muscles": [
+   "quadriceps"
+  ],
+  "secondary_muscles": [
+   "glutes",
+   "hamstrings"
+  ],
+  "instructions": [
+   "Bar on the upper back; sit down until the thighs are level, then stand."
+  ]
+ },
+ {
+  "name": "Front Squat",
+  "kind": "strength",
+  "category": "legs",
+  "equipment": "barbell",
+  "primary_muscles": [
+   "quadriceps"
+  ],
+  "secondary_muscles": [
+   "glutes"
+  ],
+  "instructions": [
+   "Bar on the front of the shoulders; squat with an upright chest."
+  ]
+ },
+ {
+  "name": "Leg Press",
+  "kind": "strength",
+  "category": "legs",
+  "equipment": "machine",
+  "primary_muscles": [
+   "quadriceps"
+  ],
+  "secondary_muscles": [
+   "glutes",
+   "hamstrings"
+  ],
+  "instructions": [
+   "Lower the platform until the knees are bent about 90°, then press."
+  ]
+ },
+ {
+  "name": "Hack Squat",
+  "kind": "strength",
+  "category": "legs",
+  "equipment": "machine",
+  "primary_muscles": [
+   "quadriceps"
+  ],
+  "secondary_muscles": [
+   "glutes"
+  ],
+  "instructions": [
+   "Back on the pad; squat down and drive back up."
+  ]
+ },
+ {
+  "name": "Goblet Squat",
+  "kind": "strength",
+  "category": "legs",
+  "equipment": "dumbbell",
+  "primary_muscles": [
+   "quadriceps"
+  ],
+  "secondary_muscles": [
+   "glutes"
+  ],
+  "instructions": [
+   "Hold a dumbbell at the chest and squat between the knees."
+  ]
+ },
+ {
+  "name": "Bulgarian Split Squat",
+  "kind": "strength",
+  "category": "legs",
+  "equipment": "dumbbell",
+  "primary_muscles": [
+   "quadriceps"
+  ],
+  "secondary_muscles": [
+   "glutes",
+   "hamstrings"
+  ],
+  "instructions": [
+   "Back foot on a bench; lower the back knee towards the floor."
+  ]
+ },
+ {
+  "name": "Walking Lunge",
+  "kind": "strength",
+  "category": "legs",
+  "equipment": "dumbbell",
+  "primary_muscles": [
+   "quadriceps"
+  ],
+  "secondary_muscles": [
+   "glutes",
+   "hamstrings"
+  ],
+  "instructions": [
+   "Step forward and lower the back knee, then step through to the next lunge."
+  ]
+ },
+ {
+  "name": "Romanian Deadlift",
+  "kind": "strength",
+  "category": "legs",
+  "equipment": "barbell",
+  "primary_muscles": [
+   "hamstrings"
+  ],
+  "secondary_muscles": [
+   "glutes",
+   "lower back"
+  ],
+  "instructions": [
+   "Soft knees; push the hips back and lower the bar along the legs."
+  ]
+ },
+ {
+  "name": "Leg Extension",
+  "kind": "strength",
+  "category": "legs",
+  "equipment": "machine",
+  "primary_muscles": [
+   "quadriceps"
+  ],
+  "secondary_muscles": [],
+  "instructions": [
+   "Straighten the legs against the pad, then lower slowly."
+  ]
+ },
+ {
+  "name": "Lying Leg Curl",
+  "kind": "strength",
+  "category": "legs",
+  "equipment": "machine",
+  "primary_muscles": [
+   "hamstrings"
+  ],
+  "secondary_muscles": [],
+  "instructions": [
+   "Face down; curl the pad towards the glutes."
+  ]
+ },
+ {
+  "name": "Seated Leg Curl",
+  "kind": "strength",
+  "category": "legs",
+  "equipment": "machine",
+  "primary_muscles": [
+   "hamstrings"
+  ],
+  "secondary_muscles": [],
+  "instructions": [
+   "Seated; curl the pad down and back under the seat."
+  ]
+ },
+ {
+  "name": "Barbell Hip Thrust",
+  "kind": "strength",
+  "category": "legs",
+  "equipment": "barbell",
+  "primary_muscles": [
+   "glutes"
+  ],
+  "secondary_muscles": [
+   "hamstrings"
+  ],
+  "instructions": [
+   "Upper back on a bench, bar on the hips; drive the hips up to a straight line."
+  ]
+ },
+ {
+  "name": "Standing Calf Raise",
+  "kind": "strength",
+  "category": "legs",
+  "equipment": "machine",
+  "primary_muscles": [
+   "calves"
+  ],
+  "secondary_muscles": [],
+  "instructions": [
+   "Rise onto the toes as high as possible, then lower the heels below the step."
+  ]
+ },
+ {
+  "name": "Seated Calf Raise",
+  "kind": "strength",
+  "category": "legs",
+  "equipment": "machine",
+  "primary_muscles": [
+   "calves"
+  ],
+  "secondary_muscles": [],
+  "instructions": [
+   "Knees under the pad; raise the heels as high as possible."
+  ]
+ },
+ {
+  "name": "Hip Abduction Machine",
+  "kind": "strength",
+  "category": "legs",
+  "equipment": "machine",
+  "primary_muscles": [
+   "abductors"
+  ],
+  "secondary_muscles": [
+   "glutes"
+  ],
+  "instructions": [
+   "Push the knees outwards against the pads."
+  ]
+ },
+ {
+  "name": "Hip Adduction Machine",
+  "kind": "strength",
+  "category": "legs",
+  "equipment": "machine",
+  "primary_muscles": [
+   "adductors"
+  ],
+  "secondary_muscles": [],
+  "instructions": [
+   "Squeeze the knees together against the pads."
+  ]
+ },
+ {
+  "name": "Plank",
+  "kind": "timed",
+  "category": "core",
+  "equipment": "body only",
+  "primary_muscles": [
+   "abdominals"
+  ],
+  "secondary_muscles": [
+   "shoulders"
+  ],
+  "instructions": [
+   "Forearms and toes on the floor; hold the body in a straight line."
+  ]
+ },
+ {
+  "name": "Side Plank",
+  "kind": "timed",
+  "category": "core",
+  "equipment": "body only",
+  "primary_muscles": [
+   "abdominals"
+  ],
+  "secondary_muscles": [],
+  "instructions": [
+   "On one forearm and the side of the foot; hold the hips up."
+  ]
+ },
+ {
+  "name": "Crunch",
+  "kind": "strength",
+  "category": "core",
+  "equipment": "body only",
+  "primary_muscles": [
+   "abdominals"
+  ],
+  "secondary_muscles": [],
+  "instructions": [
+   "Lying on your back, curl the shoulders up towards the hips."
+  ]
+ },
+ {
+  "name": "Cable Crunch",
+  "kind": "strength",
+  "category": "core",
+  "equipment": "cable",
+  "primary_muscles": [
+   "abdominals"
+  ],
+  "secondary_muscles": [],
+  "instructions": [
+   "Kneeling, hold the rope by the head and crunch down towards the knees."
+  ]
+ },
+ {
+  "name": "Hanging Leg Raise",
+  "kind": "strength",
+  "category": "core",
+  "equipment": "body only",
+  "primary_muscles": [
+   "abdominals"
+  ],
+  "secondary_muscles": [],
+  "instructions": [
+   "Hanging from a bar, raise the legs to hip height or higher."
+  ]
+ },
+ {
+  "name": "Lying Leg Raise",
+  "kind": "strength",
+  "category": "core",
+  "equipment": "body only",
+  "primary_muscles": [
+   "abdominals"
+  ],
+  "secondary_muscles": [],
+  "instructions": [
+   "Lying flat, raise straight legs to vertical and lower without touching the floor."
+  ]
+ },
+ {
+  "name": "Russian Twist",
+  "kind": "strength",
+  "category": "core",
+  "equipment": "body only",
+  "primary_muscles": [
+   "abdominals"
+  ],
+  "secondary_muscles": [],
+  "instructions": [
+   "Seated and leaning back, rotate the torso side to side. Count each side as one rep."
+  ]
+ },
+ {
+  "name": "Ab Wheel Rollout",
+  "kind": "strength",
+  "category": "core",
+  "equipment": "other",
+  "primary_muscles": [
+   "abdominals"
+  ],
+  "secondary_muscles": [
+   "lats"
+  ],
+  "instructions": [
+   "Kneeling, roll the wheel forward as far as you can control, then roll back."
+  ]
+ },
+ {
+  "name": "Bicycle Crunch",
+  "kind": "strength",
+  "category": "core",
+  "equipment": "body only",
+  "primary_muscles": [
+   "abdominals"
+  ],
+  "secondary_muscles": [],
+  "instructions": [
+   "Bring each elbow towards the opposite knee, alternating sides."
+  ]
+ },
+ {
+  "name": "Mountain Climber",
+  "kind": "strength",
+  "category": "core",
+  "equipment": "body only",
+  "primary_muscles": [
+   "abdominals"
+  ],
+  "secondary_muscles": [
+   "shoulders",
+   "quadriceps"
+  ],
+  "instructions": [
+   "In a push-up position, drive the knees towards the chest in turn."
+  ]
+ },
+ {
+  "name": "Treadmill Run",
+  "kind": "cardio",
+  "category": "cardio",
+  "equipment": "machine",
+  "primary_muscles": [
+   "quadriceps"
+  ],
+  "secondary_muscles": [
+   "hamstrings",
+   "calves",
+   "glutes"
+  ],
+  "instructions": [
+   "Level is the speed in km/h."
+  ]
+ },
+ {
+  "name": "Treadmill Incline Walk",
+  "kind": "cardio",
+  "category": "cardio",
+  "equipment": "machine",
+  "primary_muscles": [
+   "glutes"
+  ],
+  "secondary_muscles": [
+   "calves",
+   "hamstrings"
+  ],
+  "instructions": [
+   "Level is the incline in %."
+  ]
+ },
+ {
+  "name": "Outdoor Run",
+  "kind": "cardio",
+  "category": "cardio",
+  "equipment": "body only",
+  "primary_muscles": [
+   "quadriceps"
+  ],
+  "secondary_muscles": [
+   "hamstrings",
+   "calves",
+   "glutes"
+  ],
+  "instructions": [
+   "Log time and distance to see your pace."
+  ]
+ },
+ {
+  "name": "Outdoor Walk",
+  "kind": "cardio",
+  "category": "cardio",
+  "equipment": "body only",
+  "primary_muscles": [
+   "quadriceps"
+  ],
+  "secondary_muscles": [
+   "calves",
+   "glutes"
+  ],
+  "instructions": [
+   "Log time and distance to see your pace."
+  ]
+ },
+ {
+  "name": "Stationary Bike",
+  "kind": "cardio",
+  "category": "cardio",
+  "equipment": "machine",
+  "primary_muscles": [
+   "quadriceps"
+  ],
+  "secondary_muscles": [
+   "hamstrings",
+   "calves"
+  ],
+  "instructions": [
+   "Level is the machine's resistance level."
+  ]
+ },
+ {
+  "name": "Outdoor Cycling",
+  "kind": "cardio",
+  "category": "cardio",
+  "equipment": "other",
+  "primary_muscles": [
+   "quadriceps"
+  ],
+  "secondary_muscles": [
+   "hamstrings",
+   "calves"
+  ],
+  "instructions": [
+   "Log time and distance."
+  ]
+ },
+ {
+  "name": "Elliptical",
+  "kind": "cardio",
+  "category": "cardio",
+  "equipment": "machine",
+  "primary_muscles": [
+   "quadriceps"
+  ],
+  "secondary_muscles": [
+   "glutes",
+   "hamstrings"
+  ],
+  "instructions": [
+   "Level is the machine's resistance level."
+  ]
+ },
+ {
+  "name": "Rowing Machine",
+  "kind": "cardio",
+  "category": "cardio",
+  "equipment": "machine",
+  "primary_muscles": [
+   "middle back"
+  ],
+  "secondary_muscles": [
+   "quadriceps",
+   "lats",
+   "biceps"
+  ],
+  "instructions": [
+   "Drive with the legs first, then pull the handle to the ribs."
+  ]
+ },
+ {
+  "name": "Stair Climber",
+  "kind": "cardio",
+  "category": "cardio",
+  "equipment": "machine",
+  "primary_muscles": [
+   "glutes"
+  ],
+  "secondary_muscles": [
+   "quadriceps",
+   "calves"
+  ],
+  "instructions": [
+   "Level is the machine's speed level."
+  ]
+ },
+ {
+  "name": "Skipping Rope",
+  "kind": "cardio",
+  "category": "cardio",
+  "equipment": "other",
+  "primary_muscles": [
+   "calves"
+  ],
+  "secondary_muscles": [
+   "shoulders"
+  ],
+  "instructions": [
+   "Log the total time."
+  ]
+ },
+ {
+  "name": "Swimming",
+  "kind": "cardio",
+  "category": "cardio",
+  "equipment": "other",
+  "primary_muscles": [
+   "lats"
+  ],
+  "secondary_muscles": [
+   "shoulders",
+   "triceps"
+  ],
+  "instructions": [
+   "Log time and distance."
+  ]
+ }
+]

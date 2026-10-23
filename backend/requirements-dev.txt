@@ -1,0 +1,2 @@
+# Test-only tools, installed outside the app image (see backend/tests/test_workouts.py)
+pytest==9.1.1

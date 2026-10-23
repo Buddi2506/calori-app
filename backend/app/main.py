@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .routers import foods, diary, meals, goals, reports, auth, admin
+from .routers import foods, diary, meals, goals, reports, auth, admin, exercises, workouts
 from .database import SessionLocal
 from .migrate import run_migrations
 from .models.food import Food
@@ -30,6 +30,8 @@ app.include_router(diary.router)
 app.include_router(meals.router)
 app.include_router(goals.router)
 app.include_router(reports.router)
+app.include_router(exercises.router)
+app.include_router(workouts.router)
 
 
 NUTRIENT_KEYS = [
@@ -117,6 +119,26 @@ def seed_default_custom_meals(db):
         logger.info("✅ Seeded default Custom Meal: %s", combo_name)
 
 
+def seed_exercises(db):
+    """Add any built-in exercises from seeds/exercises.json that aren't in the database yet."""
+    from .models.workout import Exercise
+
+    seeds_path = os.path.join(os.path.dirname(__file__), "..", "seeds", "exercises.json")
+    if not os.path.exists(seeds_path):
+        logger.warning("Seed file not found: %s", seeds_path)
+        return
+
+    with open(seeds_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    existing = {name for (name,) in db.query(Exercise.name).filter(Exercise.user_id.is_(None))}
+    new = [Exercise(**item) for item in data if item["name"] not in existing]
+    if new:
+        db.add_all(new)
+        db.commit()
+        logger.info("✅ Seeded %d built-in exercises.", len(new))
+
+
 def create_default_goals(db):
     """Create default nutrition goals if none exist."""
     from .models.goal import NutritionGoal
@@ -159,6 +181,7 @@ def startup():
         seed_admin_user(db)
         seed_south_indian_foods(db)
         seed_default_custom_meals(db)
+        seed_exercises(db)
         create_default_goals(db)
     except Exception as e:
         logger.error("Startup seeding failed: %s", e)
