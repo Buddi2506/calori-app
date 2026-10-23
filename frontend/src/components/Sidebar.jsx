@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Home, BookOpen, Utensils, Target, BarChart2, ListFilter, Users } from 'lucide-react';
+import { Home, BookOpen, Dumbbell, Utensils, BarChart2, ListFilter, Users } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const Sidebar = () => {
@@ -9,9 +9,10 @@ const Sidebar = () => {
   const navItems = [
     { path: '/', label: 'Overview', icon: Home },
     { path: '/diary', label: 'Diary', icon: BookOpen },
+    { path: '/workouts', label: 'Workouts', icon: Dumbbell },
     { path: '/foods', label: 'Foods', icon: ListFilter },
     { path: '/meals', label: 'Meals', icon: Utensils },
-    { path: '/goals', label: 'Goals', icon: Target },
+    // Goals lives in the account menu on phones; 7 tabs is the most that fits
     { path: '/reports', label: 'Reports', icon: BarChart2 },
     ...(isAdmin ? [{ path: '/admin/users', label: 'Users', icon: Users }] : []),
   ];

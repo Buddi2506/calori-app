@@ -226,6 +226,9 @@ def test_records_progress_and_last_sets():
     last = c.get("/api/exercises/last-sets", params={"ids": f"{squat},999999"}).json()
     assert list(last) == [str(squat)] and last[str(squat)]["session_id"] == second["id"]
     assert [s["weight_kg"] for s in last[str(squat)]["sets"]] == [105, 100]
+    # While logging the second workout, "last time" means the first one
+    earlier = c.get("/api/exercises/last-sets", params={"ids": str(squat), "exclude_session": second["id"]}).json()
+    assert earlier[str(squat)]["session_id"] == first["id"]
 
 
 def test_cardio_progress_history_and_summary():

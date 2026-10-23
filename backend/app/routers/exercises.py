@@ -104,6 +104,7 @@ def exercise_options(current_user: User = Depends(get_current_user)):
 @router.get("/last-sets")
 def last_sets(
     ids: str = Query(..., description="Comma-separated exercise ids"),
+    exclude_session: Optional[int] = Query(None, description="Ignore this workout, e.g. the one being logged now"),
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
@@ -115,13 +116,14 @@ def last_sets(
 
     result = {}
     for exercise_id in wanted:
-        latest = (
+        query = (
             db.query(WorkoutSession)
             .join(WorkoutSet, WorkoutSet.session_id == WorkoutSession.id)
             .filter(WorkoutSession.user_id == current_user.id, WorkoutSet.exercise_id == exercise_id)
-            .order_by(WorkoutSession.date.desc(), WorkoutSession.id.desc())
-            .first()
         )
+        if exclude_session:
+            query = query.filter(WorkoutSession.id != exclude_session)
+        latest = query.order_by(WorkoutSession.date.desc(), WorkoutSession.id.desc()).first()
         if latest:
             result[str(exercise_id)] = {
                 "date": str(latest.date),

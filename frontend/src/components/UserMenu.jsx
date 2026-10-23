@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { Users, Shield, LogOut, Flame } from 'lucide-react';
+import { Users, Shield, LogOut, Flame, Target } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 export const userInitials = (user) => (user?.full_name || user?.username || '?')
@@ -91,6 +91,15 @@ const UserMenu = ({ variant = 'avatar' }) => {
               <span>Daily Target: {target} kcal</span>
             </div>
           </div>
+
+          <NavLink
+            to="/goals"
+            onClick={() => setOpen(false)}
+            className="flex items-center gap-2 px-3 py-2 text-xs font-bold text-gray-700 hover:bg-gray-100/70 rounded-xl transition-colors mb-1"
+          >
+            <Target size={14} className="text-amber-500" />
+            <span>Daily goals</span>
+          </NavLink>
 
           {isAdmin && (
             <NavLink

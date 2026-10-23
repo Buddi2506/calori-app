@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Home, BookOpen, ListFilter, Utensils, Target, BarChart2, Users } from 'lucide-react';
+import { Home, BookOpen, Dumbbell, ListFilter, Utensils, Target, BarChart2, Users } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import UserMenu from './UserMenu';
 
@@ -11,6 +11,7 @@ const SideRail = () => {
   const navItems = [
     { path: '/', label: 'Dashboard', icon: Home, end: true },
     { path: '/diary', label: 'Food diary', icon: BookOpen },
+    { path: '/workouts', label: 'Workouts', icon: Dumbbell },
     { path: '/foods', label: 'Food list', icon: ListFilter },
     { path: '/meals', label: 'Custom meals', icon: Utensils },
     { path: '/goals', label: 'Goals', icon: Target },

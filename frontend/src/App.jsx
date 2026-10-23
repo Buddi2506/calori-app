@@ -10,6 +10,8 @@ import Reports from './pages/Reports';
 import FoodList from './pages/FoodList';
 import Login from './pages/Login';
 import AdminUsers from './pages/AdminUsers';
+import Workouts from './pages/Workouts';
+import WorkoutSplit from './pages/WorkoutSplit';
 import ForcePasswordChangeModal from './components/ForcePasswordChangeModal';
 
 // Route wrapper that checks authentication
@@ -71,6 +73,9 @@ function AppRoutes() {
         <Route index element={<Dashboard />} />
         <Route path="diary" element={<Diary />} />
         <Route path="diary/:date" element={<Diary />} />
+        <Route path="workouts" element={<Workouts />} />
+        <Route path="workouts/split" element={<WorkoutSplit />} />
+        <Route path="workouts/:date" element={<Workouts />} />
         <Route path="foods" element={<FoodList />} />
         <Route path="meals" element={<CustomMeals />} />
         <Route path="goals" element={<Goals />} />
