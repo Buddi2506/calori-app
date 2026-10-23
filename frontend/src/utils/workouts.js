@@ -86,3 +86,21 @@ export const apiErrorMessage = (err, fallback) => {
   if (Array.isArray(detail)) return detail.map((d) => d.msg?.replace(/^Value error, /, '')).join(' ');
   return detail || fallback;
 };
+
+// "6:00 /km" from minutes per km
+export const formatPace = (minPerKm) => {
+  if (!minPerKm) return null;
+  const total = Math.round(minPerKm * 60);
+  return `${Math.floor(total / 60)}:${String(total % 60).padStart(2, '0')} /km`;
+};
+
+const DAY_COLORS = ['#FBBF24', '#60A5FA', '#34D399', '#F472B6', '#A78BFA', '#FB923C', '#2DD4BF'];
+export const CARDIO_COLOR = '#22D3EE';
+export const OTHER_COLOR = '#8B8F9A';
+
+// Colour for a workout by name: split days in rotation order, then cardio and anything else.
+export const workoutColor = (name, splitNames = []) => {
+  const i = splitNames.indexOf(name);
+  if (i >= 0) return DAY_COLORS[i % DAY_COLORS.length];
+  return name === 'Cardio' ? CARDIO_COLOR : OTHER_COLOR;
+};

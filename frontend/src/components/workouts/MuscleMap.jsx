@@ -64,21 +64,24 @@ const describe = (primary, secondary) =>
     : 'Muscles worked';
 
 // Front-and-back body outline with the worked muscles filled in amber (secondary ones fainter).
-const MuscleMap = ({ primary = [], secondary = [], className = 'w-12 h-11' }) => (
-  <svg viewBox="0 0 100 92" className={className} role="img" aria-label={describe(primary, secondary)}>
+// With `intensity` ({ muscle: 0–1 }) it becomes a heat map instead: stronger amber = more work.
+const MuscleMap = ({ primary = [], secondary = [], intensity, label, className = 'w-12 h-11' }) => (
+  <svg viewBox="0 0 100 92" className={className} role="img" aria-label={label || describe(primary, secondary)}>
     {BASE.map((s, i) => <Shape key={`b${i}`} s={s} fill={COLORS.body} />)}
     {Object.entries(REGIONS).map(([muscle, shapes]) =>
       shapes.map((s, i) => {
-        const isPrimary = primary.includes(muscle);
-        const isSecondary = !isPrimary && secondary.includes(muscle);
-        return (
-          <Shape
-            key={`${muscle}${i}`}
-            s={s}
-            fill={isPrimary || isSecondary ? COLORS.primary : COLORS.muscle}
-            opacity={isSecondary ? 0.4 : 1}
-          />
-        );
+        let opacity = 1;
+        let lit;
+        if (intensity) {
+          const v = intensity[muscle] || 0;
+          lit = v > 0;
+          opacity = lit ? 0.25 + 0.75 * v : 1;
+        } else {
+          const isPrimary = primary.includes(muscle);
+          lit = isPrimary || secondary.includes(muscle);
+          opacity = lit && !isPrimary ? 0.4 : 1;
+        }
+        return <Shape key={`${muscle}${i}`} s={s} fill={lit ? COLORS.primary : COLORS.muscle} opacity={opacity} />;
       })
     )}
   </svg>

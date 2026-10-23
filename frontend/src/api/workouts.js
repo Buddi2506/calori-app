@@ -47,5 +47,7 @@ export const deleteSet = async (sessionId, setId) =>
 
 export const getExerciseProgress = async (exerciseId, days = 365) =>
   (await client.get(`/workouts/progress/exercise/${exerciseId}`, { params: { days } })).data;
+// Every exercise the user has logged, with its records
+export const getExercisesDone = async () => (await client.get('/workouts/progress/exercises')).data;
 export const getProgressSummary = async (weeks = 8) =>
   (await client.get('/workouts/progress/summary', { params: { weeks } })).data;

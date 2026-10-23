@@ -182,7 +182,11 @@ def test_sets_order_validation_and_ownership():
     }).json()
     assert cardio["weight_kg"] is None and cardio["reps"] is None and cardio["distance_km"] == 3.2
     hold = c.post(f"/api/workouts/{sid}/sets", json={"exercise_id": plank, "duration_seconds": 60, "reps": 3}).json()
-    assert hold["duration_seconds"] == 60 and hold["reps"] is None
+    assert hold["duration_seconds"] == 60 and hold["reps"] is None and hold["records"] == []
+    later = c.post("/api/workouts", json={"date": str(TODAY - timedelta(days=9)), "name": "Core"}).json()
+    longer = c.post(f"/api/workouts/{later['id']}/sets", json={"exercise_id": plank, "duration_seconds": 75}).json()
+    assert longer["records"] == ["hold"]
+    c.delete(f"/api/workouts/{later['id']}")
     assert c.post(f"/api/workouts/{sid}/sets", json={"exercise_id": bench, "reps": 5, "set_type": "drop"}).status_code == 422
 
     # Deleting a set renumbers the rest of that exercise
@@ -217,11 +221,31 @@ def test_records_progress_and_last_sets():
     r3 = c.post(f"/api/workouts/{second['id']}/sets", json={"exercise_id": squat, "weight_kg": 100, "reps": 7}).json()
     assert r3["records"] == ["est_1rm"]
 
+    # Records also count sets earlier in the same workout: 107.5 beats this workout's 105
+    r4 = c.post(f"/api/workouts/{second['id']}/sets", json={"exercise_id": squat, "weight_kg": 107.5, "reps": 2}).json()
+    assert r4["records"] == ["weight"]
+    r5 = c.post(f"/api/workouts/{second['id']}/sets", json={"exercise_id": squat, "weight_kg": 106, "reps": 2}).json()
+    assert r5["records"] == []
+
+    # The flags are kept: reloading a workout shows which sets were records
+    reloaded = c.get(f"/api/workouts/{second['id']}").json()["exercises"][0]["sets"]
+    assert [x["records"] for x in reloaded] == [["weight"], ["est_1rm"], ["weight"], []]
+    assert all(x["records"] == [] for x in c.get(f"/api/workouts/{first['id']}").json()["exercises"][0]["sets"])
+    c.delete(f"/api/workouts/{second['id']}/sets/{r4['id']}")
+    c.delete(f"/api/workouts/{second['id']}/sets/{r5['id']}")
+
     p = c.get(f"/api/workouts/progress/exercise/{squat}").json()
     assert [pt["date"] for pt in p["points"]] == [str(TODAY - timedelta(days=7)), str(TODAY - timedelta(days=3))]
     assert p["points"][0]["est_1rm_kg"] == 116.7 and p["points"][0]["volume_kg"] == 1000
     assert p["records"]["heaviest_kg"] == {"value": 105, "date": str(TODAY - timedelta(days=3))}
     assert p["records"]["best_est_1rm_kg"]["value"] == 123.3
+
+    done = {d["exercise"]["name"]: d for d in c.get("/api/workouts/progress/exercises").json()}
+    assert done["Barbell Back Squat"]["workouts"] == 2
+    assert done["Barbell Back Squat"]["last_date"] == str(TODAY - timedelta(days=3))
+    assert done["Barbell Back Squat"]["records"]["heaviest_kg"]["value"] == 105
+    assert client_for("bob").get("/api/workouts/progress/exercises").json() == []
+    c = client_for("alice")
 
     last = c.get("/api/exercises/last-sets", params={"ids": f"{squat},999999"}).json()
     assert list(last) == [str(squat)] and last[str(squat)]["session_id"] == second["id"]

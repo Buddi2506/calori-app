@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy import and_, or_
 from sqlalchemy.orm import Session
 from datetime import date, datetime, timedelta
 from typing import Optional
@@ -39,12 +40,14 @@ def split_day_out(day: SplitDay) -> dict:
     }
 
 
-def session_out(s: WorkoutSession) -> dict:
-    """A session with its sets grouped by exercise, in the order they were done."""
+def session_out(s: WorkoutSession, records: Optional[dict[int, list[str]]] = None) -> dict:
+    """A session with its sets grouped by exercise, in the order they were done.
+    Each set carries the personal records it set (see record_flags)."""
+    records = records or {}
     groups: dict[int, dict] = {}
     for st in s.sets:
         g = groups.setdefault(st.exercise_order, {"exercise": exercise_out(st.exercise), "exercise_order": st.exercise_order, "sets": []})
-        g["sets"].append(set_out(st))
+        g["sets"].append({**set_out(st), "records": records.get(st.id, [])})
     return {
         "id": s.id,
         "date": str(s.date),
@@ -100,35 +103,69 @@ def clean_set_values(kind: str, values: dict) -> dict:
     return {**values, "duration_seconds": None, "distance_km": None, "level": None}
 
 
-def new_records(db: Session, user: User, st: WorkoutSet) -> list[str]:
-    """Which personal records this strength set beats, compared with earlier sessions."""
-    if st.exercise.kind != "strength" or st.set_type != "working" or not st.reps:
-        return []
-    earlier = (
+def record_flags(db: Session, user: User, session: WorkoutSession) -> dict[int, list[str]]:
+    """Personal records set in this workout, by set id.
+
+    A working set is a record when it beats every earlier working set of that exercise:
+    those in earlier workouts and those logged before it in this one. The very first
+    time an exercise is done sets no records.
+    """
+    by_exercise: dict[int, list[WorkoutSet]] = {}
+    for st in session.sets:
+        if st.set_type == "working" and st.exercise.kind in ("strength", "timed"):
+            by_exercise.setdefault(st.exercise_id, []).append(st)
+    if not by_exercise:
+        return {}
+
+    prior = (
         db.query(WorkoutSet)
         .join(WorkoutSession, WorkoutSet.session_id == WorkoutSession.id)
         .filter(
             WorkoutSession.user_id == user.id,
-            WorkoutSet.exercise_id == st.exercise_id,
+            WorkoutSet.exercise_id.in_(by_exercise.keys()),
             WorkoutSet.set_type == "working",
-            WorkoutSet.session_id != st.session_id,
-            WorkoutSession.date <= st.session.date,
+            or_(
+                WorkoutSession.date < session.date,
+                and_(WorkoutSession.date == session.date, WorkoutSession.id < session.id),
+            ),
         )
         .all()
     )
-    if not earlier:
-        return []  # the first time isn't a record yet
-    records = []
-    if (st.weight_kg or 0) > max((s.weight_kg or 0) for s in earlier):
-        records.append("weight")
-    this_e1rm = estimated_1rm(st.weight_kg, st.reps)
-    best_e1rm = max((estimated_1rm(s.weight_kg, s.reps) or 0) for s in earlier)
-    if this_e1rm and this_e1rm > best_e1rm:
-        records.append("est_1rm")
-    bodyweight_reps = [s.reps or 0 for s in earlier if not s.weight_kg]
-    if not st.weight_kg and bodyweight_reps and st.reps > max(bodyweight_reps):
-        records.append("reps")
-    return records
+    prior_by_exercise: dict[int, list[WorkoutSet]] = {}
+    for st in prior:
+        prior_by_exercise.setdefault(st.exercise_id, []).append(st)
+
+    flags: dict[int, list[str]] = {}
+    for exercise_id, sets in by_exercise.items():
+        before = prior_by_exercise.get(exercise_id)
+        if not before:
+            continue
+        best_weight = max((x.weight_kg or 0) for x in before)
+        best_e1rm = max((estimated_1rm(x.weight_kg, x.reps) or 0) for x in before)
+        bodyweight = [x.reps or 0 for x in before if not x.weight_kg]
+        best_bw_reps = max(bodyweight) if bodyweight else None
+        best_hold = max((x.duration_seconds or 0) for x in before)
+        for st in sorted(sets, key=lambda x: x.id):
+            found = []
+            if st.exercise.kind == "timed":
+                if (st.duration_seconds or 0) > best_hold:
+                    found.append("hold")
+                best_hold = max(best_hold, st.duration_seconds or 0)
+            elif st.reps:
+                if (st.weight_kg or 0) > best_weight:
+                    found.append("weight")
+                e1rm = estimated_1rm(st.weight_kg, st.reps)
+                if e1rm and e1rm > best_e1rm:
+                    found.append("est_1rm")
+                if not st.weight_kg and best_bw_reps is not None and st.reps > best_bw_reps:
+                    found.append("reps")
+                best_weight = max(best_weight, st.weight_kg or 0)
+                best_e1rm = max(best_e1rm, e1rm or 0)
+                if not st.weight_kg:
+                    best_bw_reps = max(best_bw_reps or 0, st.reps)
+            if found:
+                flags[st.id] = found
+    return flags
 
 
 def renumber_sets(session: WorkoutSession, exercise_order: int) -> None:
@@ -226,7 +263,7 @@ def today(
     return {
         "date": str(target),
         "suggested_day": split_day_out(suggested) if suggested else None,
-        "sessions": [session_out(s) for s in sessions],
+        "sessions": [session_out(s, record_flags(db, current_user, s)) for s in sessions],
     }
 
 
@@ -252,6 +289,40 @@ def list_workouts(
 
 # ─── Progress ────────────────────────────────────────────────────────────────
 # Declared before "/{session_id}" so "progress" isn't parsed as an id.
+
+@router.get("/progress/exercises")
+def exercises_done(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    """Every exercise the user has logged, most recent first, with its personal records."""
+    rows = (
+        db.query(WorkoutSet, WorkoutSession)
+        .join(WorkoutSession, WorkoutSet.session_id == WorkoutSession.id)
+        .filter(WorkoutSession.user_id == current_user.id)
+        .order_by(WorkoutSession.date, WorkoutSession.id, WorkoutSet.set_number)
+        .all()
+    )
+    by_exercise: dict[int, dict] = {}
+    for st, sess in rows:
+        e = by_exercise.setdefault(st.exercise_id, {"exercise": st.exercise, "sessions": {}})
+        e["sessions"].setdefault(sess.id, {"date": sess.date, "sets": []})["sets"].append(st)
+
+    result = []
+    for e in by_exercise.values():
+        ex = e["exercise"]
+        points = []
+        for g in e["sessions"].values():
+            m = metrics_for(ex.kind, g["sets"])
+            if m:
+                points.append({"date": str(g["date"]), **m})
+        result.append({
+            "exercise": exercise_out(ex),
+            "workouts": len(e["sessions"]),
+            "last_date": str(max(g["date"] for g in e["sessions"].values())),
+            "last": points[-1] if points else None,
+            "records": records_from(ex.kind, points),
+        })
+    result.sort(key=lambda r: (r["last_date"], r["workouts"]), reverse=True)
+    return result
+
 
 @router.get("/progress/exercise/{exercise_id}")
 def exercise_progress(
@@ -352,7 +423,8 @@ def create_workout(data: WorkoutSessionCreate, current_user: User = Depends(get_
 
 @router.get("/{session_id}")
 def get_workout(session_id: int, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    return session_out(get_own_session(db, current_user, session_id))
+    s = get_own_session(db, current_user, session_id)
+    return session_out(s, record_flags(db, current_user, s))
 
 
 @router.patch("/{session_id}")
@@ -372,7 +444,7 @@ def update_workout(
         setattr(s, k, v)
     db.commit()
     db.refresh(s)
-    return session_out(s)
+    return session_out(s, record_flags(db, current_user, s))
 
 
 @router.delete("/{session_id}")
@@ -409,7 +481,7 @@ def add_set(
     db.add(st)
     db.commit()
     db.refresh(st)
-    return {**set_out(st), "records": new_records(db, current_user, st)}
+    return {**set_out(st), "records": record_flags(db, current_user, s).get(st.id, [])}
 
 
 @router.patch("/{session_id}/sets/{set_id}")
@@ -430,7 +502,7 @@ def update_set(
         setattr(st, k, v)
     db.commit()
     db.refresh(st)
-    return {**set_out(st), "records": new_records(db, current_user, st)}
+    return {**set_out(st), "records": record_flags(db, current_user, s).get(st.id, [])}
 
 
 @router.delete("/{session_id}/sets/{set_id}")

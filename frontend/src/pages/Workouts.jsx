@@ -3,6 +3,7 @@ import { Link, useParams, useNavigate } from 'react-router-dom';
 import { format, addDays, subDays, parseISO } from 'date-fns';
 import { ChevronLeft, ChevronRight, Settings2 } from 'lucide-react';
 import PageHeader from '../components/ui/PageHeader';
+import WorkoutTabs from '../components/workouts/WorkoutTabs';
 import Toast from '../components/Toast';
 import { useToast } from '../hooks/useToast';
 import StartCard from './workouts/StartCard';
@@ -66,6 +67,7 @@ const Workouts = () => {
   return (
     <div className="flex flex-col gap-5">
       <Toast message={toast} />
+      <WorkoutTabs />
 
       <PageHeader
         eyebrow="Workouts"

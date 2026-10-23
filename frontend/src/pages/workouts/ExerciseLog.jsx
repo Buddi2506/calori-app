@@ -207,7 +207,7 @@ const DraftSet = ({ n, kind, suggestion, sessionId, exerciseId, name, onLogged, 
 };
 
 // One exercise in a workout: its target, last time's numbers, logged sets and sets still to do.
-const ExerciseLog = ({ entry, sessionId, last, prSetIds, finished, onSetLogged, onSetChanged, onInfo }) => {
+const ExerciseLog = ({ entry, sessionId, last, finished, onSetLogged, onSetChanged, onInfo }) => {
   const { exercise, plan, sets } = entry;
   const kind = exercise.kind;
   const [extra, setExtra] = useState(0);
@@ -259,7 +259,7 @@ const ExerciseLog = ({ entry, sessionId, last, prSetIds, finished, onSetLogged, 
             kind={kind}
             name={exercise.name}
             sessionId={sessionId}
-            isPr={prSetIds.has(s.id)}
+            isPr={s.records?.length > 0}
             disabled={finished}
             onChanged={onSetChanged}
           />

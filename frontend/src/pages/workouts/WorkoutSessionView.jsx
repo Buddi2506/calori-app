@@ -6,7 +6,7 @@ import ExerciseInfoModal from '../../components/workouts/ExerciseInfoModal';
 import { getWorkout, getLastSets, updateWorkout, deleteWorkout } from '../../api/workouts';
 import { formatDuration } from '../../utils/workouts';
 
-const RECORD_LABELS = { weight: 'heaviest weight', est_1rm: 'best estimated max', reps: 'most reps' };
+const RECORD_LABELS = { weight: 'heaviest weight', est_1rm: 'best estimated max', reps: 'most reps', hold: 'longest hold' };
 
 // Exercises to show: the plan's (in plan order) with whatever was logged for them,
 // then anything else logged, then exercises added just now that have no sets yet.
@@ -41,7 +41,6 @@ const WorkoutSessionView = ({ initialSession, plan, openPicker, onDeleted, onToa
   const [session, setSession] = useState(initialSession);
   const [added, setAdded] = useState([]);
   const [last, setLast] = useState({});
-  const [prSetIds, setPrSetIds] = useState(new Set());
   const [picker, setPicker] = useState(openPicker || null); // 'exercise' | 'cardio' | null
   const [info, setInfo] = useState(null);
   const [notes, setNotes] = useState(initialSession.notes || '');
@@ -62,16 +61,13 @@ const WorkoutSessionView = ({ initialSession, plan, openPicker, onDeleted, onToa
 
   const handleSetLogged = async (saved, exercise) => {
     if (saved.records?.length) {
-      setPrSetIds((ids) => new Set(ids).add(saved.id));
       onToast(`New PR on ${exercise.name}: ${saved.records.map((r) => RECORD_LABELS[r] || r).join(' and ')}`);
     }
     await reload();
   };
 
-  const handleSetChanged = async (updated) => {
-    if (updated?.records?.length) setPrSetIds((ids) => new Set(ids).add(updated.id));
-    await reload();
-  };
+  // Records are worked out by the server, so editing or deleting a set can change them; reload.
+  const handleSetChanged = () => reload();
 
   const saveNotes = async () => {
     if ((session.notes || '') === notes) return;
@@ -125,7 +121,6 @@ const WorkoutSessionView = ({ initialSession, plan, openPicker, onDeleted, onToa
           entry={entry}
           sessionId={session.id}
           last={last[entry.exercise.id]}
-          prSetIds={prSetIds}
           finished={finished}
           onSetLogged={handleSetLogged}
           onSetChanged={handleSetChanged}
