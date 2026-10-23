@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { format, addDays, subDays } from 'date-fns';
-import { ChevronLeft, ChevronRight, CheckCircle2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { getDailyReport, getWeeklyReport } from '../api/reports';
 import { addDiaryEntry } from '../api/diary';
 import { formatApiDate } from '../utils/formatters';
-import { mealForTime } from '../utils/quickAdd';
+import { defaultMealForDay } from '../utils/quickAdd';
+import { useToast } from '../hooks/useToast';
+import Toast from '../components/Toast';
 import QuickAdd from '../components/dashboard/QuickAdd';
 import CaloriesCard from '../components/dashboard/CaloriesCard';
 import MacroCard from '../components/dashboard/MacroCard';
@@ -19,7 +21,7 @@ const Dashboard = () => {
   const [report, setReport] = useState(null);
   const [weeklyReport, setWeeklyReport] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [toast, setToast] = useState('');
+  const [toast, showToast] = useToast();
   const [logCount, setLogCount] = useState(0); // bumps after each quick add to reload recents
 
   const dateStr = formatApiDate(currentDate);
@@ -55,19 +57,13 @@ const Dashboard = () => {
   const loggedMeals = MEALS.filter((m) => (byMeal[m] || []).length > 0);
   const openMeals = MEALS.filter((m) => !loggedMeals.includes(m));
 
-  // Today: the meal for the current time. Past days: the first meal with nothing logged.
-  const defaultMeal = isToday ? mealForTime() : (openMeals[0] || 'snack');
+  const defaultMeal = defaultMealForDay(isToday, byMeal);
 
   const subtitle = loggedMeals.length === 0
     ? 'Nothing logged yet'
     : openMeals.length === 0
     ? `All ${MEALS.length} meals logged`
     : `${loggedMeals.length} ${loggedMeals.length === 1 ? 'meal' : 'meals'} logged · ${openMeals.join(', ')} still open`;
-
-  const showToast = (msg) => {
-    setToast(msg);
-    setTimeout(() => setToast(''), 3500);
-  };
 
   const handleQuickAdd = async ({ food, quantity, unit, mealType }) => {
     try {
@@ -90,12 +86,7 @@ const Dashboard = () => {
 
   return (
     <div className="flex flex-col gap-5">
-      {toast && (
-        <div role="status" className="fixed top-5 right-5 z-50 bg-[#24262E] text-white px-5 py-3 rounded-2xl shadow-xl flex items-center gap-2.5 border border-gray-300 text-sm">
-          <CheckCircle2 size={18} className="text-emerald-400 shrink-0" />
-          <span>{toast}</span>
-        </div>
-      )}
+      <Toast message={toast} />
 
       {/* Day header and navigation */}
       <div className="flex flex-wrap items-center justify-between gap-4">

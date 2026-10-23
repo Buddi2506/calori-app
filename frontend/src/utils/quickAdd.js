@@ -47,4 +47,12 @@ export const mealForTime = (now = new Date()) => {
   return 'dinner';
 };
 
+// Today: the meal for the current time. Other days: the first meal with nothing logged.
+export const defaultMealForDay = (isToday, byMeal = {}) =>
+  isToday ? mealForTime() : (MEAL_TYPES.find((m) => !(byMeal[m] || []).length) || 'snack');
+
+// "150 g", "2 piece", "1.5 cup"
+export const formatPortion = (quantity, unit) =>
+  `${Number(quantity)}${unit === 'g' || unit === 'ml' ? '' : ' '}${unit}`;
+
 export const mealLabel = (mealType) => mealType.charAt(0).toUpperCase() + mealType.slice(1);

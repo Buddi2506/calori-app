@@ -5,7 +5,8 @@ import {
 } from '../../utils/foodPortions';
 
 // Second step of adding a food: pick the amount and unit, preview nutrients, then add.
-const PortionEditor = ({ food: selectedFood, quantity, setQuantity, unit, setUnit, mealLabel, onAdd }) => {
+// `submitLabel` replaces the "Add … to <meal>" button text, e.g. when editing an entry.
+const PortionEditor = ({ food: selectedFood, quantity, setQuantity, unit, setUnit, mealLabel, onAdd, submitLabel }) => {
   const nutrition = calculatePortionNutrition(selectedFood, quantity, unit);
   const isLiquid = isLiquidFood(selectedFood);
   const isScoop = selectedFood.serving_unit === 'scoop';
@@ -222,7 +223,7 @@ const PortionEditor = ({ food: selectedFood, quantity, setQuantity, unit, setUni
         onClick={onAdd}
         className="w-full btn-primary flex items-center justify-center gap-2 py-3.5 text-base font-semibold shadow-md shadow-green-600/20"
       >
-        <Check size={20} /> Add {quantity}{unit === 'g' || unit === 'ml' ? unit : ` ${unit}`} to {mealLabel}
+        <Check size={20} /> {submitLabel || <>Add {quantity}{unit === 'g' || unit === 'ml' ? unit : ` ${unit}`} to {mealLabel}</>}
       </button>
     </div>
   );

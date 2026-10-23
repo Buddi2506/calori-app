@@ -10,8 +10,11 @@ export const addDiaryEntry = async (entryData) => {
   return data;
 };
 
-export const updateDiaryEntry = async (id, updateData) => {
-  const { data } = await client.put(`/diary/entries/${id}`, updateData);
+// The backend reads the new amount from query parameters, not the body.
+export const updateDiaryEntry = async (id, { quantity_display, quantity_unit }) => {
+  const { data } = await client.put(`/diary/entries/${id}`, null, {
+    params: { quantity_display, quantity_unit },
+  });
   return data;
 };
 

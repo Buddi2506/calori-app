@@ -21,6 +21,19 @@ const calorieStatus = (eaten, goal, isToday) => {
   return { text: 'On target', cls: 'bg-emerald-50 text-emerald-700' };
 };
 
+// One bar segment per meal, sized against `scale` (the goal, or the total when over it).
+export const MealSplitBar = ({ mealCalories, scale, className = 'h-3.5' }) => (
+  <div
+    className={`flex ${className} rounded-full overflow-hidden bg-gray-100 gap-0.5`}
+    role="img"
+    aria-label={ORDER.map((m) => `${mealLabel(m)} ${mealCalories[m]} kcal`).join(', ')}
+  >
+    {ORDER.filter((m) => mealCalories[m] > 0).map((m) => (
+      <div key={m} style={{ width: `${(mealCalories[m] / scale) * 100}%`, background: MEAL_COLORS[m] }} />
+    ))}
+  </div>
+);
+
 // Calories eaten vs goal, split into one bar segment per meal.
 const CaloriesCard = ({ eaten, goal, mealCalories, isToday }) => {
   const scale = Math.max(goal, eaten) || 1;
@@ -39,15 +52,7 @@ const CaloriesCard = ({ eaten, goal, mealCalories, isToday }) => {
         <span className="text-[15px] text-gray-600">of {goal.toLocaleString()} kcal</span>
       </div>
 
-      <div
-        className="flex h-3.5 rounded-full overflow-hidden bg-gray-100 gap-0.5"
-        role="img"
-        aria-label={ORDER.map((m) => `${mealLabel(m)} ${mealCalories[m]} kcal`).join(', ')}
-      >
-        {ORDER.filter((m) => mealCalories[m] > 0).map((m) => (
-          <div key={m} style={{ width: `${(mealCalories[m] / scale) * 100}%`, background: MEAL_COLORS[m] }} />
-        ))}
-      </div>
+      <MealSplitBar mealCalories={mealCalories} scale={scale} />
 
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-gray-600">
         {ORDER.map((m) => (
