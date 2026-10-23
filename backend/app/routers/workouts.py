@@ -26,6 +26,7 @@ def split_day_out(day: SplitDay) -> dict:
         "id": day.id,
         "name": day.name,
         "position": day.position,
+        "is_rest": day.is_rest,
         "exercises": [
             {
                 "id": item.id,
@@ -173,6 +174,32 @@ def renumber_sets(session: WorkoutSession, exercise_order: int) -> None:
         st.set_number = i
 
 
+def next_training_index(days: list[SplitDay], after: int) -> int:
+    """Index of the first training (non-rest) day after position `after`, wrapping round."""
+    for step in range(1, len(days) + 1):
+        i = (after + step) % len(days)
+        if not days[i].is_rest:
+            return i
+    return (after + 1) % len(days)
+
+
+def rotation_index(days: list[SplitDay], last_index: int, last_date: date, target: date) -> int:
+    """Which split day comes up on `target`, given the last day trained.
+
+    The day after a workout moves to the next day in the rotation. Rest days are used up
+    by calendar days passing; a training day waits until it's actually done, so a missed
+    gym day doesn't skip it.
+    """
+    pos = (last_index + 1) % len(days)
+    day = last_date + timedelta(days=1)
+    steps = 0
+    while day < target and days[pos].is_rest and steps < len(days):
+        pos = (pos + 1) % len(days)
+        day += timedelta(days=1)
+        steps += 1
+    return pos
+
+
 # ─── Split ───────────────────────────────────────────────────────────────────
 
 @router.get("/split")
@@ -187,10 +214,14 @@ def save_split(data: SplitIn, current_user: User = Depends(get_current_user), db
     unknown = [d.id for d in data.days if d.id is not None and d.id not in existing]
     if unknown:
         raise HTTPException(status_code=404, detail=f"Split day(s) not found: {unknown}")
-    names = [d.name.strip().lower() for d in data.days]
+    names = [d.name.strip().lower() for d in data.days if not d.is_rest]
     if len(names) != len(set(names)):
         raise HTTPException(status_code=422, detail="Each split day needs a different name")
+    if data.days and all(d.is_rest for d in data.days):
+        raise HTTPException(status_code=422, detail="A split needs at least one training day")
     for d in data.days:
+        if d.is_rest:
+            continue
         for item in d.exercises:
             get_visible_exercise(db, current_user, item.exercise_id)
             if item.target_reps_min and item.target_reps_max and item.target_reps_min > item.target_reps_max:
@@ -208,7 +239,8 @@ def save_split(data: SplitIn, current_user: User = Depends(get_current_user), db
             db.add(day)
         day.name = d.name.strip()
         day.position = position
-        day.exercises = [
+        day.is_rest = d.is_rest
+        day.exercises = [] if d.is_rest else [
             SplitDayExercise(
                 exercise_id=item.exercise_id,
                 position=i,
@@ -240,7 +272,7 @@ def today(
         .all()
     )
 
-    suggested = None
+    suggested = next_training = None
     if days:
         last = (
             db.query(WorkoutSession)
@@ -254,15 +286,20 @@ def today(
         )
         ids = [d.id for d in days]
         if last is None or last.split_day_id not in ids:
-            suggested = days[0]
+            pos = next_training_index(days, len(days) - 1)  # nothing done yet: first training day
         elif last.date == target:
-            suggested = days[ids.index(last.split_day_id)]  # already training this day today
+            pos = ids.index(last.split_day_id)  # already training this day today
         else:
-            suggested = days[(ids.index(last.split_day_id) + 1) % len(days)]
+            pos = rotation_index(days, ids.index(last.split_day_id), last.date, target)
+        suggested = days[pos]
+        if suggested.is_rest:
+            next_training = days[next_training_index(days, pos)]
 
     return {
         "date": str(target),
         "suggested_day": split_day_out(suggested) if suggested else None,
+        # on a rest day, the training day that comes after it
+        "next_training_day": split_day_out(next_training) if next_training else None,
         "sessions": [session_out(s, record_flags(db, current_user, s)) for s in sessions],
     }
 
@@ -407,6 +444,8 @@ def create_workout(data: WorkoutSessionCreate, current_user: User = Depends(get_
         day = db.query(SplitDay).filter(SplitDay.id == data.split_day_id, SplitDay.user_id == current_user.id).first()
         if not day:
             raise HTTPException(status_code=404, detail="Split day not found")
+        if day.is_rest:
+            raise HTTPException(status_code=422, detail="That's a rest day; pick a training day or log cardio")
         name = name or day.name
     s = WorkoutSession(
         user_id=current_user.id,

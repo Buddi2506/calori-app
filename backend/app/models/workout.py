@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float, Date, DateTime, ForeignKey, Text, JSON
+from sqlalchemy import Column, Integer, String, Float, Date, DateTime, ForeignKey, Text, JSON, Boolean, false
 from sqlalchemy.orm import relationship
 from datetime import datetime
 from ..database import Base
@@ -33,12 +33,13 @@ class Exercise(Base):
 
 
 class SplitDay(Base):
-    """One day of a user's workout split, e.g. Push, Pull, Legs."""
+    """One day of a user's workout split, e.g. Push, Pull, Legs, or a rest day in the rotation."""
     __tablename__ = "split_days"
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
     name = Column(String, nullable=False)
     position = Column(Integer, nullable=False, default=0)
+    is_rest = Column(Boolean, nullable=False, default=False, server_default=false())
     created_at = Column(DateTime, default=datetime.utcnow)
 
     exercises = relationship(

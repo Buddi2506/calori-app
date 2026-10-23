@@ -71,7 +71,8 @@ class SplitDayExerciseIn(BaseModel):
 
 class SplitDayIn(BaseModel):
     id: Optional[int] = None  # keep an existing day (and its workout history link)
-    name: str = Field(min_length=1, max_length=60)
+    name: str = Field(default="Rest", min_length=1, max_length=60)
+    is_rest: bool = False  # a rest day in the rotation; it has no exercises
     exercises: List[SplitDayExerciseIn] = []
 
 

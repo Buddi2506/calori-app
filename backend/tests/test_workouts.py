@@ -52,10 +52,11 @@ def test_data():
     db = TestSession()
     alice = User(username="alice", email="alice@test.local", full_name="Alice", hashed_password="x", role="member")
     bob = User(username="bob", email="bob@test.local", full_name="Bob", hashed_password="x", role="member")
-    db.add_all([alice, bob])
+    carol = User(username="carol", email="carol@test.local", full_name="Carol", hashed_password="x", role="member")
+    db.add_all([alice, bob, carol])
     db.commit()
     seed_exercises(db)
-    ids = {"alice": alice.id, "bob": bob.id}
+    ids = {"alice": alice.id, "bob": bob.id, "carol": carol.id}
     db.close()
     app.dependency_overrides[get_db] = _override_db
     yield ids
@@ -285,3 +286,61 @@ def test_exercise_in_use_cannot_be_deleted():
     assert c.delete(f"/api/exercises/{unused['id']}").status_code == 200
     builtin = exercise_id(c, "Plank")
     assert c.delete(f"/api/exercises/{builtin}").status_code == 403
+
+
+# ─── Rest days ───────────────────────────────────────────────────────────────
+
+def test_rest_days_in_rotation():
+    c = client_for("carol")
+    bench = exercise_id(c, "Barbell Bench Press")
+
+    def suggestion(day):
+        t = c.get("/api/workouts/today", params={"date": str(day)}).json()
+        return t["suggested_day"]["name"], (t["next_training_day"] or {}).get("name")
+
+    def train(day_id, day):
+        return c.post("/api/workouts", json={"date": str(day), "split_day_id": day_id}).json()
+
+    # A split needs a training day; rest days may repeat their name and never keep exercises
+    assert c.put("/api/workouts/split", json={"days": [{"is_rest": True}]}).status_code == 422
+    days = c.put("/api/workouts/split", json={"days": [
+        {"name": "Push"}, {"name": "Pull"}, {"name": "Legs"},
+        {"is_rest": True, "exercises": [{"exercise_id": bench}]},
+    ]}).json()
+    assert [(d["name"], d["is_rest"], len(d["exercises"])) for d in days] == [
+        ("Push", False, 0), ("Pull", False, 0), ("Legs", False, 0), ("Rest", True, 0)]
+    push, pull, legs, rest = (d["id"] for d in days)
+    assert c.post("/api/workouts", json={"date": str(TODAY), "split_day_id": rest}).status_code == 422
+
+    # Push, Pull, Legs, Rest: the rest day passes with the calendar, then Push comes round
+    t0 = TODAY - timedelta(days=60)
+    train(legs, t0)
+    assert suggestion(t0 + timedelta(days=1)) == ("Rest", "Push")
+    assert suggestion(t0 + timedelta(days=2)) == ("Push", None)
+    # A missed gym day doesn't skip Push
+    assert suggestion(t0 + timedelta(days=5)) == ("Push", None)
+    # Training on a rest day carries on from what was trained
+    train(push, t0 + timedelta(days=6))
+    assert suggestion(t0 + timedelta(days=7)) == ("Pull", None)
+
+    # Two rest days in a row, and rest placed mid-rotation
+    days = c.put("/api/workouts/split", json={"days": [
+        {"id": push, "name": "Push"}, {"is_rest": True}, {"id": pull, "name": "Pull"},
+        {"id": legs, "name": "Legs"}, {"id": rest, "is_rest": True}, {"is_rest": True},
+    ]}).json()
+    assert [d["name"] for d in days] == ["Push", "Rest", "Pull", "Legs", "Rest", "Rest"]
+    t1 = TODAY - timedelta(days=40)
+    train(legs, t1)
+    assert suggestion(t1 + timedelta(days=1)) == ("Rest", "Push")
+    assert suggestion(t1 + timedelta(days=2)) == ("Rest", "Push")
+    assert suggestion(t1 + timedelta(days=3)) == ("Push", None)
+    train(push, t1 + timedelta(days=3))
+    assert suggestion(t1 + timedelta(days=4)) == ("Rest", "Pull")
+    assert suggestion(t1 + timedelta(days=5)) == ("Pull", None)
+
+    # With no history, start on the first training day even if a rest day is first
+    c.put("/api/workouts/split", json={"days": [{"is_rest": True}, {"name": "Full body"}]})
+    bob = client_for("bob")
+    bob.put("/api/workouts/split", json={"days": [{"is_rest": True}, {"name": "Full body"}]})
+    assert bob.get("/api/workouts/today").json()["suggested_day"]["name"] == "Full body"
+    bob.put("/api/workouts/split", json={"days": []})
