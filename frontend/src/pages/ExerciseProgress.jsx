@@ -8,6 +8,7 @@ import {
 import PageHeader from '../components/ui/PageHeader';
 import Segmented from '../components/ui/Segmented';
 import MuscleMap from '../components/workouts/MuscleMap';
+import ProgressGuide from '../components/workouts/ProgressGuide';
 import { getExerciseProgress } from '../api/workouts';
 import { CATEGORY_LABELS, formatDuration, formatPace, VOLUME_EXPLANATION } from '../utils/workouts';
 
@@ -101,6 +102,7 @@ const ExerciseProgress = () => {
                 title={ex.name}
                 subtitle={`${points.length} ${points.length === 1 ? 'workout' : 'workouts'} in this period`}
               >
+                <ProgressGuide />
                 <Segmented label="Time range" options={RANGES} value={days} onChange={setDays} />
               </PageHeader>
             </div>

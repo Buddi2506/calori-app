@@ -7,6 +7,7 @@ import PageHeader from '../components/ui/PageHeader';
 import Segmented from '../components/ui/Segmented';
 import WorkoutTabs from '../components/workouts/WorkoutTabs';
 import MuscleMap from '../components/workouts/MuscleMap';
+import ProgressGuide from '../components/workouts/ProgressGuide';
 import { getProgressSummary, getExercisesDone, getSplit } from '../api/workouts';
 import { formatDuration, formatPace, workoutColor } from '../utils/workouts';
 
@@ -97,6 +98,7 @@ const WorkoutProgress = () => {
     <div className="flex flex-col gap-5">
       <WorkoutTabs />
       <PageHeader eyebrow="Workouts" title="Progress" subtitle="How your training is adding up">
+        <ProgressGuide />
         <Segmented label="Time range" options={RANGES} value={weeks} onChange={setWeeks} />
       </PageHeader>
 
