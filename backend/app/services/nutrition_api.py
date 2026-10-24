@@ -2,6 +2,7 @@ import httpx
 import json
 import re
 from ..config import settings
+from .food_catalog import categorize, plausible
 import redis
 
 _redis_client = None
@@ -32,100 +33,138 @@ def get_redis():
     return _redis_client
 
 
-def _search_open_food_facts(query: str) -> list:
-    """Search Open Food Facts API."""
-    url = (
-        f"https://world.openfoodfacts.org/cgi/search.pl"
-        f"?search_terms={query}"
-        f"&search_simple=1&action=process&json=1"
-        f"&fields=id,product_name,nutriments,serving_size&page_size=10"
-    )
+def _per_100(nutriments: dict, key: str) -> float:
     try:
-        res = httpx.get(url, timeout=8.0, headers={"User-Agent": "CaloriApp/1.0"})
+        return float(nutriments.get(f"{key}_100g") or 0)
+    except (TypeError, ValueError):
+        return 0.0
+
+
+def _food_row(name, source, source_id, values: dict) -> dict:
+    is_liq = is_liquid_name(name)
+    category = categorize(name)
+    if is_liq and category == "Packaged & Other":
+        category = "Beverages"
+    row = {
+        "name": name,
+        "name_local": None,
+        "category": category,
+        "source": source,
+        "source_id": source_id,
+        "serving_size_g": 100.0,
+        "serving_unit": "ml" if is_liq else "g",
+        "serving_unit_weight_g": 1.0 if is_liq else 100.0,
+        "is_custom": False,
+    }
+    for key in ("calories", "protein", "carbohydrates", "fat", "fiber", "sugar", "sodium", "potassium",
+                "iron", "calcium", "vitamin_c", "vitamin_d", "vitamin_b12", "magnesium", "zinc",
+                "saturated_fat", "trans_fat", "cholesterol"):
+        row[key] = round(float(values.get(key) or 0), 2)
+    return row
+
+
+def _tidy_name(name: str) -> str:
+    """USDA branded names come in capitals; make them readable."""
+    name = " ".join((name or "").split())
+    return name.title() if name.isupper() else name
+
+
+SKIP_NAMES = re.compile(r"^(babyfood|baby food|toddler|infant formula)", re.IGNORECASE)
+
+
+def _readable(name: str) -> bool:
+    """An English name worth showing: not empty, not another script, not baby food."""
+    return bool(name) and name.isascii() and not SKIP_NAMES.match(name)
+
+
+def _search_open_food_facts(query: str) -> list:
+    """Packaged products from Open Food Facts, only those with a full nutrition label."""
+    try:
+        res = httpx.get(
+            "https://world.openfoodfacts.org/cgi/search.pl",
+            params={
+                "search_terms": query, "search_simple": 1, "action": "process", "json": 1,
+                "fields": "code,product_name,product_name_en,brands,nutriments", "page_size": 20,
+                # Products sold in India; the global catalogue is mostly European items.
+                "tagtype_0": "countries", "tag_contains_0": "contains", "tag_0": "india",
+            },
+            timeout=6.0,
+            headers={"User-Agent": "CaloriApp/1.0"},
+        )
         if res.status_code != 200:
             return []
-        data = res.json()
         results = []
-        for p in data.get("products", []):
-            name = p.get("product_name", "").strip()
-            if not name:
+        for p in res.json().get("products", []):
+            name = _tidy_name(p.get("product_name_en") or p.get("product_name") or "")
+            if not _readable(name):
                 continue
-            nut = p.get("nutriments", {})
-            is_liq = is_liquid_name(name)
-            serving_unit = "ml" if is_liq else "g"
-            results.append({
-                "name": name,
-                "name_local": None,
-                "category": "Beverage" if is_liq else "General",
-                "source": "off",
-                "source_id": f"off_{p.get('id', '')}",
-                "serving_size_g": 100.0,
-                "serving_unit": serving_unit,
-                "serving_unit_weight_g": 1.0 if is_liq else 100.0,
-                "is_custom": False,
-                "calories": float(nut.get("energy-kcal_100g") or 0),
-                "protein": float(nut.get("proteins_100g") or 0),
-                "carbohydrates": float(nut.get("carbohydrates_100g") or 0),
-                "fat": float(nut.get("fat_100g") or 0),
-                "fiber": float(nut.get("fiber_100g") or 0),
-                "sugar": float(nut.get("sugars_100g") or 0),
-                "sodium": float(nut.get("sodium_100g") or 0) * 1000,  # g → mg
-                "potassium": 0.0,
-                "iron": 0.0,
-                "calcium": float(nut.get("calcium_100g") or 0) * 1000,  # g → mg
-                "vitamin_c": float(nut.get("vitamin-c_100g") or 0) * 1000,
-                "vitamin_d": 0.0,
-                "vitamin_b12": 0.0,
-                "magnesium": 0.0,
-                "zinc": 0.0,
-                "saturated_fat": float(nut.get("saturated-fat_100g") or 0),
-                "trans_fat": 0.0,
-                "cholesterol": 0.0,
-            })
+            brand = (p.get("brands") or "").split(",")[0].strip()
+            if brand and brand.lower() not in name.lower():
+                name = f"{name} ({brand})"
+            nut = p.get("nutriments") or {}
+            kcal = _per_100(nut, "energy-kcal") or _per_100(nut, "energy") / 4.184
+            protein, carbs, fat = _per_100(nut, "proteins"), _per_100(nut, "carbohydrates"), _per_100(nut, "fat")
+            if not plausible(kcal, protein, carbs, fat):
+                continue
+            results.append(_food_row(name, "off", f"off_{p.get('code', '')}", {
+                "calories": kcal,
+                "protein": protein,
+                "carbohydrates": carbs,
+                "fat": fat,
+                "fiber": _per_100(nut, "fiber"),
+                "sugar": _per_100(nut, "sugars"),
+                "sodium": _per_100(nut, "sodium") * 1000,  # g → mg
+                "calcium": _per_100(nut, "calcium") * 1000,
+                "iron": _per_100(nut, "iron") * 1000,
+                "vitamin_c": _per_100(nut, "vitamin-c") * 1000,
+                "saturated_fat": _per_100(nut, "saturated-fat"),
+                "trans_fat": _per_100(nut, "trans-fat"),
+                "cholesterol": _per_100(nut, "cholesterol") * 1000,
+            }))
         return results
     except Exception as e:
         print(f"Open Food Facts error: {e}")
         return []
 
 
-def _search_usda(query: str) -> list:
-    """Search USDA FoodData Central API."""
-    url = (
-        f"{settings.USDA_BASE_URL}/foods/search"
-        f"?query={query}&api_key={settings.USDA_API_KEY}&pageSize=10"
-    )
-    NUTRIENT_ID = {
-        1008: "calories", 1003: "protein", 1005: "carbohydrates", 1004: "fat",
-        1079: "fiber", 1093: "sodium", 1092: "potassium", 1089: "iron",
-        1087: "calcium", 1162: "vitamin_c", 1114: "vitamin_d", 1178: "vitamin_b12",
-        1090: "magnesium", 1095: "zinc", 1258: "saturated_fat", 1253: "cholesterol",
-    }
+# USDA nutrient ids → our fields. Energy has three ids: 1008 in most data,
+# 2047 / 2048 (Atwater factors) in the newer Foundation foods.
+USDA_NUTRIENTS = {
+    1003: "protein", 1005: "carbohydrates", 1004: "fat", 1079: "fiber", 2000: "sugar",
+    1093: "sodium", 1092: "potassium", 1089: "iron", 1087: "calcium", 1162: "vitamin_c",
+    1114: "vitamin_d", 1178: "vitamin_b12", 1090: "magnesium", 1095: "zinc",
+    1258: "saturated_fat", 1257: "trans_fat", 1253: "cholesterol",
+}
+USDA_ENERGY = (1008, 2047, 2048)
+# Lab-measured generic foods first; branded labels only when those find too little.
+USDA_GENERIC = ["Foundation", "SR Legacy", "Survey (FNDDS)"]
+
+
+def _search_usda(query: str, data_types: list) -> list:
     try:
-        res = httpx.get(url, timeout=8.0)
+        res = httpx.post(
+            f"{settings.USDA_BASE_URL}/foods/search",
+            params={"api_key": settings.USDA_API_KEY},
+            json={"query": query, "pageSize": 15, "dataType": data_types},
+            timeout=6.0,
+        )
         if res.status_code != 200:
+            print(f"USDA search returned {res.status_code}")
             return []
-        data = res.json()
         results = []
-        for f in data.get("foods", []):
-            name = f.get("description", "").strip()
-            nutrients = {n["nutrientId"]: float(n.get("value") or 0) for n in f.get("foodNutrients", [])}
-            mapped = {nname: nutrients.get(nid, 0.0) for nid, nname in NUTRIENT_ID.items()}
-            is_liq = is_liquid_name(name)
-            serving_unit = "ml" if is_liq else "g"
-            results.append({
-                "name": name,
-                "name_local": None,
-                "category": "Beverage" if is_liq else "General",
-                "source": "usda",
-                "source_id": f"usda_{f.get('fdcId')}",
-                "serving_size_g": 100.0,
-                "serving_unit": serving_unit,
-                "serving_unit_weight_g": 1.0 if is_liq else 100.0,
-                "is_custom": False,
-                "sugar": 0.0,
-                "trans_fat": 0.0,
-                **mapped,
-            })
+        for f in res.json().get("foods", []):
+            nutrients = {n.get("nutrientId"): float(n.get("value") or 0) for n in f.get("foodNutrients", [])}
+            values = {field: nutrients.get(nid, 0.0) for nid, field in USDA_NUTRIENTS.items()}
+            values["calories"] = next((nutrients[i] for i in USDA_ENERGY if nutrients.get(i)), 0.0)
+            if not plausible(values["calories"], values["protein"], values["carbohydrates"], values["fat"]):
+                continue
+            name = _tidy_name(f.get("description", ""))
+            if not _readable(name):
+                continue
+            brand = _tidy_name(f.get("brandName") or f.get("brandOwner") or "")
+            if brand and brand.lower() not in name.lower():
+                name = f"{name} ({brand})"
+            results.append(_food_row(name, "usda", f"usda_{f.get('fdcId')}", values))
         return results
     except Exception as e:
         print(f"USDA error: {e}")
@@ -133,8 +172,8 @@ def _search_usda(query: str) -> list:
 
 
 def search_external(query: str) -> list:
-    """Search external nutrition APIs with Redis caching."""
-    cache_key = f"food:search:{query.lower().strip()}"
+    """Foods from USDA and Open Food Facts, cached in Redis."""
+    cache_key = f"food:search:v2:{query.lower().strip()}"
     rc = get_redis()
     if rc:
         try:
@@ -144,32 +183,25 @@ def search_external(query: str) -> list:
         except Exception:
             pass
 
-    results = []
+    results = _search_usda(query, USDA_GENERIC)
+    if len(results) < 5:
+        results += _search_usda(query, ["Branded"])
+    results += _search_open_food_facts(query)
 
-    # Try USDA first (often faster and more accurate)
-    if settings.USDA_API_KEY and settings.USDA_API_KEY != "DEMO_KEY":
-        results.extend(_search_usda(query))
+    unique, seen = [], set()
+    for r in results:
+        key = r["name"].lower()
+        if key not in seen:
+            seen.add(key)
+            unique.append(r)
+    unique = unique[:20]
 
-    # Then Open Food Facts
-    off_results = _search_open_food_facts(query)
-    existing_names = {r["name"].lower() for r in results}
-    for r in off_results:
-        if r["name"].lower() not in existing_names:
-            results.append(r)
-
-    # If DEMO_KEY, try USDA last
-    if not results or settings.USDA_API_KEY == "DEMO_KEY":
-        usda_results = _search_usda(query)
-        existing_names = {r["name"].lower() for r in results}
-        for r in usda_results:
-            if r["name"].lower() not in existing_names:
-                results.append(r)
-
-    # Cache for 7 days
     if rc:
         try:
-            rc.setex(cache_key, 7 * 24 * 60 * 60, json.dumps(results))
+            # An empty answer is often a rate limit or a timeout, so it is only kept for an hour.
+            ttl = 7 * 24 * 60 * 60 if unique else 60 * 60
+            rc.setex(cache_key, ttl, json.dumps(unique))
         except Exception:
             pass
 
-    return results[:20]
+    return unique

@@ -6,6 +6,7 @@ from .migrate import run_migrations
 from .models.food import Food
 from .models.user import User
 from .services.security import hash_password
+from .services.food_catalog import apply_catalog_fixes
 import json
 import os
 import logging
@@ -180,6 +181,9 @@ def startup():
     try:
         seed_admin_user(db)
         seed_south_indian_foods(db)
+        apply_catalog_fixes(db)
+        # Seeding and fixes may have changed foods, so the cached food list is stale
+        foods._invalidate_library_cache()
         seed_default_custom_meals(db)
         seed_exercises(db)
         create_default_goals(db)

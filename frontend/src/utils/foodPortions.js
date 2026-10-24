@@ -14,7 +14,7 @@ export const isLiquidFood = (food) => {
     return true;
   }
   const category = (food.category || '').toLowerCase();
-  if (category === 'beverage' || category === 'drinks') {
+  if (category.startsWith('beverage') || category === 'drinks') {
     return true;
   }
   const text = `${food.name || ''} ${food.category || ''}`.toLowerCase();
