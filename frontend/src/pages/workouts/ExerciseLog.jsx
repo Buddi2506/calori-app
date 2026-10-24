@@ -212,14 +212,18 @@ const ExerciseLog = ({ entry, sessionId, last, finished, onSetLogged, onSetChang
   const kind = exercise.kind;
   const [extra, setExtra] = useState(0);
   const target = plan?.target_sets || 0;
+  // Warm-ups don't count toward the plan, and aren't used to prefill working sets.
+  const workingToday = sets.filter((s) => s.set_type === 'working');
+  const lastWorking = (last?.sets || []).filter((s) => s.set_type === 'working');
   // Planned: one row per set still to do. Unplanned: always one "next set" row (cardio: only until logged).
-  const base = target ? Math.max(target - sets.length, 0) : kind === 'cardio' && sets.length ? 0 : 1;
+  const base = target ? Math.max(target - workingToday.length, 0) : kind === 'cardio' && sets.length ? 0 : 1;
   const draftCount = finished ? 0 : base + extra;
 
-  // Placeholder for set n: last time's set n, else the last set logged today, else last time's final set
-  const suggestionFor = (n) => {
-    const fromLast = last?.sets?.[n - 1] || null;
-    const source = fromLast || sets[sets.length - 1] || last?.sets?.[last.sets.length - 1] || null;
+  // Placeholder for the i-th row still to do: last time's matching working set, else the last
+  // working set logged today, else last time's final working set
+  const suggestionFor = (i) => {
+    const fromLast = lastWorking[workingToday.length + i] || null;
+    const source = fromLast || workingToday[workingToday.length - 1] || lastWorking[lastWorking.length - 1] || null;
     return source ? valuesFromSet(source) : null;
   };
 
@@ -272,7 +276,7 @@ const ExerciseLog = ({ entry, sessionId, last, finished, onSetLogged, onSetChang
               n={n}
               kind={kind}
               name={exercise.name}
-              suggestion={suggestionFor(n)}
+              suggestion={suggestionFor(i)}
               sessionId={sessionId}
               exerciseId={exercise.id}
               onLogged={(saved) => { if (i >= base) setExtra((x) => Math.max(0, x - 1)); onSetLogged(saved, exercise); }}
