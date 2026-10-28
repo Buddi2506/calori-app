@@ -50,7 +50,7 @@ const Box = ({ label, unit, value, placeholder, onChange, step = 'any', width = 
       value={value}
       placeholder={placeholder}
       onChange={(e) => onChange(e.target.value)}
-      className={`${width} h-10 rounded-xl bg-[#0E0F13] border border-gray-200 text-center text-[15px] font-bold text-gray-900 placeholder-gray-500 focus:outline-none focus:border-amber-400`}
+      className={`${width} h-10 rounded-xl bg-[#080A0F] border border-gray-200 text-center text-[15px] font-bold text-gray-900 placeholder-gray-500 focus:outline-none focus:border-amber-400`}
     />
     {unit}
   </label>
@@ -140,7 +140,7 @@ const LoggedSet = ({ set, kind, sessionId, name, isPr, onChanged, disabled }) =>
         <>
           <SetInputs kind={kind} values={values} onChange={setValues} name={name} />
           <span className="flex gap-1 ml-auto">
-            <button onClick={save} disabled={busy} aria-label="Save set" className="w-10 h-10 rounded-full bg-amber-400 text-[#0B0C10] flex items-center justify-center"><Check size={18} /></button>
+            <button onClick={save} disabled={busy} aria-label="Save set" className="w-10 h-10 rounded-full bg-amber-400 text-[#030407] flex items-center justify-center"><Check size={18} /></button>
             <button onClick={() => { setEditing(false); setValues(valuesFromSet(set)); }} aria-label="Cancel" className="w-10 h-10 rounded-full text-gray-500 hover:bg-gray-100 flex items-center justify-center"><X size={18} /></button>
           </span>
         </>
@@ -149,7 +149,7 @@ const LoggedSet = ({ set, kind, sessionId, name, isPr, onChanged, disabled }) =>
           <span className="flex-1 min-w-0 text-[15px] font-bold text-gray-900">
             {formatSet(set, kind)}
             {isPr && (
-              <span className="ml-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-400 text-[#0B0C10] text-[11px] font-black align-middle">
+              <span className="ml-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-400 text-[#030407] text-[11px] font-black align-middle">
                 <Trophy size={11} /> PR
               </span>
             )}
@@ -194,7 +194,7 @@ const DraftSet = ({ n, kind, suggestion, sessionId, exerciseId, name, onLogged, 
           onClick={log}
           disabled={!payload || busy}
           aria-label={`Log set ${n}`}
-          className="w-10 h-10 rounded-full border border-gray-200 text-gray-500 flex items-center justify-center hover:bg-amber-400 hover:border-amber-400 hover:text-[#0B0C10] disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-gray-500 disabled:hover:border-gray-200 transition-colors"
+          className="w-10 h-10 rounded-full border border-gray-200 text-gray-500 flex items-center justify-center hover:bg-amber-400 hover:border-amber-400 hover:text-[#030407] disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-gray-500 disabled:hover:border-gray-200 transition-colors"
         >
           <Check size={18} />
         </button>

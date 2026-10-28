@@ -15,8 +15,8 @@ import { CATEGORY_LABELS, formatDuration, formatPace, VOLUME_EXPLANATION } from 
 const RANGES = [{ id: 90, label: '3M' }, { id: 180, label: '6M' }, { id: 365, label: '1Y' }, { id: 3650, label: 'All' }];
 const AXIS = { fontSize: 12, fill: '#8E8E98' };
 const TOOLTIP = {
-  contentStyle: { background: '#1A1B21', border: '1px solid #2A2C34', borderRadius: 12, color: '#F4F4F5' },
-  itemStyle: { color: '#F4F4F5' },
+  contentStyle: { background: '#11141B', border: '1px solid #1F2430', borderRadius: 12, color: '#F2F4F8' },
+  itemStyle: { color: '#F2F4F8' },
   labelStyle: { color: '#A1A1AA', fontWeight: 700 },
   cursor: { fill: 'rgba(255,255,255,0.04)' },
 };
@@ -48,7 +48,7 @@ const ChartCard = ({ title, note, children }) => (
 );
 
 const axes = (unit) => [
-  <CartesianGrid key="g" strokeDasharray="3 3" stroke="#2A2C34" vertical={false} />,
+  <CartesianGrid key="g" strokeDasharray="3 3" stroke="#1F2430" vertical={false} />,
   <XAxis key="x" dataKey="label" tick={AXIS} axisLine={false} tickLine={false} />,
   <YAxis key="y" tick={AXIS} axisLine={false} tickLine={false} width={44} unit={unit} domain={['auto', 'auto']} />,
   <Tooltip key="t" {...TOOLTIP} />,
@@ -140,14 +140,14 @@ const ExerciseProgress = () => {
                     <LineChart data={points}>
                       {axes(' kg')}
                       <Legend wrapperStyle={{ fontSize: 12 }} />
-                      <Line type="monotone" dataKey="est_1rm_kg" name="Estimated max" stroke="#FBBF24" strokeWidth={2.5} dot={{ r: 3 }} connectNulls />
-                      <Line type="monotone" dataKey="top_weight_kg" name="Heaviest set" stroke="#60A5FA" strokeWidth={2.5} dot={{ r: 3 }} />
+                      <Line type="monotone" dataKey="est_1rm_kg" name="Estimated max" stroke="#D4FF24" strokeWidth={2.5} dot={{ r: 3 }} connectNulls />
+                      <Line type="monotone" dataKey="top_weight_kg" name="Heaviest set" stroke="#6F9BFF" strokeWidth={2.5} dot={{ r: 3 }} />
                     </LineChart>
                   </ChartCard>
                   <ChartCard title="Volume per workout" note={VOLUME_EXPLANATION}>
                     <BarChart data={points}>
                       {axes(' kg')}
-                      <Bar dataKey="volume_kg" name="Volume" fill="#34D399" radius={[6, 6, 0, 0]} />
+                      <Bar dataKey="volume_kg" name="Volume" fill="#1558C9" radius={[6, 6, 0, 0]} />
                     </BarChart>
                   </ChartCard>
                 </>
@@ -156,7 +156,7 @@ const ExerciseProgress = () => {
                 <ChartCard title="Longest hold per workout">
                   <BarChart data={points}>
                     {axes(' s')}
-                    <Bar dataKey="best_seconds" name="Seconds" fill="#FBBF24" radius={[6, 6, 0, 0]} />
+                    <Bar dataKey="best_seconds" name="Seconds" fill="#D4FF24" radius={[6, 6, 0, 0]} />
                   </BarChart>
                 </ChartCard>
               )}
@@ -165,14 +165,14 @@ const ExerciseProgress = () => {
                   <ChartCard title="Minutes per session">
                     <BarChart data={points}>
                       {axes(' min')}
-                      <Bar dataKey="minutes" name="Minutes" fill="#22D3EE" radius={[6, 6, 0, 0]} />
+                      <Bar dataKey="minutes" name="Minutes" fill="#1558C9" radius={[6, 6, 0, 0]} />
                     </BarChart>
                   </ChartCard>
                   {points.some((p) => p.pace_min_per_km) && (
                     <ChartCard title="Pace (lower is faster)">
                       <LineChart data={points}>
                         {axes('')}
-                        <Line type="monotone" dataKey="pace_min_per_km" name="Min per km" stroke="#FBBF24" strokeWidth={2.5} dot={{ r: 3 }} connectNulls />
+                        <Line type="monotone" dataKey="pace_min_per_km" name="Min per km" stroke="#D4FF24" strokeWidth={2.5} dot={{ r: 3 }} connectNulls />
                       </LineChart>
                     </ChartCard>
                   )}

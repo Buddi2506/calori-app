@@ -86,7 +86,7 @@ const ForcePasswordChangeModal = () => {
                 required
                 minLength={6}
                 placeholder="Enter at least 6 characters"
-                className="w-full pl-10 pr-10 h-12 bg-[#0E0F13] border border-gray-200 rounded-2xl text-[15px] text-gray-900 placeholder-gray-500 focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-400/30 transition-colors"
+                className="w-full pl-10 pr-10 h-12 bg-[#080A0F] border border-gray-200 rounded-2xl text-[15px] text-gray-900 placeholder-gray-500 focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-400/30 transition-colors"
               />
               <button
                 type="button"
@@ -113,7 +113,7 @@ const ForcePasswordChangeModal = () => {
                 required
                 minLength={6}
                 placeholder="Re-type new password"
-                className="w-full pl-10 pr-4 h-12 bg-[#0E0F13] border border-gray-200 rounded-2xl text-[15px] text-gray-900 placeholder-gray-500 focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-400/30 transition-colors"
+                className="w-full pl-10 pr-4 h-12 bg-[#080A0F] border border-gray-200 rounded-2xl text-[15px] text-gray-900 placeholder-gray-500 focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-400/30 transition-colors"
               />
             </div>
           </div>
@@ -131,7 +131,7 @@ const ForcePasswordChangeModal = () => {
             className="w-full h-12 btn-primary text-sm flex items-center justify-center gap-2"
           >
             {loading ? (
-              <span className="inline-block w-4 h-4 border-2 border-[#0B0C10] border-t-transparent rounded-full animate-spin"></span>
+              <span className="inline-block w-4 h-4 border-2 border-[#030407] border-t-transparent rounded-full animate-spin"></span>
             ) : (
               <>
                 <span>Save password and continue</span>

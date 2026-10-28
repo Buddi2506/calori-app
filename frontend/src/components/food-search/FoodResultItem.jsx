@@ -39,7 +39,7 @@ const FoodResultItem = ({ food, onSelect }) => {
           {food.name_local && <span className="block text-xs text-orange-600 mt-0.5">{food.name_local}</span>}
           <span className="flex flex-wrap items-center gap-1.5 mt-1 text-xs text-gray-500">
             <span><span className="font-bold text-gray-700">{calories} kcal</span> / {baseUnit}</span>
-            {protein > 0 && <span className="text-emerald-700">· {protein}g protein</span>}
+            {protein > 0 && <span className="text-protein">· {protein}g protein</span>}
             {servingUnit && unitWeight && (
               <span>· ~{Math.round((calories * unitWeight) / 100)} kcal / {servingUnit} ({unitWeight}{liquid ? 'ml' : 'g'})</span>
             )}
@@ -48,7 +48,7 @@ const FoodResultItem = ({ food, onSelect }) => {
             ))}
           </span>
         </span>
-        <span className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-gray-500 group-hover:bg-amber-400 group-hover:border-amber-400 group-hover:text-[#0B0C10] transition-colors shrink-0">
+        <span className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-gray-500 group-hover:bg-amber-400 group-hover:border-amber-400 group-hover:text-[#030407] transition-colors shrink-0">
           <Plus size={16} />
         </span>
       </button>

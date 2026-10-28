@@ -119,7 +119,7 @@ const FoodList = () => {
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div className="flex flex-col gap-1">
           <span className="text-xs font-bold uppercase tracking-wider text-gray-500">Foods</span>
-          <h1 className="text-[28px] font-black tracking-tight text-gray-900">Food library</h1>
+          <h1 className="font-display italic text-[32px] leading-tight font-bold text-gray-900">Food library</h1>
           <span className="text-sm text-gray-600">
             {libraryData
               ? `${libraryData.total_items} foods in ${libraryData.total_categories} categories · tap a food for full nutrition`

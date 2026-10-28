@@ -8,9 +8,9 @@ import { userInitials } from '../../components/UserMenu';
 
 const TOTALS = [
   { key: 'calories', label: 'Calories', unit: 'kcal' },
-  { key: 'protein', label: 'Protein', unit: 'g', cls: 'text-emerald-700' },
-  { key: 'carbohydrates', label: 'Carbs', unit: 'g', cls: 'text-blue-700' },
-  { key: 'fat', label: 'Fat', unit: 'g', cls: 'text-pink-700' },
+  { key: 'protein', label: 'Protein', unit: 'g', cls: 'text-protein' },
+  { key: 'carbohydrates', label: 'Carbs', unit: 'g', cls: 'text-carbs' },
+  { key: 'fat', label: 'Fat', unit: 'g', cls: 'text-fat' },
 ];
 
 // Read-only view of a member's diary for one day.
@@ -74,9 +74,9 @@ const MemberDiaryModal = ({ selectedUser, inspectDate, inspectDiary, diaryLoadin
                             <span className="block text-sm font-bold text-gray-900 truncate">{item.food?.name || 'Item'}</span>
                             <span className="text-gray-500">
                               {formatPortion(item.quantity_display, item.quantity_unit)}
-                              <span className="text-emerald-700"> · {Math.round(item.protein || 0)}g P</span>
-                              <span className="text-blue-700"> · {Math.round(item.carbohydrates || 0)}g C</span>
-                              <span className="text-pink-700"> · {Math.round(item.fat || 0)}g F</span>
+                              <span className="text-protein"> · {Math.round(item.protein || 0)}g P</span>
+                              <span className="text-carbs"> · {Math.round(item.carbohydrates || 0)}g C</span>
+                              <span className="text-fat"> · {Math.round(item.fat || 0)}g F</span>
                             </span>
                           </span>
                           <span className="text-sm font-extrabold text-gray-900 shrink-0">{Math.round(item.calories || 0)} kcal</span>

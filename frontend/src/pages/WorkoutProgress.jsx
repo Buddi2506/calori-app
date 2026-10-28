@@ -14,8 +14,8 @@ import { formatDuration, formatPace, workoutColor } from '../utils/workouts';
 const RANGES = [{ id: 4, label: '4 weeks' }, { id: 8, label: '8 weeks' }, { id: 12, label: '12 weeks' }];
 const AXIS = { fontSize: 12, fill: '#8E8E98' };
 const TOOLTIP = {
-  contentStyle: { background: '#1A1B21', border: '1px solid #2A2C34', borderRadius: 12, color: '#F4F4F5' },
-  itemStyle: { color: '#F4F4F5' },
+  contentStyle: { background: '#11141B', border: '1px solid #1F2430', borderRadius: 12, color: '#F2F4F8' },
+  itemStyle: { color: '#F2F4F8' },
   labelStyle: { color: '#A1A1AA', fontWeight: 700 },
   cursor: { fill: 'rgba(255,255,255,0.04)' },
 };
@@ -109,11 +109,11 @@ const WorkoutProgress = () => {
           ) : summary ? (
             <ResponsiveContainer width="100%" height={220}>
               <BarChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#2A2C34" vertical={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#1F2430" vertical={false} />
                 <XAxis dataKey="week" tick={AXIS} axisLine={false} tickLine={false} />
                 <YAxis tick={AXIS} axisLine={false} tickLine={false} width={36} allowDecimals={false} />
                 <Tooltip {...TOOLTIP} content={<WeekTooltip />} />
-                <Bar dataKey="Sets" fill="#FBBF24" radius={[6, 6, 0, 0]} />
+                <Bar dataKey="Sets" fill="#D4FF24" radius={[6, 6, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           ) : <div className="h-[220px] animate-pulse rounded-2xl bg-gray-50" />}
@@ -124,11 +124,11 @@ const WorkoutProgress = () => {
             hasCardio ? (
               <ResponsiveContainer width="100%" height={220}>
                 <BarChart data={chartData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#2A2C34" vertical={false} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#1F2430" vertical={false} />
                   <XAxis dataKey="week" tick={AXIS} axisLine={false} tickLine={false} />
                   <YAxis tick={AXIS} axisLine={false} tickLine={false} width={36} allowDecimals={false} />
                   <Tooltip {...TOOLTIP} />
-                  <Bar dataKey="Cardio min" fill="#22D3EE" radius={[6, 6, 0, 0]} />
+                  <Bar dataKey="Cardio min" fill="#1558C9" radius={[6, 6, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             ) : <p className="text-sm text-gray-500">No cardio logged in these weeks.</p>
@@ -179,7 +179,7 @@ const WorkoutProgress = () => {
 
       <Card title="Exercises" note="Tap one for its charts and personal records">
         {exercises && exercises.length > 6 && (
-          <div className="flex items-center gap-3 h-11 px-4 rounded-2xl bg-[#0E0F13] border border-gray-200 focus-within:border-amber-400">
+          <div className="flex items-center gap-3 h-11 px-4 rounded-2xl bg-[#080A0F] border border-gray-200 focus-within:border-amber-400">
             <Search size={16} className="text-gray-600" aria-hidden="true" />
             <input value={query} onChange={(e) => setQuery(e.target.value)} aria-label="Search your exercises"
               placeholder="Find an exercise" className="flex-1 bg-transparent outline-none text-sm text-gray-900 placeholder-gray-500" />

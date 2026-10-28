@@ -16,7 +16,7 @@ const NUTRIENTS = [
 
 const TONES = {
   good: 'bg-emerald-50 text-emerald-300',
-  mid: 'bg-amber-50 text-amber-300',
+  mid: 'bg-blue-50 text-blue-300',
   bad: 'bg-rose-50 text-rose-300',
 };
 
@@ -49,7 +49,7 @@ const NutrientChipsCard = ({ totals, goals }) => {
         ))}
       </ul>
       <p className="text-xs text-gray-500">
-        Red is far from goal (or over a limit like sodium), amber is partway, green is on track.
+        Red is far from goal (or over a limit like sodium), blue is partway, lime is on track.
       </p>
     </section>
   );

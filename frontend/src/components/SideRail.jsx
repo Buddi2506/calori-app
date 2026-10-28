@@ -20,9 +20,9 @@ const SideRail = () => {
   ];
 
   return (
-    <aside className="hidden md:flex sticky top-0 h-screen w-60 shrink-0 flex-col gap-7 px-4 py-6 border-r border-gray-100 bg-[#0E0F13]">
+    <aside className="hidden md:flex sticky top-0 h-screen w-60 shrink-0 flex-col gap-7 px-4 py-6 border-r border-gray-100 bg-[#080A0F]">
       <NavLink to="/" className="flex items-center gap-2.5 px-2 group">
-        <span className="w-8 h-8 rounded-xl bg-amber-400 flex items-center justify-center text-[#0B0C10] font-black text-sm group-hover:scale-105 transition-transform">
+        <span className="w-8 h-8 rounded-xl bg-amber-400 flex items-center justify-center text-[#030407] font-black text-sm group-hover:scale-105 transition-transform">
           C
         </span>
         <span className="text-xl font-black tracking-tight text-gray-900">calori</span>

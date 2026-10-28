@@ -30,7 +30,7 @@ const IngredientSearch = ({ onPick }) => {
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex items-center gap-3 h-12 px-4 rounded-2xl bg-[#0E0F13] border border-gray-200 focus-within:border-amber-400 focus-within:ring-2 focus-within:ring-amber-400/30 transition-colors">
+      <div className="flex items-center gap-3 h-12 px-4 rounded-2xl bg-[#080A0F] border border-gray-200 focus-within:border-amber-400 focus-within:ring-2 focus-within:ring-amber-400/30 transition-colors">
         <Search size={17} className="text-gray-600 shrink-0" aria-hidden="true" />
         <input
           type="text"

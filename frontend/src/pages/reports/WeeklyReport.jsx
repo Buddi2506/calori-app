@@ -13,19 +13,19 @@ import { Spinner, EmptyState, PeriodNav, GoalDaysCard } from './shared';
 
 const AXIS = { fontSize: 12, fill: '#8E8E98' };
 const TOOLTIP = {
-  contentStyle: { background: '#1A1B21', border: '1px solid #2A2C34', borderRadius: 12, color: '#F4F4F5' },
-  itemStyle: { color: '#F4F4F5' },
+  contentStyle: { background: '#11141B', border: '1px solid #1F2430', borderRadius: 12, color: '#F2F4F8' },
+  itemStyle: { color: '#F2F4F8' },
   labelStyle: { color: '#A1A1AA', fontWeight: 700 },
   cursor: { fill: 'rgba(255,255,255,0.04)' },
 };
 
 // Bar color by how close the day was to the calorie goal (same ±10% rule as the Overview).
 const barColor = (calories, goal) => {
-  if (!calories) return '#2A2C34';
+  if (!calories) return '#1F2430';
   const ratio = calories / (goal || 1);
   if (ratio > 1.1) return '#FB7185';
-  if (ratio < 0.9) return '#FBBF24';
-  return '#34D399';
+  if (ratio < 0.9) return '#6F9BFF';
+  return '#D4FF24';
 };
 
 const WeeklyReport = () => {
@@ -94,21 +94,21 @@ const WeeklyReport = () => {
               </div>
               <ResponsiveContainer width="100%" height={240}>
                 <BarChart data={chartData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#2A2C34" vertical={false} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#1F2430" vertical={false} />
                   <XAxis dataKey="day" tick={AXIS} axisLine={false} tickLine={false} />
                   {/* Always tall enough to show the goal line */}
                   <YAxis tick={AXIS} axisLine={false} tickLine={false} width={44}
                     domain={[0, (max) => Math.ceil((Math.max(max, goal) * 1.1) / 500) * 500]} />
                   <Tooltip {...TOOLTIP} />
-                  <ReferenceLine y={goal} stroke="#FBBF24" strokeDasharray="4 4" label={{ value: 'Goal', fill: '#FBBF24', fontSize: 11, position: 'insideTopRight' }} />
+                  <ReferenceLine y={goal} stroke="#F2F4F8" strokeDasharray="4 4" label={{ value: 'Goal', fill: '#F2F4F8', fontSize: 11, position: 'insideTopRight' }} />
                   <Bar dataKey="Calories" radius={[8, 8, 0, 0]} cursor="pointer" onClick={(d) => navigate(`/diary/${d.payload?.date || d.date}`)}>
                     {chartData.map((d) => <Cell key={d.date} fill={barColor(d.Calories, goal)} />)}
                   </Bar>
                 </BarChart>
               </ResponsiveContainer>
               <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500 mt-2">
-                <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded bg-[#34D399]" />Within 10% of goal</span>
-                <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded bg-[#FBBF24]" />Under</span>
+                <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded bg-[#D4FF24]" />Within 10% of goal</span>
+                <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded bg-[#6F9BFF]" />Under</span>
                 <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded bg-[#FB7185]" />Over</span>
               </div>
             </section>
@@ -117,7 +117,7 @@ const WeeklyReport = () => {
               <h3 className="text-base font-extrabold text-gray-900 mb-4">Macros per day (g)</h3>
               <ResponsiveContainer width="100%" height={240}>
                 <LineChart data={chartData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#2A2C34" vertical={false} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#1F2430" vertical={false} />
                   <XAxis dataKey="day" tick={AXIS} axisLine={false} tickLine={false} />
                   <YAxis tick={AXIS} axisLine={false} tickLine={false} width={44} />
                   <Tooltip {...TOOLTIP} />

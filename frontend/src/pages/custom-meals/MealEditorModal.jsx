@@ -187,9 +187,9 @@ const MealEditorModal = ({ meal: editingMeal, onClose, onSaved }) => {
                     <p className="font-bold text-gray-900 text-sm truncate">{item.food_name}</p>
                     <p className="text-xs text-gray-500 mt-0.5">
                       <span className="font-semibold text-gray-700">{item.calories} kcal</span>
-                      <span className="text-emerald-700"> · {item.protein}g P</span>
-                      <span className="text-blue-700"> · {item.carbs}g C</span>
-                      <span className="text-pink-700"> · {item.fat}g F</span>
+                      <span className="text-protein"> · {item.protein}g P</span>
+                      <span className="text-carbs"> · {item.carbs}g C</span>
+                      <span className="text-fat"> · {item.fat}g F</span>
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
@@ -248,9 +248,9 @@ const MealEditorModal = ({ meal: editingMeal, onClose, onSaved }) => {
               }}
             />
             <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs">
-              <span className="text-emerald-700 font-bold">{totalMealNutrition.protein}g <span className="font-normal text-gray-500">protein</span></span>
-              <span className="text-blue-700 font-bold">{totalMealNutrition.carbs}g <span className="font-normal text-gray-500">carbs</span></span>
-              <span className="text-pink-700 font-bold">{totalMealNutrition.fat}g <span className="font-normal text-gray-500">fat</span></span>
+              <span className="text-protein font-bold">{totalMealNutrition.protein}g <span className="font-normal text-gray-500">protein</span></span>
+              <span className="text-carbs font-bold">{totalMealNutrition.carbs}g <span className="font-normal text-gray-500">carbs</span></span>
+              <span className="text-fat font-bold">{totalMealNutrition.fat}g <span className="font-normal text-gray-500">fat</span></span>
               {totalMealNutrition.fiber > 0 && (
                 <span className="text-gray-700 font-bold">{totalMealNutrition.fiber}g <span className="font-normal text-gray-500">fiber</span></span>
               )}

@@ -103,7 +103,7 @@ const ProgressGuide = () => {
 
             <Section title="5. Reading your charts">
               <Terms items={[
-                ['Strength over time', 'On an exercise\'s page, the yellow line (estimated max) going up means you are getting stronger, even on weeks the weight stays the same. The blue line steps up each time you lift heavier.'],
+                ['Strength over time', 'On an exercise\'s page, the lime line (estimated max) going up means you are getting stronger, even on weeks the weight stays the same. The blue line steps up each time you lift heavier.'],
                 ['Volume per workout', 'Bars grow as you add reps. A dip right after you raise the weight is normal: fewer reps at a heavier weight.'],
                 ['Stuck for 3 weeks or more?', 'Check sleep, protein and rest days, or drop the weight about 10% for a week and build back up.'],
               ]} />

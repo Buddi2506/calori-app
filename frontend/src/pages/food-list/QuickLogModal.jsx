@@ -139,9 +139,9 @@ const QuickLogModal = ({ food: logModalFood, logMealType, setLogMealType, logDat
               <span className="text-xs text-gray-500"> kcal · {Math.round(grams)} g</span>
             </span>
             <span className="flex gap-3 text-xs">
-              <span className="text-emerald-700 font-bold">{preview.protein}g P</span>
-              <span className="text-blue-700 font-bold">{preview.carbs}g C</span>
-              <span className="text-pink-700 font-bold">{preview.fat}g F</span>
+              <span className="text-protein font-bold">{preview.protein}g P</span>
+              <span className="text-carbs font-bold">{preview.carbs}g C</span>
+              <span className="text-fat font-bold">{preview.fat}g F</span>
             </span>
           </div>
 

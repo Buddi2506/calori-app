@@ -35,7 +35,7 @@ const CalorieRing = ({ nutrients }) => {
   return (
     <div className="relative w-[136px] h-[136px] shrink-0">
       <svg viewBox="0 0 136 136" className="w-full h-full -rotate-90" aria-hidden="true">
-        <circle cx="68" cy="68" r={r} fill="none" stroke="#24262E" strokeWidth="14" />
+        <circle cx="68" cy="68" r={r} fill="none" stroke="#191D27" strokeWidth="14" />
         {split && MACROS.map(({ key }) => {
           const len = split[key] * c;
           const arc = (

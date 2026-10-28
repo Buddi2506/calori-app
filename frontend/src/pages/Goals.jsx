@@ -40,7 +40,7 @@ const GoalInput = ({ field, value, onChange, large }) => (
       {field.dot && <span className={`w-2 h-2 rounded-full ${field.dot}`} aria-hidden="true" />}
       {field.label}
     </label>
-    <div className="flex items-center rounded-2xl bg-[#0E0F13] border border-gray-200 focus-within:border-amber-400 focus-within:ring-2 focus-within:ring-amber-400/30 transition-colors">
+    <div className="flex items-center rounded-2xl bg-[#080A0F] border border-gray-200 focus-within:border-amber-400 focus-within:ring-2 focus-within:ring-amber-400/30 transition-colors">
       <input
         id={`goal-${field.key}`}
         type="number"
@@ -77,7 +77,7 @@ const MacroCheck = ({ goals }) => {
         <span className="text-gray-600">
           Your macros add up to <span className="font-extrabold text-gray-900">{fromMacros.toLocaleString()} kcal</span>
         </span>
-        <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${close ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}`}>
+        <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${close ? 'bg-emerald-50 text-emerald-700' : 'bg-blue-50 text-blue-700'}`}>
           {close
             ? 'Matches your calorie goal'
             : `${Math.abs(diff).toLocaleString()} kcal ${diff > 0 ? 'over' : 'under'} your calorie goal`}

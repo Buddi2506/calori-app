@@ -7,7 +7,7 @@ const defaultColors = Object.fromEntries(
 );
 
 /*
- * Dark theme ("Zentra Night").
+ * Dark theme: Midnight Black, Acid Lime and Electric Cobalt Blue.
  *
  * The UI was written with light-mode utility classes (bg-white, text-gray-900,
  * bg-amber-50 ...). Instead of rewriting every class, the palettes below remap
@@ -17,8 +17,8 @@ const defaultColors = Object.fromEntries(
  */
 
 // Base surfaces
-const canvas = '#0B0C10';   // page background
-const surface = '#15161B';  // cards (bg-white)
+const canvas = '#030407';   // page background (Midnight Black)
+const surface = '#0B0D13';  // cards (bg-white)
 
 // Mix `hex` into `base` by `amount` (0..1) and return a solid hex.
 const mix = (hex, amount, base = surface) => {
@@ -31,17 +31,31 @@ const mix = (hex, amount, base = surface) => {
 
 // Neutral scales: backgrounds go darker -> lighter, text goes light -> dim.
 const bgGray = {
-  50: '#1A1B21', 100: '#202229', 200: '#2A2C34', 300: '#363944', 400: '#4A4E5A',
-  500: '#6B6F7B', 600: '#8B8F9A', 700: '#B4B7C0', 800: '#2A2C34', 900: '#2A2C34', 950: '#0B0C10',
+  50: '#11141B', 100: '#161A23', 200: '#1F2430', 300: '#2A303D', 400: '#3E4452',
+  500: '#626879', 600: '#8A90A0', 700: '#B4B9C6', 800: '#1F2430', 900: '#1F2430', 950: '#030407',
 };
 const textGray = {
-  50: '#FAFAFA', 100: '#F4F4F5', 200: '#3F3F46', 300: '#52525B', 400: '#71717A',
-  500: '#8E8E98', 600: '#A1A1AA', 700: '#C4C4CC', 800: '#E4E4E7', 900: '#F4F4F5', 950: '#FFFFFF',
+  50: '#FAFBFC', 100: '#F2F4F8', 200: '#3B4150', 300: '#4E5466', 400: '#6B7183',
+  500: '#8A90A0', 600: '#A3A9B8', 700: '#C5CAD6', 800: '#E2E6EE', 900: '#F2F4F8', 950: '#FFFFFF',
 };
 const borderGray = {
-  50: '#1D1F25', 100: '#22242B', 200: '#2A2C34', 300: '#363944', 400: '#4A4E5A',
-  500: '#6B6F7B', 600: '#8B8F9A', 700: '#363944', 800: '#2A2C34', 900: '#202229', 950: '#15161B',
+  50: '#14171F', 100: '#191D27', 200: '#222735', 300: '#2E3442', 400: '#434A5A',
+  500: '#626879', 600: '#8A90A0', 700: '#2E3442', 800: '#222735', 900: '#191D27', 950: '#0B0D13',
 };
+
+// Acid Lime (#D4FF24) is the accent: it takes over the amber classes the UI uses for
+// buttons and highlights, and the emerald / lime ones used for "on track" and success.
+const acidLime = {
+  50: '#F9FFE0', 100: '#F2FFBF', 200: '#E8FF8A', 300: '#DEFF55', 400: '#D4FF24', 500: '#BEE60F',
+  600: '#9ABD08', 700: '#76900A', 800: '#5A6E0E', 900: '#4A5A10', 950: '#283303',
+};
+// Electric Cobalt Blue (#1558C9) for charts and selection; light shades keep text readable.
+const cobalt = {
+  50: '#EEF4FF', 100: '#DCE7FF', 200: '#B9CEFF', 300: '#93B4FF', 400: '#6F9BFF', 500: '#1558C9',
+  600: '#1558C9', 700: '#1247A3', 800: '#103B85', 900: '#0F326C', 950: '#0A1F45',
+};
+const paletteOverrides = { amber: acidLime, emerald: acidLime, lime: acidLime, blue: cobalt };
+Object.assign(defaultColors, paletteOverrides);
 
 const hues = ['red', 'orange', 'amber', 'yellow', 'lime', 'green', 'emerald', 'teal', 'cyan',
   'sky', 'blue', 'indigo', 'violet', 'purple', 'fuchsia', 'pink', 'rose'];
@@ -74,13 +88,17 @@ const brand = {
   zentra: {
     canvas,
     surface,
-    dark: '#F4F4F5',
-    gray: '#1A1B21',
-    blue: '#3B82F6',
-    green: '#10B981',
-    pink: '#EC4899',
-    amber: '#F59E0B',
+    dark: '#F2F4F8',
+    gray: '#11141B',
+    blue: '#1558C9',
+    green: '#D4FF24',
+    pink: '#E6E9F2',
+    amber: '#D4FF24',
   },
+  // Macro colours: protein lime, carbs cobalt, fat soft white
+  protein: '#D4FF24',
+  carbs: '#6F9BFF',
+  fat: '#E6E9F2',
 };
 
 const bgColors = { ...build(bgGray, bgHue, surface), ...brand };
@@ -95,6 +113,9 @@ export default {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        display: ['"Playfair Display"', 'Georgia', 'serif'],
+      },
       colors: brand,
       backgroundColor: bgColors,
       gradientColorStops: bgColors,

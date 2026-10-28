@@ -36,10 +36,10 @@ const MEAL_ORDER = ['breakfast', 'lunch', 'snack', 'dinner'];
 // ─── Daily Report Nutrient Columns ──────────────────────────────────────────
 const ALL_NUTRIENT_COLS = [
   { key: 'calories', label: 'Cal', unit: 'kcal', category: 'macro', color: 'text-gray-900 font-extrabold', decimals: 0 },
-  { key: 'protein', label: 'Protein', unit: 'g', category: 'macro', color: 'text-emerald-600 font-bold', decimals: 1 },
-  { key: 'carbohydrates', label: 'Carbs', unit: 'g', category: 'macro', color: 'text-blue-600 font-bold', decimals: 1 },
-  { key: 'fat', label: 'Fat', unit: 'g', category: 'macro', color: 'text-pink-600 font-bold', decimals: 1 },
-  { key: 'fiber', label: 'Fiber', unit: 'g', category: 'macro', color: 'text-emerald-700 font-bold', decimals: 1 },
+  { key: 'protein', label: 'Protein', unit: 'g', category: 'macro', color: 'text-protein font-bold', decimals: 1 },
+  { key: 'carbohydrates', label: 'Carbs', unit: 'g', category: 'macro', color: 'text-carbs font-bold', decimals: 1 },
+  { key: 'fat', label: 'Fat', unit: 'g', category: 'macro', color: 'text-fat font-bold', decimals: 1 },
+  { key: 'fiber', label: 'Fiber', unit: 'g', category: 'macro', color: 'text-gray-700 font-bold', decimals: 1 },
   { key: 'vitamin_b12', label: 'Vit B12', unit: 'mcg', category: 'micro', color: 'text-amber-600 font-bold', decimals: 2 },
   { key: 'vitamin_d', label: 'Vit D', unit: 'mcg', category: 'micro', color: 'text-amber-600 font-bold', decimals: 1 },
   { key: 'vitamin_c', label: 'Vit C', unit: 'mg', category: 'micro', color: 'text-amber-600 font-bold', decimals: 1 },

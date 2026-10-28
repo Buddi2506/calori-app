@@ -12,9 +12,9 @@ const EntryRow = ({ entry, onEdit, onDelete }) => {
         <p className="text-sm font-bold text-gray-900 truncate">{name}</p>
         <p className="flex flex-wrap items-center gap-x-2.5 gap-y-0.5 mt-0.5 text-xs text-gray-500">
           <span className="font-semibold text-gray-700">{formatPortion(entry.quantity_display, entry.quantity_unit)}</span>
-          <span className="text-emerald-700">{formatNutrient(entry.protein, 'g')} P</span>
-          <span className="text-blue-700">{formatNutrient(entry.carbohydrates, 'g')} C</span>
-          <span className="text-pink-700">{formatNutrient(entry.fat, 'g')} F</span>
+          <span className="text-protein">{formatNutrient(entry.protein, 'g')} P</span>
+          <span className="text-carbs">{formatNutrient(entry.carbohydrates, 'g')} C</span>
+          <span className="text-fat">{formatNutrient(entry.fat, 'g')} F</span>
         </p>
       </div>
       <span className="text-sm font-extrabold text-gray-900 shrink-0">

@@ -171,9 +171,9 @@ const PortionEditor = ({ food: selectedFood, quantity, setQuantity, unit, setUni
       <div className="grid grid-cols-4 gap-2.5 mb-4 text-center">
         {[
           { label: 'kcal', value: nutrition.calories, cls: 'text-gray-900' },
-          { label: 'Protein', value: `${nutrition.protein}g`, cls: 'text-emerald-700' },
-          { label: 'Carbs', value: `${nutrition.carbs}g`, cls: 'text-blue-700' },
-          { label: 'Fat', value: `${nutrition.fat}g`, cls: 'text-pink-700' },
+          { label: 'Protein', value: `${nutrition.protein}g`, cls: 'text-protein' },
+          { label: 'Carbs', value: `${nutrition.carbs}g`, cls: 'text-carbs' },
+          { label: 'Fat', value: `${nutrition.fat}g`, cls: 'text-fat' },
         ].map((m) => (
           <div key={m.label} className="rounded-2xl border border-gray-100 bg-gray-50 p-3">
             <span className={`block text-xl font-black ${m.cls}`}>{m.value}</span>
@@ -189,7 +189,7 @@ const PortionEditor = ({ food: selectedFood, quantity, setQuantity, unit, setUni
             Also in {nutrition.totalGrams}g
           </p>
           <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-700">
-            {nutrition.fiber > 0 && <span>Fiber: <strong className="text-emerald-700">{nutrition.fiber} g</strong></span>}
+            {nutrition.fiber > 0 && <span>Fiber: <strong className="text-gray-800">{nutrition.fiber} g</strong></span>}
             {nutrition.iron > 0 && <span>Iron: <strong className="text-gray-900">{nutrition.iron} mg</strong></span>}
             {nutrition.zinc > 0 && <span>Zinc: <strong className="text-gray-900">{nutrition.zinc} mg</strong></span>}
             {nutrition.potassium > 0 && <span>Potassium: <strong className="text-gray-900">{nutrition.potassium} mg</strong></span>}

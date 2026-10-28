@@ -2,10 +2,10 @@ import React from 'react';
 import { mealLabel } from '../../utils/quickAdd';
 
 export const MEAL_COLORS = {
-  breakfast: '#FBBF24',
-  lunch: '#60A5FA',
-  snack: '#34D399',
-  dinner: '#F472B6',
+  breakfast: '#D4FF24',
+  lunch: '#1558C9',
+  snack: '#E6E9F2',
+  dinner: '#626879',
 };
 
 const ORDER = ['breakfast', 'lunch', 'snack', 'dinner'];
@@ -17,7 +17,7 @@ const calorieStatus = (eaten, goal, isToday) => {
   if (eaten === 0) return { text: isToday ? 'Not started' : 'Nothing logged', cls: 'bg-gray-100 text-gray-600' };
   if (ratio > 1.1) return { text: 'Over goal', cls: 'bg-rose-50 text-rose-700' };
   if (isToday) return { text: 'On track', cls: 'bg-emerald-50 text-emerald-700' };
-  if (ratio < 0.9) return { text: 'Under goal', cls: 'bg-amber-50 text-amber-700' };
+  if (ratio < 0.9) return { text: 'Under goal', cls: 'bg-blue-50 text-carbs' };
   return { text: 'On target', cls: 'bg-emerald-50 text-emerald-700' };
 };
 

@@ -18,7 +18,7 @@ const FoodToolbar = ({
 }) => (
   <section className="zentra-card p-4 flex flex-col gap-3 !border-gray-200">
     <div className="flex flex-col lg:flex-row gap-3">
-      <div className="flex-1 flex items-center gap-3 h-[52px] px-4 rounded-2xl bg-[#0E0F13] border border-gray-200 focus-within:border-amber-400 focus-within:ring-2 focus-within:ring-amber-400/30 transition-colors">
+      <div className="flex-1 flex items-center gap-3 h-[52px] px-4 rounded-2xl bg-[#080A0F] border border-gray-200 focus-within:border-amber-400 focus-within:ring-2 focus-within:ring-amber-400/30 transition-colors">
         <Search size={18} className="text-gray-600 shrink-0" aria-hidden="true" />
         <input
           type="search"

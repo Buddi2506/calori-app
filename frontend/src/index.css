@@ -8,12 +8,12 @@
   }
 
   body {
-    background-color: #0B0C10;
+    background-color: #030407;
     background-image:
-      radial-gradient(900px 500px at 10% -10%, rgba(245, 158, 11, 0.07), transparent 60%),
-      radial-gradient(800px 500px at 100% 0%, rgba(236, 72, 153, 0.05), transparent 60%);
+      radial-gradient(900px 520px at 100% -10%, rgba(21, 88, 201, 0.22), transparent 60%),
+      radial-gradient(800px 500px at 0% 110%, rgba(212, 255, 36, 0.05), transparent 60%);
     background-attachment: fixed;
-    color: #F4F4F5;
+    color: #F2F4F8;
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI", Roboto, sans-serif;
     -webkit-font-smoothing: antialiased;
   }
@@ -21,10 +21,10 @@
   /* Slim dark scrollbars */
   * {
     scrollbar-width: thin;
-    scrollbar-color: #2A2C34 transparent;
+    scrollbar-color: #1F2430 transparent;
   }
   ::-webkit-scrollbar { width: 10px; height: 10px; }
-  ::-webkit-scrollbar-thumb { background: #2A2C34; border-radius: 9999px; border: 2px solid #0B0C10; }
+  ::-webkit-scrollbar-thumb { background: #1F2430; border-radius: 9999px; border: 2px solid #030407; }
   ::-webkit-scrollbar-track { background: transparent; }
 }
 
@@ -40,7 +40,7 @@
   }
 
   .btn-primary {
-    @apply bg-amber-400 hover:bg-amber-300 text-[#0B0C10] font-bold py-2 px-5 rounded-full transition-all shadow-sm active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100;
+    @apply bg-amber-400 hover:bg-amber-300 text-[#030407] font-bold py-2 px-5 rounded-full transition-all shadow-sm active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100;
   }
 
   .btn-secondary {
@@ -53,44 +53,44 @@
 
   /* Accent pill used for active tabs and primary actions */
   .pill-active {
-    @apply bg-amber-400 text-[#0B0C10];
+    @apply bg-amber-400 text-[#030407];
   }
 
   /* Candy-Stripe Diagonal Hatched Utilities */
   .stripe-green {
     background: repeating-linear-gradient(
       -45deg,
-      #10B981,
-      #10B981 5px,
-      #059669 5px,
-      #059669 10px
+      #D4FF24,
+      #D4FF24 5px,
+      #BEE60F 5px,
+      #BEE60F 10px
     );
   }
   .stripe-blue {
     background: repeating-linear-gradient(
       -45deg,
-      #3B82F6,
-      #3B82F6 5px,
-      #2563EB 5px,
-      #2563EB 10px
+      #1558C9,
+      #1558C9 5px,
+      #1247A3 5px,
+      #1247A3 10px
     );
   }
   .stripe-pink {
     background: repeating-linear-gradient(
       -45deg,
-      #EC4899,
-      #EC4899 5px,
-      #DB2777 5px,
-      #DB2777 10px
+      #E6E9F2,
+      #E6E9F2 5px,
+      #C5CAD6 5px,
+      #C5CAD6 10px
     );
   }
   .stripe-amber {
     background: repeating-linear-gradient(
       -45deg,
-      #F59E0B,
-      #F59E0B 5px,
-      #D97706 5px,
-      #D97706 10px
+      #8A90A0,
+      #8A90A0 5px,
+      #6B7183 5px,
+      #6B7183 10px
     );
   }
 }

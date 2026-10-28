@@ -6,9 +6,9 @@ import UserMenu from './UserMenu';
 // Phone header (below md): logo, food search and the account menu.
 // Page links live in the bottom pill nav (Sidebar); desktop uses the SideRail instead.
 const Navbar = () => (
-  <header className="md:hidden bg-[#0B0C10]/80 backdrop-blur-md border-b border-[#fff]/[0.04] py-3 px-4 flex items-center justify-between sticky top-0 z-30">
+  <header className="md:hidden bg-[#030407]/80 backdrop-blur-md border-b border-[#fff]/[0.04] py-3 px-4 flex items-center justify-between sticky top-0 z-30">
     <NavLink to="/" className="flex items-center gap-2.5 group">
-      <span className="w-8 h-8 rounded-xl bg-amber-400 flex items-center justify-center text-[#0B0C10] font-black text-sm">
+      <span className="w-8 h-8 rounded-xl bg-amber-400 flex items-center justify-center text-[#030407] font-black text-sm">
         C
       </span>
       <span className="text-xl font-black tracking-tight text-gray-900">calori</span>

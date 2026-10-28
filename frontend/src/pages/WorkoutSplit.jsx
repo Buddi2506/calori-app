@@ -56,7 +56,7 @@ const NumberBox = ({ label, value, onChange, width = 'w-14' }) => (
     aria-label={label}
     value={value ?? ''}
     onChange={(e) => onChange(e.target.value === '' ? null : Math.max(1, parseInt(e.target.value, 10) || 1))}
-    className={`${width} h-9 rounded-xl bg-[#0E0F13] border border-gray-200 text-center text-sm font-bold text-gray-900 focus:outline-none focus:border-amber-400`}
+    className={`${width} h-9 rounded-xl bg-[#080A0F] border border-gray-200 text-center text-sm font-bold text-gray-900 focus:outline-none focus:border-amber-400`}
   />
 );
 
@@ -264,7 +264,7 @@ const WorkoutSplit = () => {
           ) : (
             <section key={day.key} className="zentra-card p-5 flex flex-col gap-2">
               <div className="flex items-center gap-2">
-                <span className="w-9 h-9 rounded-full bg-amber-400 text-[#0B0C10] text-sm font-black flex items-center justify-center shrink-0">
+                <span className="w-9 h-9 rounded-full bg-amber-400 text-[#030407] text-sm font-black flex items-center justify-center shrink-0">
                   {days.slice(0, di + 1).filter((d) => !d.is_rest).length}
                 </span>
                 <input

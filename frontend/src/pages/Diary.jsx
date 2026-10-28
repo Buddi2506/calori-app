@@ -108,7 +108,7 @@ const Diary = () => {
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex flex-col gap-1">
           <span className="text-xs font-bold uppercase tracking-wider text-gray-500">Diary</span>
-          <h1 className="text-[28px] font-black tracking-tight text-gray-900">
+          <h1 className="font-display italic text-[32px] leading-tight font-bold text-gray-900">
             {format(currentDate, 'EEEE, d MMM')}
           </h1>
           <span className="text-sm text-gray-600">

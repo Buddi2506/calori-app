@@ -169,8 +169,8 @@ export const formatPace = (minPerKm) => {
   return `${Math.floor(total / 60)}:${String(total % 60).padStart(2, '0')} /km`;
 };
 
-const DAY_COLORS = ['#FBBF24', '#60A5FA', '#34D399', '#F472B6', '#A78BFA', '#FB923C', '#2DD4BF'];
-export const CARDIO_COLOR = '#22D3EE';
+const DAY_COLORS = ['#D4FF24', '#6F9BFF', '#E6E9F2', '#B79CFF', '#FFB86B', '#5EEAD4', '#F9A8D4'];
+export const CARDIO_COLOR = '#6F9BFF';
 export const OTHER_COLOR = '#8B8F9A';
 
 // Colour for a workout by name: split days in rotation order, then cardio and anything else.

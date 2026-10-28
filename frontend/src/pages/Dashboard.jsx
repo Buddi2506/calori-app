@@ -91,7 +91,7 @@ const Dashboard = () => {
       {/* Day header and navigation */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex flex-col gap-1">
-          <h1 className="text-[28px] font-black tracking-tight text-gray-900">
+          <h1 className="font-display italic text-[32px] leading-tight font-bold text-gray-900">
             {format(currentDate, 'EEEE, d MMM')}
           </h1>
           <span className="text-sm text-gray-600">{loading && !report ? 'Loading…' : subtitle}</span>

@@ -44,7 +44,7 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0B0C10] flex flex-col justify-center items-center px-4 py-12 selection:bg-amber-500 selection:text-white relative overflow-hidden">
+    <div className="min-h-screen bg-[#030407] flex flex-col justify-center items-center px-4 py-12 selection:bg-amber-400 selection:text-[#030407] relative overflow-hidden">
       {/* Ambient background glows */}
       <div className="absolute -top-32 -left-32 w-96 h-96 bg-amber-400/10 rounded-full blur-3xl pointer-events-none"></div>
       <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-pink-500/10 rounded-full blur-3xl pointer-events-none"></div>
@@ -52,7 +52,7 @@ const Login = () => {
       <div className="w-full max-w-md relative z-10">
         {/* Brand Header */}
         <div className="flex flex-col items-center mb-8 text-center">
-          <div className="w-14 h-14 rounded-2xl bg-amber-400 flex items-center justify-center text-[#0B0C10] font-black text-2xl shadow-lg shadow-amber-500/20 mb-4">
+          <div className="w-14 h-14 rounded-2xl bg-amber-400 flex items-center justify-center text-[#030407] font-black text-2xl shadow-lg shadow-amber-500/20 mb-4">
             C
           </div>
           <h1 className="text-3xl font-black tracking-tight text-gray-900">calori</h1>
@@ -91,7 +91,7 @@ const Login = () => {
                   onChange={(e) => setUsernameOrEmail(e.target.value)}
                   required
                   placeholder="e.g. Nithin-Kiran"
-                  className="w-full pl-10 pr-4 h-12 bg-[#0E0F13] border border-gray-200 rounded-2xl text-[15px] text-gray-900 placeholder-gray-500 focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-400/30 transition-colors"
+                  className="w-full pl-10 pr-4 h-12 bg-[#080A0F] border border-gray-200 rounded-2xl text-[15px] text-gray-900 placeholder-gray-500 focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-400/30 transition-colors"
                 />
               </div>
             </div>
@@ -112,7 +112,7 @@ const Login = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   placeholder="Enter your password"
-                  className="w-full pl-10 pr-10 h-12 bg-[#0E0F13] border border-gray-200 rounded-2xl text-[15px] text-gray-900 placeholder-gray-500 focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-400/30 transition-colors"
+                  className="w-full pl-10 pr-10 h-12 bg-[#080A0F] border border-gray-200 rounded-2xl text-[15px] text-gray-900 placeholder-gray-500 focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-400/30 transition-colors"
                 />
                 <button
                   type="button"
@@ -132,7 +132,7 @@ const Login = () => {
               className="w-full mt-2 h-12 btn-primary text-sm flex items-center justify-center gap-2 group"
             >
               {loading ? (
-                <span className="inline-block w-4 h-4 border-2 border-[#0B0C10] border-t-transparent rounded-full animate-spin"></span>
+                <span className="inline-block w-4 h-4 border-2 border-[#030407] border-t-transparent rounded-full animate-spin"></span>
               ) : (
                 <>
                   <span>Sign in</span>

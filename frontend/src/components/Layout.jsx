@@ -6,7 +6,7 @@ import Navbar from './Navbar';
 
 const Layout = () => {
   return (
-    <div className="min-h-screen text-gray-900 flex selection:bg-amber-500 selection:text-white">
+    <div className="min-h-screen text-gray-900 flex selection:bg-amber-400 selection:text-[#030407]">
       {/* Desktop side navigation */}
       <SideRail />
 

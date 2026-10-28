@@ -6,7 +6,7 @@ const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 // Same ±10% rule and colors as the Overview's 7-day card.
 const STYLES = {
   target: 'bg-emerald-50 ring-emerald-200 text-emerald-700',
-  under: 'bg-amber-50 ring-amber-200 text-amber-700',
+  under: 'bg-blue-50 ring-blue-200 text-blue-700',
   over: 'bg-rose-50 ring-rose-200 text-rose-700',
   empty: 'bg-white ring-gray-100 text-gray-500',
 };
@@ -56,7 +56,7 @@ const CalendarHeatmap = ({ calendarData, calorieGoal, year, month }) => {
       </ol>
       <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-xs text-gray-500">
         <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded bg-emerald-50 ring-1 ring-emerald-200" />Within 10% of goal</span>
-        <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded bg-amber-50 ring-1 ring-amber-200" />Under</span>
+        <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded bg-blue-50 ring-1 ring-blue-200" />Under</span>
         <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded bg-rose-50 ring-1 ring-rose-200" />Over</span>
         <span className="ml-auto">Tap a day to see its log</span>
       </div>

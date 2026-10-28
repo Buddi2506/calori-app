@@ -44,7 +44,7 @@ const REGIONS = {
   calves: back([['e', 20.2, 77.5, 2.7, 6.6]]),
 };
 
-const COLORS = { body: '#2A2C34', muscle: '#33363F', primary: '#FBBF24' };
+const COLORS = { body: '#1F2430', muscle: '#262B37', primary: '#D4FF24' };
 
 const Shape = ({ s, fill, opacity }) => {
   if (s[0] === 'e') {
@@ -64,7 +64,7 @@ const describe = (primary, secondary) =>
     : 'Muscles worked';
 
 // Front-and-back body outline with the worked muscles filled in amber (secondary ones fainter).
-// With `intensity` ({ muscle: 0–1 }) it becomes a heat map instead: stronger amber = more work.
+// With `intensity` ({ muscle: 0–1 }) it becomes a heat map instead: stronger lime = more work.
 const MuscleMap = ({ primary = [], secondary = [], intensity, label, className = 'w-12 h-11' }) => (
   <svg viewBox="0 0 100 92" className={className} role="img" aria-label={label || describe(primary, secondary)}>
     {BASE.map((s, i) => <Shape key={`b${i}`} s={s} fill={COLORS.body} />)}

@@ -104,7 +104,7 @@ const WorkoutHistory = () => {
                     {list.map((w) => (
                       <span
                         key={w.id}
-                        className="h-1.5 sm:h-auto sm:px-1.5 sm:py-0.5 rounded-full sm:rounded-md text-[10px] font-bold text-[#0B0C10] truncate"
+                        className="h-1.5 sm:h-auto sm:px-1.5 sm:py-0.5 rounded-full sm:rounded-md text-[10px] font-bold text-[#030407] truncate"
                         style={{ background: workoutColor(w.name, splitNames) }}
                       >
                         <span className="hidden sm:inline">{w.name}</span>

@@ -149,7 +149,7 @@ const ExercisePicker = ({ title = 'Add exercise', initialPart = 'all', cardioOnl
       ) : (
         <div className="flex flex-col">
           <div className="p-4 sm:px-6 flex flex-col gap-3 border-b border-gray-100">
-            <div className="flex items-center gap-3 h-12 px-4 rounded-2xl bg-[#0E0F13] border border-gray-200 focus-within:border-amber-400 focus-within:ring-2 focus-within:ring-amber-400/30">
+            <div className="flex items-center gap-3 h-12 px-4 rounded-2xl bg-[#080A0F] border border-gray-200 focus-within:border-amber-400 focus-within:ring-2 focus-within:ring-amber-400/30">
               <Search size={17} className="text-gray-600 shrink-0" aria-hidden="true" />
               <input
                 value={query}
@@ -189,7 +189,7 @@ const ExercisePicker = ({ title = 'Add exercise', initialPart = 'all', cardioOnl
                       {[e.equipment, musclesLabel(e)].filter(Boolean).join(' · ')}
                     </span>
                   </span>
-                  <span className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-gray-500 group-hover:bg-amber-400 group-hover:border-amber-400 group-hover:text-[#0B0C10] shrink-0">
+                  <span className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-gray-500 group-hover:bg-amber-400 group-hover:border-amber-400 group-hover:text-[#030407] shrink-0">
                     <Plus size={16} />
                   </span>
                 </button>

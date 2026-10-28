@@ -14,7 +14,7 @@ const FoodTile = ({ item, portionMode, rank, onOpen, onLog }) => {
     <article className="group relative zentra-card !rounded-3xl p-4 flex flex-col gap-3 hover:!border-amber-400/60">
       <div className="flex items-start gap-3">
         {rank && (
-          <span className="shrink-0 mt-0.5 min-w-[28px] h-7 px-1.5 rounded-lg bg-amber-400 text-[#0B0C10] text-xs font-black flex items-center justify-center">
+          <span className="shrink-0 mt-0.5 min-w-[28px] h-7 px-1.5 rounded-lg bg-amber-400 text-[#030407] text-xs font-black flex items-center justify-center">
             #{rank}
           </span>
         )}
@@ -36,13 +36,13 @@ const FoodTile = ({ item, portionMode, rank, onOpen, onLog }) => {
       <MacroSplitBar nutrients={n} />
 
       <div className="flex items-center gap-3 text-xs">
-        <span className="text-emerald-700 font-bold">{fmt(n.protein)}g <span className="font-normal text-gray-500">P</span></span>
-        <span className="text-blue-700 font-bold">{fmt(n.carbohydrates)}g <span className="font-normal text-gray-500">C</span></span>
-        <span className="text-pink-700 font-bold">{fmt(n.fat)}g <span className="font-normal text-gray-500">F</span></span>
+        <span className="text-protein font-bold">{fmt(n.protein)}g <span className="font-normal text-gray-500">P</span></span>
+        <span className="text-carbs font-bold">{fmt(n.carbohydrates)}g <span className="font-normal text-gray-500">C</span></span>
+        <span className="text-fat font-bold">{fmt(n.fat)}g <span className="font-normal text-gray-500">F</span></span>
         <button
           onClick={() => onLog(item)}
           aria-label={`Log ${item.name}`}
-          className="relative z-10 ml-auto h-8 px-3 rounded-full flex items-center gap-1 text-xs font-bold text-gray-900 bg-gray-50 border border-gray-200 hover:bg-amber-400 hover:text-[#0B0C10] hover:border-amber-400 transition-colors"
+          className="relative z-10 ml-auto h-8 px-3 rounded-full flex items-center gap-1 text-xs font-bold text-gray-900 bg-gray-50 border border-gray-200 hover:bg-amber-400 hover:text-[#030407] hover:border-amber-400 transition-colors"
         >
           <Plus size={14} /> Log
         </button>

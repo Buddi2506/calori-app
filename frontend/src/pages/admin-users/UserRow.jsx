@@ -23,7 +23,7 @@ const UserRow = ({ u, currentAdmin, onInspect, onReset, onEdit, onDelete }) => {
     <tr className="hover:bg-gray-50 transition-colors">
       <td className="py-3.5 px-5">
         <div className="flex items-center gap-3">
-          <span className="w-9 h-9 rounded-full bg-amber-400 text-[#0B0C10] font-black text-xs flex items-center justify-center shrink-0">
+          <span className="w-9 h-9 rounded-full bg-amber-400 text-[#030407] font-black text-xs flex items-center justify-center shrink-0">
             {userInitials(u)}
           </span>
           <div className="min-w-0">

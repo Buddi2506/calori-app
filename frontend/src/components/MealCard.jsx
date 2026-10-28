@@ -34,9 +34,9 @@ const MealCard = ({ meal, onLog, onEdit, onDelete }) => {
       <div className="flex flex-col gap-2">
         <MacroSplitBar nutrients={n} />
         <div className="flex gap-3 text-xs">
-          <span className="text-emerald-700 font-bold">{fmt(n.protein)}g <span className="font-normal text-gray-500">P</span></span>
-          <span className="text-blue-700 font-bold">{fmt(n.carbohydrates)}g <span className="font-normal text-gray-500">C</span></span>
-          <span className="text-pink-700 font-bold">{fmt(n.fat)}g <span className="font-normal text-gray-500">F</span></span>
+          <span className="text-protein font-bold">{fmt(n.protein)}g <span className="font-normal text-gray-500">P</span></span>
+          <span className="text-carbs font-bold">{fmt(n.carbohydrates)}g <span className="font-normal text-gray-500">C</span></span>
+          <span className="text-fat font-bold">{fmt(n.fat)}g <span className="font-normal text-gray-500">F</span></span>
           {n.fiber > 0 && <span className="text-gray-700 font-bold">{fmt(n.fiber)}g <span className="font-normal text-gray-500">fiber</span></span>}
         </div>
       </div>
@@ -55,7 +55,7 @@ const MealCard = ({ meal, onLog, onEdit, onDelete }) => {
       <div className="mt-auto flex items-center gap-1">
         <button
           onClick={() => onLog(meal)}
-          className="h-9 px-4 rounded-full flex items-center gap-1.5 text-xs font-bold bg-amber-400 hover:bg-amber-300 text-[#0B0C10] transition-colors"
+          className="h-9 px-4 rounded-full flex items-center gap-1.5 text-xs font-bold bg-amber-400 hover:bg-amber-300 text-[#030407] transition-colors"
         >
           <Plus size={14} /> Log meal
         </button>

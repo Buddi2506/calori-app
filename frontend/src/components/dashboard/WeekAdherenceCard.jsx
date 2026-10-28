@@ -13,7 +13,7 @@ const dayStatus = (day, goal) => {
 
 const STYLES = {
   target: 'bg-emerald-50 ring-emerald-200',
-  under: 'bg-amber-50 ring-amber-200',
+  under: 'bg-blue-50 ring-blue-200',
   over: 'bg-rose-50 ring-rose-200',
   empty: 'bg-white ring-gray-100',
 };
@@ -62,7 +62,7 @@ const WeekAdherenceCard = ({ days, goal, selectedDate }) => {
 
       <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500">
         <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded bg-emerald-50 ring-1 ring-emerald-200" />Within 10% of goal</span>
-        <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded bg-amber-50 ring-1 ring-amber-200" />Under</span>
+        <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded bg-blue-50 ring-1 ring-blue-200" />Under</span>
         <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded bg-rose-50 ring-1 ring-rose-200" />Over</span>
         <span className="ml-auto">Tap a day to see its log</span>
       </div>
