@@ -121,6 +121,7 @@ export default {
       gradientColorStops: bgColors,
       textColor: textColors,
       placeholderColor: textColors,
+      accentColor: textColors,  // native checkboxes and radios
       borderColor: borderColors,
       divideColor: borderColors,
       ringColor: { ...borderColors, white: surface },

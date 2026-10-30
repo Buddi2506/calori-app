@@ -101,7 +101,7 @@ const QuickAdd = ({ defaultMeal, onAdd, refreshKey }) => {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Type “2 chapati” or search 662 foods…"
+            placeholder="Type “2 chapati” or search all foods…"
             autoComplete="off"
             role="combobox"
             aria-expanded={showDropdown}
