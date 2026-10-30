@@ -7,7 +7,7 @@ import {
 } from 'recharts';
 import PageHeader from '../components/ui/PageHeader';
 import Segmented from '../components/ui/Segmented';
-import MuscleMap from '../components/workouts/MuscleMap';
+import ExerciseThumb from '../components/workouts/ExerciseThumb';
 import ProgressGuide from '../components/workouts/ProgressGuide';
 import { getExerciseProgress } from '../api/workouts';
 import { CATEGORY_LABELS, formatDuration, formatPace, VOLUME_EXPLANATION } from '../utils/workouts';
@@ -93,9 +93,7 @@ const ExerciseProgress = () => {
       ) : (
         <>
           <div className="flex flex-wrap items-center gap-4">
-            <span className="w-20 h-[4.5rem] rounded-2xl bg-white border border-gray-100 flex items-center justify-center shrink-0">
-              <MuscleMap primary={ex.primary_muscles} secondary={ex.secondary_muscles} className="w-[4.5rem] h-16" />
-            </span>
+            <ExerciseThumb exercise={ex} size="lg" />
             <div className="flex-1 min-w-[200px]">
               <PageHeader
                 eyebrow={`${CATEGORY_LABELS[ex.category]} · ${ex.primary_muscles.join(', ')}`}

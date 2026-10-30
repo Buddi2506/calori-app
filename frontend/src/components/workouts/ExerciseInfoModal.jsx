@@ -8,7 +8,7 @@ const ExerciseInfoModal = ({ exercise, onClose }) => (
   <Modal title={exercise.name} subtitle={`${CATEGORY_LABELS[exercise.category]} · ${KIND_LABELS[exercise.kind]}`} size="sm" onClose={onClose}>
     <div className="flex flex-col gap-5">
       <div className="rounded-2xl bg-gray-50 border border-gray-100 p-4 flex justify-center">
-        <MuscleMap primary={exercise.primary_muscles} secondary={exercise.secondary_muscles} className="w-56 h-52" />
+        <MuscleMap primary={exercise.primary_muscles} secondary={exercise.secondary_muscles} className="w-72 h-64 sm:w-80 sm:h-72" />
       </div>
       {exercise.instructions?.length > 0 && (
         <div>

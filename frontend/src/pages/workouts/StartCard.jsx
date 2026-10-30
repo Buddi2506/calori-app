@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { format, parseISO } from 'date-fns';
 import { Play, HeartPulse, Plus, Settings2, Moon } from 'lucide-react';
-import MuscleMap from '../../components/workouts/MuscleMap';
+import ExerciseThumb from '../../components/workouts/ExerciseThumb';
 import Segmented from '../../components/ui/Segmented';
 import { getLastSets } from '../../api/workouts';
 import { formatSet, formatTarget } from '../../utils/workouts';
@@ -99,9 +99,7 @@ const StartCard = ({ split: fullSplit, suggestedDayId, nextTrainingDayId, isToda
             const working = prev?.sets.filter((s) => s.set_type === 'working') || [];
             return (
               <li key={item.id} className="flex items-center gap-3 py-2.5 border-t border-gray-100 first:border-t-0">
-                <span className="w-12 h-11 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center shrink-0">
-                  <MuscleMap primary={item.exercise.primary_muscles} secondary={item.exercise.secondary_muscles} className="w-10 h-9" />
-                </span>
+                <ExerciseThumb exercise={item.exercise} />
                 <span className="flex-1 min-w-0">
                   <span className="block text-sm font-bold text-gray-900 truncate">{item.exercise.name}</span>
                   <span className="block text-xs text-gray-500 truncate">

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { format, parseISO } from 'date-fns';
 import { Check, Pencil, Trash2, Plus, X, Trophy } from 'lucide-react';
-import MuscleMap from '../../components/workouts/MuscleMap';
+import ExerciseThumb from '../../components/workouts/ExerciseThumb';
+import NumberDial, { useTouchDial } from '../../components/ui/NumberDial';
 import { addSet, updateSet, deleteSet } from '../../api/workouts';
 import { formatSet, formatTarget, formatDuration, apiErrorMessage } from '../../utils/workouts';
 
@@ -39,32 +40,71 @@ const toPayload = (kind, values, suggestion) => {
   return { ...base, weight_kg: num(pick('weight')), reps: Math.round(reps) };
 };
 
-const Box = ({ label, unit, value, placeholder, onChange, step = 'any', width = 'w-[4.5rem]' }) => (
+const Box = ({ label, unit, value, placeholder, onChange, onTap, step = 'any', width = 'w-[4.5rem]' }) => (
   <label className="flex items-center gap-1 text-xs text-gray-500">
     <input
       type="number"
-      inputMode="decimal"
+      // On phones a tap opens the number dial instead of the keyboard
+      inputMode={onTap ? 'none' : 'decimal'}
+      readOnly={Boolean(onTap)}
+      onClick={onTap}
       min="0"
       step={step}
       aria-label={label}
       value={value}
       placeholder={placeholder}
       onChange={(e) => onChange(e.target.value)}
-      className={`${width} h-10 rounded-xl bg-[#080A0F] border border-gray-200 text-center text-[15px] font-bold text-gray-900 placeholder-gray-500 focus:outline-none focus:border-amber-400`}
+      className={`${width} h-10 rounded-xl bg-[#080A0F] border border-gray-200 text-center text-[15px] font-bold text-gray-900 placeholder-gray-500 focus:outline-none focus:border-amber-400 ${onTap ? 'cursor-pointer' : ''}`}
     />
     {unit}
   </label>
 );
 
+// Dial ranges per field. `blank` turns that value back into an empty box (e.g. no added weight).
+const DIAL = {
+  weight: { label: 'Weight', unit: 'kg', min: 0, max: 300, step: 0.5, start: 0, blank: 0 },
+  reps: { label: 'Reps', min: 1, max: 100, step: 1, start: 10 },
+  seconds: { label: 'Seconds', unit: 's', min: 5, max: 600, step: 5, start: 30 },
+  minutes: { label: 'Minutes', min: 1, max: 180, step: 1, start: 20 },
+  km: { label: 'Distance', unit: 'km', min: 0, max: 50, step: 0.1, start: 0, blank: 0 },
+  level: { label: 'Level', min: 0, max: 30, step: 1, start: 0, blank: 0 },
+};
+const FIELDS = { strength: ['weight', 'reps'], timed: ['seconds', 'weight'], cardio: ['minutes', 'km', 'level'] };
+
 // The number boxes for one set, depending on how the exercise is logged.
 const SetInputs = ({ kind, values, suggestion, onChange, name }) => {
-  const field = (k) => ({ value: values[k], placeholder: suggestion?.[k] || '', onChange: (v) => onChange({ ...values, [k]: v }) });
+  const touch = useTouchDial();
+  const [dial, setDial] = useState(false);
+  const [typing, setTyping] = useState(false);
+  const useDial = touch && !typing;
+  const field = (k) => ({
+    value: values[k],
+    placeholder: suggestion?.[k] || '',
+    onChange: (v) => onChange({ ...values, [k]: v }),
+    onTap: useDial ? () => setDial(true) : undefined,
+  });
+  const keys = FIELDS[kind] || FIELDS.strength;
+  const columns = keys.map((k) => {
+    const current = values[k] !== '' ? values[k] : suggestion?.[k] ?? '';
+    return { key: k, ...DIAL[k], value: current === '' ? null : Number(current) };
+  });
+  const done = (picked) => {
+    const next = { ...values };
+    keys.forEach((k) => { next[k] = picked[k] === DIAL[k].blank ? '' : String(picked[k]); });
+    onChange(next);
+    setDial(false);
+  };
+  const dialSheet = dial && (
+    <NumberDial title={name} columns={columns} onDone={done} onClose={() => setDial(false)}
+      onType={() => { setTyping(true); setDial(false); }} />
+  );
   if (kind === 'cardio') {
     return (
       <div className="flex flex-wrap items-center gap-2">
         <Box label={`${name} minutes`} unit="min" {...field('minutes')} />
         <Box label={`${name} distance in km`} unit="km" {...field('km')} />
         <Box label={`${name} level, speed or incline`} unit="lvl" width="w-14" {...field('level')} />
+        {dialSheet}
       </div>
     );
   }
@@ -73,6 +113,7 @@ const SetInputs = ({ kind, values, suggestion, onChange, name }) => {
       <div className="flex flex-wrap items-center gap-2">
         <Box label={`${name} seconds`} unit="sec" step="1" {...field('seconds')} />
         <Box label={`${name} added weight in kg`} unit="kg" {...field('weight')} />
+        {dialSheet}
       </div>
     );
   }
@@ -81,6 +122,7 @@ const SetInputs = ({ kind, values, suggestion, onChange, name }) => {
       <Box label={`${name} weight in kg`} unit="kg" {...field('weight')} />
       <span className="text-gray-500">×</span>
       <Box label={`${name} reps`} unit="reps" step="1" width="w-14" {...field('reps')} />
+      {dialSheet}
     </div>
   );
 };
@@ -235,9 +277,7 @@ const ExerciseLog = ({ entry, sessionId, last, finished, onSetLogged, onSetChang
   return (
     <section className="zentra-card !rounded-3xl p-4 sm:p-5 flex flex-col gap-2">
       <header className="flex items-start gap-3">
-        <button onClick={onInfo} aria-label={`About ${exercise.name}`} className="w-14 h-12 rounded-xl bg-gray-50 border border-gray-100 hover:border-amber-400 flex items-center justify-center shrink-0 transition-colors">
-          <MuscleMap primary={exercise.primary_muscles} secondary={exercise.secondary_muscles} className="w-12 h-11" />
-        </button>
+        <ExerciseThumb exercise={exercise} size="md" />
         <div className="flex-1 min-w-0">
           <button onClick={onInfo} className="text-left text-base font-extrabold text-gray-900 hover:text-amber-400 leading-snug">{exercise.name}</button>
           <p className="text-xs text-gray-500">

@@ -7,6 +7,7 @@ import PageHeader from '../components/ui/PageHeader';
 import Segmented from '../components/ui/Segmented';
 import WorkoutTabs from '../components/workouts/WorkoutTabs';
 import MuscleMap from '../components/workouts/MuscleMap';
+import ExerciseThumb from '../components/workouts/ExerciseThumb';
 import ProgressGuide from '../components/workouts/ProgressGuide';
 import { getProgressSummary, getExercisesDone, getSplit } from '../api/workouts';
 import { formatDuration, formatPace, workoutColor } from '../utils/workouts';
@@ -196,11 +197,9 @@ const WorkoutProgress = () => {
             {shown.map((e) => {
               const best = headlineRecord(e.exercise.kind, e.records);
               return (
-                <li key={e.exercise.id}>
-                  <Link to={`/workouts/progress/${e.exercise.id}`} className="flex items-center gap-3 py-3 border-t border-gray-100 group">
-                    <span className="w-12 h-11 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center shrink-0">
-                      <MuscleMap primary={e.exercise.primary_muscles} secondary={e.exercise.secondary_muscles} className="w-10 h-9" />
-                    </span>
+                <li key={e.exercise.id} className="flex items-center gap-3 border-t border-gray-100">
+                  <ExerciseThumb exercise={e.exercise} />
+                  <Link to={`/workouts/progress/${e.exercise.id}`} className="flex-1 min-w-0 flex items-center gap-3 py-3 group">
                     <span className="flex-1 min-w-0">
                       <span className="block text-sm font-bold text-gray-900 group-hover:text-amber-400 truncate">{e.exercise.name}</span>
                       <span className="block text-xs text-gray-500 truncate">

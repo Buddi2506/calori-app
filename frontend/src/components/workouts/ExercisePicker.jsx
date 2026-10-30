@@ -3,6 +3,7 @@ import { Search, Plus, ArrowLeft } from 'lucide-react';
 import Modal, { FieldLabel } from '../ui/Modal';
 import Segmented from '../ui/Segmented';
 import MuscleMap from './MuscleMap';
+import ExerciseThumb from './ExerciseThumb';
 import { getExercises, getExerciseOptions, createExercise } from '../../api/workouts';
 import { CATEGORY_LABELS, KIND_LABELS, BODY_PARTS, inBodyPart, musclesLabel, apiErrorMessage } from '../../utils/workouts';
 
@@ -173,14 +174,12 @@ const ExercisePicker = ({ title = 'Add exercise', initialPart = 'all', cardioOnl
               <li className="p-6 text-center text-sm text-gray-500">No exercises match{query ? ` “${query}”` : ''}.</li>
             )}
             {shown.map((e) => (
-              <li key={e.id}>
+              <li key={e.id} className="flex items-center gap-1 pl-2.5 rounded-2xl hover:bg-gray-100 transition-colors">
+                <ExerciseThumb exercise={e} size="md" />
                 <button
                   onClick={() => onPick(e)}
-                  className="w-full text-left flex items-center gap-3 p-2.5 rounded-2xl hover:bg-gray-100 transition-colors group"
+                  className="flex-1 min-w-0 text-left flex items-center gap-3 p-2.5 pl-2 rounded-2xl group"
                 >
-                  <span className="w-14 h-12 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center shrink-0">
-                    <MuscleMap primary={e.primary_muscles} secondary={e.secondary_muscles} className="w-12 h-11" />
-                  </span>
                   <span className="flex-1 min-w-0">
                     <span className="block text-sm font-bold text-gray-900 truncate">
                       {e.name}{e.is_custom && <span className="ml-1.5 text-[10px] font-bold text-amber-400">Yours</span>}

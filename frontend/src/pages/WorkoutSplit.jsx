@@ -7,6 +7,7 @@ import { useToast } from '../hooks/useToast';
 import MuscleMap from '../components/workouts/MuscleMap';
 import ExercisePicker from '../components/workouts/ExercisePicker';
 import ExerciseInfoModal from '../components/workouts/ExerciseInfoModal';
+import NumberDial, { useTouchDial } from '../components/ui/NumberDial';
 import { getSplit, saveSplit, getExercises } from '../api/workouts';
 import { SPLIT_TEMPLATES, bodyPartForName, apiErrorMessage } from '../utils/workouts';
 
@@ -48,15 +49,18 @@ const move = (list, from, to) => {
   return next;
 };
 
-const NumberBox = ({ label, value, onChange, width = 'w-14' }) => (
+const NumberBox = ({ label, value, onChange, onTap, width = 'w-14' }) => (
   <input
     type="number"
-    inputMode="numeric"
+    // On phones a tap opens the number dial instead of the keyboard
+    inputMode={onTap ? 'none' : 'numeric'}
+    readOnly={Boolean(onTap)}
+    onClick={onTap}
     min="1"
     aria-label={label}
     value={value ?? ''}
     onChange={(e) => onChange(e.target.value === '' ? null : Math.max(1, parseInt(e.target.value, 10) || 1))}
-    className={`${width} h-9 rounded-xl bg-[#080A0F] border border-gray-200 text-center text-sm font-bold text-gray-900 focus:outline-none focus:border-amber-400`}
+    className={`${width} h-9 rounded-xl bg-[#080A0F] border border-gray-200 text-center text-sm font-bold text-gray-900 focus:outline-none focus:border-amber-400 ${onTap ? 'cursor-pointer' : ''}`}
   />
 );
 
@@ -74,6 +78,25 @@ const IconButton = ({ label, onClick, disabled, danger, children }) => (
 
 const ExerciseRow = ({ item, index, count, onChange, onMove, onRemove, onInfo }) => {
   const isStrength = item.exercise.kind === 'strength';
+  const touch = useTouchDial();
+  const [dial, setDial] = useState(false);
+  const [typing, setTyping] = useState(false);
+  const onTap = touch && !typing ? () => setDial(true) : undefined;
+  const columns = [
+    { key: 'target_sets', label: 'Sets', min: 1, max: 10, step: 1, start: 3, value: item.target_sets },
+    ...(isStrength ? [
+      { key: 'target_reps_min', label: 'Reps from', min: 1, max: 50, step: 1, start: 8, value: item.target_reps_min },
+      { key: 'target_reps_max', label: 'Reps to', min: 1, max: 50, step: 1, start: 12, value: item.target_reps_max },
+    ] : []),
+  ];
+  const done = (v) => {
+    // Picked the range backwards? Swap it rather than complain.
+    if (isStrength && v.target_reps_min > v.target_reps_max) {
+      [v.target_reps_min, v.target_reps_max] = [v.target_reps_max, v.target_reps_min];
+    }
+    onChange(v);
+    setDial(false);
+  };
   return (
     <li className="flex flex-wrap items-center gap-x-4 gap-y-2 py-3 border-t border-gray-100 first:border-t-0">
       <div className="flex items-center gap-2 flex-1 min-w-[240px]">
@@ -93,18 +116,22 @@ const ExerciseRow = ({ item, index, count, onChange, onMove, onRemove, onInfo })
         </div>
       </div>
       <div className="flex items-center gap-1.5 text-xs text-gray-500 pl-[3.75rem] sm:pl-0">
-        <NumberBox label={`Sets for ${item.exercise.name}`} value={item.target_sets} onChange={(v) => onChange({ target_sets: v })} width="w-12" />
+        <NumberBox label={`Sets for ${item.exercise.name}`} value={item.target_sets} onTap={onTap} onChange={(v) => onChange({ target_sets: v })} width="w-12" />
         sets
         {isStrength && (
           <>
             <span className="mx-0.5">×</span>
-            <NumberBox label={`Minimum reps for ${item.exercise.name}`} value={item.target_reps_min} onChange={(v) => onChange({ target_reps_min: v })} width="w-12" />
+            <NumberBox label={`Minimum reps for ${item.exercise.name}`} value={item.target_reps_min} onTap={onTap} onChange={(v) => onChange({ target_reps_min: v })} width="w-12" />
             –
-            <NumberBox label={`Maximum reps for ${item.exercise.name}`} value={item.target_reps_max} onChange={(v) => onChange({ target_reps_max: v })} width="w-12" />
+            <NumberBox label={`Maximum reps for ${item.exercise.name}`} value={item.target_reps_max} onTap={onTap} onChange={(v) => onChange({ target_reps_max: v })} width="w-12" />
             reps
           </>
         )}
       </div>
+      {dial && (
+        <NumberDial title={item.exercise.name} columns={columns} onDone={done} onClose={() => setDial(false)}
+          onType={() => { setTyping(true); setDial(false); }} />
+      )}
     </li>
   );
 };
